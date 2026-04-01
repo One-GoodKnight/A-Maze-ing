@@ -6,7 +6,7 @@ except ImportError as e:
 
 
 def handle_key_hook(keycode, params) -> None:
-    if keycode == 65307 or keycode == 0x71:
+    if keycode == 0xFF1B or keycode == 0x71:
         params[0].mlx_loop_exit(params[1])
     # print(keycode)
     # TODO generate new maze, change colors, etc
