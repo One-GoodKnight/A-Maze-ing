@@ -1,4 +1,5 @@
 from maze import *
+from maze_generator import *
 try:
     from mlx import *
 except ImportError as e:

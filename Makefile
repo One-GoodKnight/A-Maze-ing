@@ -4,7 +4,10 @@ install:
 	pip install mlx-2.2-py3-none-any.whl
 
 run:
-	python3 $(NAME)
+	@if [ -z "$(CONF)" ]; then \
+		echo "(Makefile) You can set the config file with make run CONF='name'"; \
+	fi
+	python3 $(NAME) $(CONF)
 
 debug:
 	python3 -m pdb $(NAME)
