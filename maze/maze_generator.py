@@ -25,4 +25,8 @@ class MazeGenerator(BaseModel):
             raise ValueError("Exit should be inside the map")
         return self
 
+    def build_output(self):
+        with open(self.output_file, 'w') as f:
+            f.write("a")
+
 

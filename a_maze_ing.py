@@ -28,16 +28,26 @@ def main() -> None:
     except FileNotFoundError as _:
         print(f"Could not find the file {sys.argv[1]}")
         return 1
+    except PermissionError as e:
+        print(f"Cannot read config file '{sys.argv[1]}', permission denied")
+        return 1
     except Exception as e:
         print(f"An error occured during the file parsing: {e}")
         return 1
+
     maze = MazeGenerator(**config)
     print(maze)
+
+    try:
+        maze.build_output()
+    except PermissionError as e:
+        print(f"Cannot write to output '{maze.output_file}', permission denied")
+        return 1
     
     mlx = Mlx()
     mlx_ptr = mlx.mlx_init()
     _, screen_width, screen_height = mlx.mlx_get_screen_size(mlx_ptr)
-    win_ptr = mlx.mlx_new_window(mlx_ptr, screen_width, screen_height, "test")
+    win_ptr = mlx.mlx_new_window(mlx_ptr, screen_width, screen_height, "A-maze-ing")
 
     mlx.mlx_key_hook(win_ptr, handle_key_hook, (mlx, mlx_ptr))
     mlx.mlx_hook(win_ptr, 33, 0, handle_close, (mlx, mlx_ptr))
