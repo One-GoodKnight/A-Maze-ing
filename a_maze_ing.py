@@ -9,7 +9,6 @@ except ImportError as e:
 def handle_key_hook(keycode, params) -> None:
     if keycode == 0xFF1B or keycode == 0x71:
         params[0].mlx_loop_exit(params[1])
-    # print(keycode)
     # TODO generate new maze, change colors, etc
 
 def handle_close(params):
@@ -29,19 +28,23 @@ def main() -> None:
     except FileNotFoundError as _:
         print(f"Could not find the file {sys.argv[1]}")
         return 1
-    except PermissionError as e:
+    except PermissionError as _:
         print(f"Cannot read config file '{sys.argv[1]}', permission denied")
         return 1
     except Exception as e:
         print(f"An error occured during the file parsing: {e}")
         return 1
 
-    maze = MazeGenerator(**config)
+    maze = Maze.from_file('output_maze.txt')
+    print(repr(maze))
     print(maze)
 
+    """
+    generated_maze = MazeGenerator(**config)
+    print(generated_maze)
     try:
-        maze.build_output()
-    except PermissionError as e:
+        generated_maze.build_output()
+    except PermissionError as _:
         print(f"Cannot write to output '{maze.output_file}', permission denied")
         return 1
     
@@ -59,6 +62,7 @@ def main() -> None:
 
     mlx.mlx_destroy_window(mlx_ptr, win_ptr)
     mlx.mlx_release(mlx_ptr)
+    """
 
 if __name__ == "__main__":
     main()
