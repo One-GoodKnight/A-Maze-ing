@@ -17,20 +17,23 @@ class Cell(BaseModel):
     west: bool  = Field(default=False)
 
     @staticmethod
-    def from_hex(hex: str) -> Self:
+    def from_hex(hex: str, x: int, y: int) -> Self:
         nb = int(hex, 16)
         north = nb & 1
         east = nb >> 1 & 1
         south = nb >> 2 & 1
         west = nb >> 3 & 1
-        return Cell(north=north, east=east, south=south, west=west)
+        return Cell(x=x, y=y, north=north, east=east, south=south, west=west)
 
-    def to_hex(self) -> str:
+    def to_int(self) -> int:
         north = int(self.north)
         east = int(self.east) << 1
         south = int(self.south) << 2
         west = int(self.west) << 3
-        return f"{(north + east + south + west):X}"
+        return north + east + south + west
+
+    def to_hex(self) -> str:
+        return f"{self.to_int():X}"
 
     def __str__(self) -> str:
         return self.to_hex()

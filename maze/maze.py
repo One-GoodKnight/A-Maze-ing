@@ -32,86 +32,68 @@ class Maze(BaseModel):
     def from_file(filename: str) -> Self:
         maze_str: list[str] = []
         with open(filename, 'r') as f:
-            line = f.readline().strip()
-            width = len(line)
-            while line != '':
-                if len(line) != width:
+            row = f.readline().strip()
+            width = len(row)
+            while row != '':
+                if len(row) != width:
                     raise ValueError("Invalid file content: "
-                                     "inconsistent maze line length")
-                maze_str.append(line)
-                line = f.readline().strip()
+                                     "inconsistent maze row length")
+                maze_str.append(row)
+                row = f.readline().strip()
             entry: tuple[int, int] = tuple(f.readline().strip().split(','))
             exit: tuple[int, int] = tuple(f.readline().strip().split(','))
             solution = f.readline().strip()
-            maze: list[list[Cell]] = [[Cell.from_hex(x) for x in line] for line in maze_str]
+            maze = [
+                [Cell.from_hex(c, x, y) for x, c in enumerate(row)]
+                for y, row in enumerate(maze_str)
+            ]
             return Maze(maze=maze, solution=solution, width=width,
                         height=len(maze), entry=entry, exit=exit,
                         output_file=filename)
 
     def __str__(self) -> str:
         ret: str = ''
-        for line in self.maze:
-            top: str = ' '
-            bot: str = ' '
-            for byte in line:
-                if byte.to_hex() == '0':
-                    top += '  '
-                    bot += '  '
-                elif byte.to_hex() == '1':
-                    top += '🭶🭶'
-                    bot += '  '
-                elif byte.to_hex() == '2':
-                    top += ' 🭵'
-                    bot += ' 🭵'
-                elif byte.to_hex() == '3':
-                    top += '🭶🭾'
-                    bot += ' 🭵'
-                elif byte.to_hex() == '4':
-                    top += '  '
-                    bot += '🭻🭻'
-                elif byte.to_hex() == '5':
-                    top += '🭶🭶'
-                    bot += '🭻🭻'
-                elif byte.to_hex() == '6':
-                    top += ' 🭵'
-                    bot += '🭻🭿'
-                elif byte.to_hex() == '7':
-                    top += '🭶🭾'
-                    bot += '🭻🭿'
-                elif byte.to_hex() == '8':
-                    top += '🭰 '
-                    bot += '🭰 '
-                elif byte.to_hex() == '9':
-                    top += '🭽🭶'
-                    bot += '🭰 '
-                elif byte.to_hex() == 'A':
-                    top += '🭰🭵'
-                    bot += '🭰🭵'
-                elif byte.to_hex() == 'B':
-                    top += '🭽🭾'
-                    bot += '🭰🭵'
-                elif byte.to_hex() == 'C':
-                    top += '🭰 '
-                    bot += '🭼🭻'
-                elif byte.to_hex() == 'D':
-                    top += '🭽🭶'
-                    bot += '🭼🭻'
-                elif byte.to_hex() == 'E':
-                    top += '🭰🭵'
-                    bot += '🭼🭿'
-                elif byte.to_hex() == 'F':
-                    top += '🭽🭾'
-                    bot += '🭼🭿'
+        for row in self.maze:
+            top = bot = ' '
+            for cell in row:
+                top_left = top_right = bot_left = bot_right = ' '
+                if cell.north:
+                    if cell.west:
+                        top_left = '🭽'
+                    else:
+                        top_left = '🭶'
+                    if cell.east:
+                        top_right = '🭾'
+                    else:
+                        top_right = '🭶'
                 else:
-                    ret += byte.to_hex()
-            ret += top + '\n'
-            ret += bot + '\n'
+                    if cell.west:
+                        top_left = '🭰'
+                    if cell.east:
+                        top_right = '🭵'
+                if cell.south:
+                    if cell.west:
+                        bot_left = '🭼'
+                    else:
+                        bot_left = '🭻'
+                    if cell.east:
+                        bot_right = '🭿'
+                    else:
+                        bot_right = '🭻'
+                else:
+                    if cell.west:
+                        bot_left = '🭰'
+                    if cell.east:
+                        bot_right = '🭵'
+                top += top_left + top_right
+                bot += bot_left + bot_right
+            ret += top + '\n' + bot + '\n'
         return ret
 
     def __repr__(self) -> str:
         ret: str = ''
-        for line in self.maze:
-            for byte in line:
-                ret += byte.to_hex()
+        for row in self.maze:
+            for cell in row:
+                ret += cell.to_hex()
             ret += '\n'
         return ret

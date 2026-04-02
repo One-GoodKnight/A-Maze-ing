@@ -28,7 +28,7 @@ class MazeGenerator(BaseModel):
         return self
 
     def build_output(self) -> None:
-        maze = WilsonAlgo.wilson_algo(self.width, self.height, self.entry, self.height)
+        maze: list[list[Cell]] = WilsonAlgo.wilson_algo(self.width, self.height, self.entry, self.height)
         print(maze)
         with open(self.output_file, 'w') as f:
             for row in maze:
