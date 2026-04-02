@@ -52,39 +52,40 @@ class Maze(BaseModel):
                         output_file=filename)
 
     def __str__(self) -> str:
+        chars: list[str] = ["🬕🬂🬂🬨","▌  ▐","🬲🬭🬭🬷"]
         ret: str = ''
         for row in self.maze:
             top = bot = ' '
             for cell in row:
-                top_left = top_right = bot_left = bot_right = ' '
+                top_left = top_right = bot_left = bot_right = '  '
                 if cell.north:
                     if cell.west:
-                        top_left = '🭽'
+                        top_left = chars[0][:2]
                     else:
-                        top_left = '🭶'
+                        top_left = chars[0][1:3]
                     if cell.east:
-                        top_right = '🭾'
+                        top_right = chars[0][2:]
                     else:
-                        top_right = '🭶'
+                        top_right = chars[0][1:3]
                 else:
                     if cell.west:
-                        top_left = '🭰'
+                        top_left = chars[1][:2]
                     if cell.east:
-                        top_right = '🭵'
+                        top_right = chars[1][2:]
                 if cell.south:
                     if cell.west:
-                        bot_left = '🭼'
+                        bot_left = chars[2][:2]
                     else:
-                        bot_left = '🭻'
+                        bot_left = chars[2][1:3]
                     if cell.east:
-                        bot_right = '🭿'
+                        bot_right = chars[2][2:]
                     else:
-                        bot_right = '🭻'
+                        bot_right = chars[2][1:3]
                 else:
                     if cell.west:
-                        bot_left = '🭰'
+                        bot_left = chars[1][:2]
                     if cell.east:
-                        bot_right = '🭵'
+                        bot_right = chars[1][2:]
                 top += top_left + top_right
                 bot += bot_left + bot_right
             ret += top + '\n' + bot + '\n'
