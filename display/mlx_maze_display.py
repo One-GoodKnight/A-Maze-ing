@@ -1,4 +1,7 @@
-from mlx import Mlx
+try:
+    from mlx import *
+except ImportError as e:
+    raise SystemExit(f"Unable to import mlx: {e}")
 from typing import Callable
 from ctypes import c_void_p, c_ubyte
 from maze import Maze

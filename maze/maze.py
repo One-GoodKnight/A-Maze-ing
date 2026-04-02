@@ -3,7 +3,7 @@ from typing import Self, ClassVar
 from maze_generator.cell import Cell
 
 class Maze(BaseModel):
-    MAX_SIZE: ClassVar = 100
+    MAX_SIZE: ClassVar = 1000
 
     maze: list[list[Cell]]
     solution: str
@@ -16,15 +16,15 @@ class Maze(BaseModel):
 
     @model_validator(mode='after')
     def check_entry(self) -> Self:
-        if not ((0 <= self.entry[0] <= self.MAX_SIZE-1) and
-                (0 <= self.entry[1] <= self.MAX_SIZE-1)):
+        if not ((0 <= self.entry[0] <= self.width - 1) and
+                (0 <= self.entry[1] <= self.height - 1)):
             raise ValueError("Entry should be inside the map")
         return self
 
     @model_validator(mode='after')
     def check_exit(self) -> Self:
-        if not ((0 <= self.exit[0] <= self.MAX_SIZE-1) and
-                (0 <= self.exit[1] <= self.MAX_SIZE-1)):
+        if not ((0 <= self.exit[0] <= self.width - 1) and
+                (0 <= self.exit[1] <= self.height - 1)):
             raise ValueError("Exit should be inside the map")
         return self
 

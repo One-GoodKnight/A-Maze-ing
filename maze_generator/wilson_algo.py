@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple
 from random import randint, choice
 from .cell import Cell, Direction
 
@@ -8,7 +8,18 @@ class WilsonAlgo():
             return (randint(0, max_x), randint(0, max_y))
 
         @staticmethod
-        def get_close_pos(cur_cell: Cell, dir: Direction) -> list[int, int]:
+        def create_starting_walk_cell(maze: list[list[Cell]], max_width: int, max_height: int) -> Cell:
+            start = WilsonAlgo.rand_pos(max_width, max_height)
+            x, y = start
+            while (True):
+                if (not maze[y][x]):
+                    return Cell(x=x, y=y, north=y==0, east=x==max_width, south=y==max_height, west=x==0)
+                else:
+                    start = WilsonAlgo.rand_pos(max_width, max_height)
+                    x, y = start
+
+        @staticmethod
+        def get_close_pos(cell: Cell, dir: Direction) -> list[int, int]:
             offset = [0, 0]
             match (dir):
                 case Direction.NORTH:
@@ -19,73 +30,62 @@ class WilsonAlgo():
                     offset[1] += 1
                 case Direction.WEST:
                     offset[0] -= 1
-            return (cur_cell.x + offset[0], cur_cell.y + offset[1])
+            return (cell.x + offset[0], cell.y + offset[1])
 
         @staticmethod
-        def get_next_cell_pos(maze: list[list[Cell]], cur_cell: Cell, max_width: int, max_height: int) -> Optional[tuple[int, int, Direction]]:
-            checked = {dir: False for dir in list(Direction)}
-            while (not all([b for b in checked.values()])):
-                dir = choice([dir for dir, b in checked.items() if not b])
-                checked[dir] = True
-                x, y = WilsonAlgo.get_close_pos(cur_cell, dir)
+        def get_next_cell(maze: list[list[Cell]], cur_cell: Cell, max_width: int, max_height: int) -> Optional[Tuple[Cell, Direction]]:
+            directions_checked = {
+                'north': cur_cell.north,
+                'east': cur_cell.east,
+                'south': cur_cell.south,
+                'west': cur_cell.west
+            }
+            while (not all([flag for flag in directions_checked.values()])):
+                direction = choice([dir for dir, b in directions_checked.items() if not b])
+                directions_checked[direction] = True
+                x, y = WilsonAlgo.get_close_pos(cur_cell, direction)
                 if (x < 0 or x > max_width or y < 0 or y > max_height):
                     continue
-                #next_cell = Cell(x=x, y=y, **{d: True if d == dir else False for d in list(Direction)})
-                return (x, y, dir)
+                return (Cell(x=x, y=y, north=y==0, east=x==max_width, south=y==max_height, west=x==0), direction)
             return None
 
         @staticmethod
-        def cell_has_multiple_exits(cell: Cell):
-            pass
-
-        @staticmethod
-        def walk(maze: list[list[Cell]], max_width: int, max_height: int) -> int:
-            walk: list[list[Cell]] = [[None] * (max_width + 1) for _ in range(max_height + 1)]
+        def create_walk(maze: list[list[Cell]], max_width: int, max_height: int) -> list[Cell]:
+            walk: list[Cell] = []
             length = 0
 
-            # Starting walk cell
-            start = WilsonAlgo.rand_pos(max_width, max_height)
-            x, y = start
-            start_found = False
-            while (not start_found):
-                if (not maze[y][x]):
-                    maze[y][x] = Cell(x=x, y=y, north=False, east=False, south=False, west=False)
-                    length += 1
-                    start_found = True
-                else:
-                    start = WilsonAlgo.rand_pos(max_width, max_height)
-                    x, y = start
-            cur_cell = maze[y][x]
+            walk.append(WilsonAlgo.create_starting_walk_cell(maze, max_width, max_height))
+            cur_cell = walk[0]
             
-            next_pos = WilsonAlgo.get_next_cell_pos(maze, cur_cell, max_width, max_height)
-            last_available_cell = WilsonAlgo.has_cell_multiple_exits()
-            while (next_pos):
-                if (walk[next_pos[1]][next_pospp[0]]):
-                    if (not last_available_cell):
-                        print("should not happen")
-                        return length
-                    cur_cell = last_available_cell
-                if (maze[next_pos[1]][next_pos[0]]):
-                    # open maze cell wall
-                    return length
-                length += 1
-                dir = next_pos[2]
-                cell = Cell(
-                    x=next_pos[0],
-                    y=next_pos[1],
-                    north=(dir==Direction.NORTH),
-                    east=(dir==Direction.EAST),
-                    south=(dir==Direction.SOUTH),
-                    west=(dir==Direction.WEST)
-                )
-                walk[cell.y][cell.x] = cell
-                maze[cell.y][cell.x] = cell
-                cur_cell = cell
-                if (cell_has_multiple_exits()):
-                    last_available_cell = cur_cell
-                next_pos = WilsonAlgo.get_next_cell_pos(maze, cur_cell, max_width, max_height)
+            next_cell_data = WilsonAlgo.get_next_cell(maze, cur_cell, max_width, max_height)
+            if (next_cell_data):
+                next_cell = next_cell_data[0]
+                next_cell_direction = next_cell_data[1]
+            while (next_cell):
+                if (maze[next_cell.y][next_cell.x]):
+                    # next cell is already in maze, we can return the current path
+                    # todo: set the directions of the cells
+                    return walk
+                elif (next_cell in walk):
+                    # next cell is in the current walk, we go back and set the wall of the previous cell to block the path to this cell
+                    setattr(cur_cell, next_cell_direction, True)
+                    if (cur_cell.isolated()):
+                        if (walk[0] == cur_cell):
+                            # todo: set the directions of the cells
+                            return walk
+                        walk.pop()
+                        cur_cell = walk[-1]
+                else:
+                    walk.append(next_cell)
 
-            return length
+                next_cell_data = WilsonAlgo.get_next_cell(maze, cur_cell, max_width, max_height)
+                if (next_cell_data):
+                    next_cell = next_cell_data[0]
+                    next_cell_direction = next_cell_data[1]
+
+            # dead end for all the possible paths, but i don't think it should happen
+            print("should not happen ?")
+            return walk
 
         @staticmethod
         def wilson_algo(width: int, height: int, entry: tuple[int, int], exit: tuple[int, int]) -> list[list[Cell]]:
@@ -93,5 +93,8 @@ class WilsonAlgo():
             total = 0
             total_target = width * height
             while (total != total_target):
-                total += WilsonAlgo.walk(maze, width - 1, height - 1)
+                walk: list[Cell] = WilsonAlgo.create_walk(maze, width - 1, height - 1)
+                for cell in walk:
+                    maze[cell.y][cell.x] = cell
+                total += len(walk)
             return maze

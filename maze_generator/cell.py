@@ -35,8 +35,16 @@ class Cell(BaseModel):
     def to_hex(self) -> str:
         return f"{self.to_int():X}"
 
+    def isolated(self) -> bool:
+        return (
+            self.north and
+            self.east and
+            self.south and
+            self.east
+        )
+
     def __str__(self) -> str:
-        return self.to_hex()
+       return self.to_hex()
 
     def __repr__(self) -> str:
         return self.to_hex()
