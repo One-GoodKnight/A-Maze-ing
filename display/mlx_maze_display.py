@@ -37,11 +37,13 @@ class MlxMazeDisplay():
     def write_cell(self, cell: Cell, set_pixel: Callable,
                    cell_width: int, cell_height: int, x: int, y: int) -> None:
         WALL_COLOR: int = 0xFF_A4_34_EB
-        LINE_WIDTH_PERCENT: int = 30
+        LINE_WIDTH_PERCENT: int = 20
         vline_width: int = int(cell_width / 100 * LINE_WIDTH_PERCENT / 2)
         hline_width: int = int(cell_height / 100 * LINE_WIDTH_PERCENT / 2)
         xpos: int = cell_width * x
         ypos: int = cell_height * y
+        if (cell.color != 0):
+            self.draw_rect((xpos, ypos), (xpos+cell_width, ypos+cell_height), cell.color, set_pixel)
         if cell.north:
             self.draw_rect(
                 (xpos              - vline_width, ypos - hline_width),

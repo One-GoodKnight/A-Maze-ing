@@ -27,10 +27,19 @@ class MazeGenerator(BaseModel):
             raise ValueError("Exit should be inside the map")
         return self
 
-    def build_output(self) -> None:
-        maze: list[list[Cell]] = WilsonAlgo.wilson_algo(self.width, self.height, self.entry, self.height)
-        print(maze)
+    def build_maze(self) -> list[list[Cell]]:
+        maze: list[list[Cell]] = WilsonAlgo.wilson_algo(self.width, self.height, self.entry, self.exit)
+        return maze
+
+    def build_output(self, maze: list[list[Cell]]) -> None:
         with open(self.output_file, 'w') as f:
             for row in maze:
                 for cell in row:
                     f.write(cell.to_hex())
+                f.write("\n")
+            f.write("\n")
+            f.write(str(self.entry[0]) + ',' + str(self.entry[1]))
+            f.write("\n")
+            f.write(str(self.exit[0]) + ',' + str(self.exit[1]))
+            f.write("\n")
+            f.write("temp(should be the solution to the maze)")

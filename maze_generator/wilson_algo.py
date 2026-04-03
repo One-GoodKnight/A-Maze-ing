@@ -57,35 +57,84 @@ class WilsonAlgo():
             walk.append(WilsonAlgo.create_starting_walk_cell(maze, max_width, max_height))
             cur_cell = walk[0]
             
-            next_cell_data = WilsonAlgo.get_next_cell(maze, cur_cell, max_width, max_height)
-            if (next_cell_data):
-                next_cell = next_cell_data[0]
-                next_cell_direction = next_cell_data[1]
-            while (next_cell):
+            while (True):
+                next_cell_data = WilsonAlgo.get_next_cell(maze, cur_cell, max_width, max_height)
+
+                if (not next_cell_data):
+                    return walk
+
+                next_cell, next_cell_direction = next_cell_data
+
                 if (maze[next_cell.y][next_cell.x]):
                     # next cell is already in maze, we can return the current path
-                    # todo: set the directions of the cells
+                    walk.append(next_cell)
                     return walk
                 elif (next_cell in walk):
                     # next cell is in the current walk, we go back and set the wall of the previous cell to block the path to this cell
                     setattr(cur_cell, next_cell_direction, True)
                     if (cur_cell.isolated()):
-                        if (walk[0] == cur_cell):
-                            # todo: set the directions of the cells
+                        if (len(walk) == 1):
                             return walk
+                        if (walk[-2].x < walk[-1].x):
+                            walk[-2].east = True
+                        elif (walk[-2].x > walk[-1].x):
+                            walk[-2].west = True
+                        elif (walk[-2].y < walk[-1].y):
+                            walk[-2].south = True
+                        elif (walk[-2].y > walk[-1].y):
+                            walk[-2].north = True
                         walk.pop()
                         cur_cell = walk[-1]
                 else:
+                    cur_cell = next_cell
                     walk.append(next_cell)
 
-                next_cell_data = WilsonAlgo.get_next_cell(maze, cur_cell, max_width, max_height)
-                if (next_cell_data):
-                    next_cell = next_cell_data[0]
-                    next_cell_direction = next_cell_data[1]
-
-            # dead end for all the possible paths, but i don't think it should happen
-            print("should not happen ?")
+            # dead end for all the possible paths, should not happen with this algo
             return walk
+
+        @staticmethod
+        def add_walk_to_maze(maze: list[list[Optional[Cell]]], walk: list[Cell]) -> int:
+            count = 0
+            for i, cell in enumerate(walk):
+                if (cell == walk[-1] and maze[cell.y][cell.x]):
+                    # end of walk is an existing cell of the maze, don't add it
+                    maze_cell = maze[cell.y][cell.x]
+                    if (walk[i - 1].x < walk[i].x):
+                        maze_cell.west = False
+                        walk[i - 1].east = False
+                    elif (walk[i - 1].x > walk[i].x):
+                        maze_cell.east = False
+                        walk[i - 1].west = False
+                    elif (walk[i - 1].y < walk[i].y):
+                        maze_cell.north = False
+                        walk[i - 1].south = False
+                    elif (walk[i - 1].y > walk[i].y):
+                        maze_cell.south = False
+                        walk[i - 1].north = False
+                    continue
+                else:
+                    # direction
+                    cell.north = True
+                    cell.east = True
+                    cell.south = True
+                    cell.west = True
+                    maze[cell.y][cell.x] = cell
+                    count += 1
+                    if (i == 0):
+                        continue
+                    if (walk[i - 1].x < cell.x):
+                        cell.west = False
+                        walk[i - 1].east = False
+                    elif (walk[i - 1].x > cell.x):
+                        cell.east = False
+                        walk[i - 1].west = False
+                    elif (walk[i - 1].y < cell.y):
+                        cell.north = False
+                        walk[i - 1].south = False
+                    elif (walk[i - 1].y > cell.y):
+                        cell.south = False
+                        walk[i - 1].north = False
+            return count
 
         @staticmethod
         def wilson_algo(width: int, height: int, entry: tuple[int, int], exit: tuple[int, int]) -> list[list[Cell]]:
@@ -94,7 +143,6 @@ class WilsonAlgo():
             total_target = width * height
             while (total != total_target):
                 walk: list[Cell] = WilsonAlgo.create_walk(maze, width - 1, height - 1)
-                for cell in walk:
-                    maze[cell.y][cell.x] = cell
-                total += len(walk)
+                cells_added = WilsonAlgo.add_walk_to_maze(maze, walk)
+                total += cells_added
             return maze

@@ -15,6 +15,7 @@ class Cell(BaseModel):
     east: bool  = Field(default=False)
     south: bool = Field(default=False)
     west: bool  = Field(default=False)
+    color: int  = Field(default=0)
 
     @staticmethod
     def from_hex(hex: str, x: int, y: int) -> Self:
@@ -40,12 +41,15 @@ class Cell(BaseModel):
             self.north and
             self.east and
             self.south and
-            self.east
+            self.west
         )
 
-    def __str__(self) -> str:
-       return self.to_hex()
+    def __eq__(self, cell: Self) -> bool:
+        return (self.x == cell.x and self.y == cell.y)
 
-    def __repr__(self) -> str:
-        return self.to_hex()
+    #def __str__(self) -> str:
+    #   return self.to_hex()
+
+    #def __repr__(self) -> str:
+    #    return self.to_hex()
 

@@ -38,22 +38,20 @@ def main() -> None:
         print(f"An error occured during the file parsing: {e}")
         return 1
 
-    #maze = Maze.from_file('output_maze.txt')
-    #print(repr(maze))
-    #print(maze)
-
-    generated_maze = MazeGenerator(**config)
-    print(generated_maze)
+    maze_generator = MazeGenerator(**config)
+    maze_generated = maze_generator.build_maze()
     try:
-        generated_maze.build_output()
+        maze_generator.build_output(maze_generated)
     except PermissionError as _:
         print(f"Cannot write to output '{maze.output_file}', permission denied")
         return 1
-    
+
+    maze = Maze.from_file(maze_generator.output_file)
+
     mlx = Mlx()
     mlx_ptr = mlx.mlx_init()
     _, screen_width, screen_height = mlx.mlx_get_screen_size(mlx_ptr)
-    win_ptr = mlx.mlx_new_window(mlx_ptr, screen_width, screen_height, "A-maze-ing")
+    win_ptr = mlx.mlx_new_window(mlx_ptr, 1600, 1600, "A-maze-ing")
 
     mlx.mlx_key_hook(win_ptr, handle_key_hook, (mlx, mlx_ptr))
     client_message_event = 33
@@ -61,7 +59,7 @@ def main() -> None:
 
     mlx.mlx_string_put(mlx_ptr, win_ptr, int(screen_width / 2), int(screen_height / 2) - 5, 0x00FFFFFF, "Hello world")
 
-    mlx_maze_display = MlxMazeDisplay(mlx, mlx_ptr, win_ptr, 1600, 800)
+    mlx_maze_display = MlxMazeDisplay(mlx, mlx_ptr, win_ptr, 1600, 1600)
     mlx.mlx_loop_hook(mlx_ptr, display_maze, (mlx_maze_display, maze))
 
     mlx.mlx_loop(mlx_ptr)
