@@ -11,5 +11,6 @@ __all__ = [
     "__author__",
     "MazeGenerator",
     "parse_config_file",
-    "parse_logo"
+    "parse_logo",
+    "Cell"
 ]

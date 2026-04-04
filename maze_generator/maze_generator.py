@@ -27,6 +27,12 @@ class MazeGenerator(BaseModel):
             raise ValueError("Exit should be inside the map")
         return self
 
+    @model_validator(mode='after')
+    def check_entry_eq_exit(self) -> Self:
+        if (self.entry[0] == self.exit[0] and self.entry[1] == self.exit[1]):
+            raise ValueError("Exit and entry should not be at the same cell")
+        return self
+
     # check entry != exit
 
     def build_maze(self, logo: list[Cell]) -> list[list[Cell]]:

@@ -1,5 +1,5 @@
 from ..cell import Cell
-from typing import Tuple
+from typing import Tuple, Optional
 
 def parse_logo(filename: str, maze_width: int, maze_height: int) -> list[Cell]:
     lines: list[str] = []
@@ -20,9 +20,11 @@ def parse_logo(filename: str, maze_width: int, maze_height: int) -> list[Cell]:
     return logo_to_cells(lines, width, height, maze_width, maze_height)
 
 
-def logo_to_cells(lines: list[str], width: int, height: int, maze_width: int, maze_height: int) -> Tuple[list[Cell], int, int]:
+def logo_to_cells(lines: list[str], width: int, height: int, maze_width: int, maze_height: int) -> Optional[Tuple[list[Cell], int, int]]:
     cells: list[Cell] = []
     offset_x, offset_y = (maze_width // 2 - width // 2, maze_height // 2 - height // 2)
+    if (offset_x < 0 or offset_y < 0):
+        return None
     for y, line in enumerate(lines):
         for x, c in enumerate(line):
             if (c == 'x'):
