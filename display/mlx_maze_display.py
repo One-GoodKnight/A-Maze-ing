@@ -6,6 +6,7 @@ from typing import Callable
 from ctypes import c_void_p, c_ubyte
 from maze import Maze
 from maze_generator import Cell
+from numpy import ndarray
 
 class MlxMazeDisplay():
     def __init__(self, mlx: Mlx, mlx_ptr: c_void_p, win_ptr: c_void_p,
@@ -85,9 +86,12 @@ class MlxMazeDisplay():
         img_ptr = self.mlx.mlx_new_image(self.mlx_ptr, self.width, self.height)
         data, bpp, line_size, fmt = self.mlx.mlx_get_data_addr(img_ptr)
         set_pixel = self.get_set_pixel(data, bpp, line_size, fmt)
+        print("super long")
         self.set_to(0xFF_FF_FF_FF, set_pixel)
+        print("1")
         cell_width = int(self.width / maze.width)
         cell_height = int(self.height / maze.height)
+        print("un peu long")
         for y, row in enumerate(maze.maze):
             for x, cell in enumerate(row):
                 self.write_cell(cell, set_pixel, cell_width, cell_height, x, y)

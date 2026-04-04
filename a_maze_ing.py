@@ -7,6 +7,7 @@ from maze_generator import *
 from display import *
 from helpers import *
 import random
+import time
 
 def display_maze(params):
     params[0].display(params[1], 0, 0)
