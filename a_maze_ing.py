@@ -5,6 +5,7 @@ except ImportError as e:
 from maze import *
 from maze_generator import *
 from display import *
+import random
 
 def display_maze(params):
     params[0].display(params[1], 0, 0)
@@ -26,27 +27,44 @@ def main() -> None:
         return 1
 
     config = {}
+    filename = sys.argv[1]
     try:
-        config = parse_config_file(sys.argv[1])
+        config = parse_config_file(filename)
+        filename = "logo.42"
+        logo, logo_width, logo_height = parse_logo(filename, config['width'], config['height'])
     except FileNotFoundError as _:
-        print(f"Could not find the file {sys.argv[1]}")
+        print(f"Could not find the file '{filename}'")
         return 1
     except PermissionError as _:
-        print(f"Cannot read config file '{sys.argv[1]}', permission denied")
+        print(f"Cannot read config file '{filename}', permission denied")
         return 1
     except Exception as e:
         print(f"An error occured during the file parsing: {e}")
         return 1
 
+    if (len(logo) >= 1 and ((logo_width > config['width'] + 2) or (logo_height > config['height'] + 2))):
+        sys.stderr.write("Error, logo too small, starting the maze without it.\n")
+        logo = []
+
+    random.seed(10)
     maze_generator = MazeGenerator(**config)
-    maze_generated = maze_generator.build_maze()
+    maze_generated = maze_generator.build_maze(logo)
     try:
         maze_generator.build_output(maze_generated)
     except PermissionError as _:
         print(f"Cannot write to output '{maze.output_file}', permission denied")
         return 1
 
-    maze = Maze.from_file(maze_generator.output_file)
+    maze = Maze(
+        maze=maze_generated,
+        solution="",
+        width=maze_generator.width,
+        height=maze_generator.height,
+        entry=maze_generator.entry,
+        exit=maze_generator.exit,
+        output_file=maze_generator.output_file,
+        perfect=maze_generator.perfect
+    )
 
     mlx = Mlx()
     mlx_ptr = mlx.mlx_init()

@@ -3,9 +3,13 @@ __author__ = "Nifogi"
 
 from .maze_generator import MazeGenerator
 from .cell import Cell
+from .parsing.parsing_config import parse_config_file
+from .parsing.parsing_logo import parse_logo
 
 __all__ = [
     "__version__",
     "__author__",
-    "MazeGenerator"
+    "MazeGenerator",
+    "parse_config_file",
+    "parse_logo"
 ]

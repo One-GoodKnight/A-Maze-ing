@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field, model_validator
 from typing import Tuple, Self, ClassVar
 from .cell import Cell
-from .wilson_algo import WilsonAlgo
+from .shape_mazester import ShapeMazester
 
 class MazeGenerator(BaseModel):
     MAX_SIZE: ClassVar = 1000
@@ -27,8 +27,10 @@ class MazeGenerator(BaseModel):
             raise ValueError("Exit should be inside the map")
         return self
 
-    def build_maze(self) -> list[list[Cell]]:
-        maze: list[list[Cell]] = WilsonAlgo.wilson_algo(self.width, self.height, self.entry, self.exit)
+    # check entry != exit
+
+    def build_maze(self, logo: list[Cell]) -> list[list[Cell]]:
+        maze: list[list[Cell]] = ShapeMazester.generate_maze(self.width, self.height, self.entry, self.exit, logo)
         return maze
 
     def build_output(self, maze: list[list[Cell]]) -> None:

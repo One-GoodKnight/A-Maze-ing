@@ -28,7 +28,7 @@ class Maze(BaseModel):
             raise ValueError("Exit should be inside the map")
         return self
 
-    @staticmethod
+    '''@staticmethod
     def from_file(filename: str) -> Self:
         maze_str: list[str] = []
         with open(filename, 'r') as f:
@@ -51,7 +51,7 @@ class Maze(BaseModel):
             maze[int(exit[1])][int(exit[0])].color = 0xFF_FF_00_00
             return Maze(maze=maze, solution=solution, width=width,
                         height=len(maze), entry=entry, exit=exit,
-                        output_file=filename)
+                        output_file=filename)'''
 
     def __str__(self) -> str:
         chars: list[str] = ["🬕🬂🬂🬨","▌  ▐","🬲🬭🬭🬷"]

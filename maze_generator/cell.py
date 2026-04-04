@@ -9,13 +9,17 @@ class Direction(StrEnum):
     WEST = 'west'
 
 class Cell(BaseModel):
-    x: int      = Field(ge=0)
-    y: int      = Field(ge=0)
-    north: bool = Field(default=False)
-    east: bool  = Field(default=False)
-    south: bool = Field(default=False)
-    west: bool  = Field(default=False)
-    color: int  = Field(default=0)
+    x: int          = Field(ge=0)
+    y: int          = Field(ge=0)
+    north: bool     = Field(default=False)
+    east: bool      = Field(default=False)
+    south: bool     = Field(default=False)
+    west: bool      = Field(default=False)
+    dir_north: bool = Field(default=False)
+    dir_east: bool  = Field(default=False)
+    dir_south: bool = Field(default=False)
+    dir_west: bool  = Field(default=False)
+    color: int      = Field(default=0)
 
     @staticmethod
     def from_hex(hex: str, x: int, y: int) -> Self:
@@ -47,9 +51,12 @@ class Cell(BaseModel):
     def __eq__(self, cell: Self) -> bool:
         return (self.x == cell.x and self.y == cell.y)
 
-    #def __str__(self) -> str:
-    #   return self.to_hex()
+    def __str__(self) -> str:
+       return self.to_hex()
 
-    #def __repr__(self) -> str:
-    #    return self.to_hex()
+    def __repr__(self) -> str:
+        return self.to_hex()
+
+    def __hash__(self):
+        return hash((self.x, self.y))
 

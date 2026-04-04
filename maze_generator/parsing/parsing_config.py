@@ -2,14 +2,14 @@ from typing import Dict, Any
 from enum import StrEnum
 
 class Key(StrEnum):
-    WIDTH = 'width'
-    HEIGHT = 'height'
-    ENTRY = 'entry'
-    EXIT = 'exit'
+    WIDTH       = 'width'
+    HEIGHT      = 'height'
+    ENTRY       = 'entry'
+    EXIT        = 'exit'
     OUTPUT_FILE = 'output_file'
-    PERFECT = 'perfect'
+    PERFECT     = 'perfect'
 
-def parse_config_file(filename) -> Dict[str, Any]:
+def parse_config_file(filename: str) -> Dict[str, Any]:
     conf = {}
     with open(filename, 'r') as f:
         for line in f.readlines():
