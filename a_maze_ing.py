@@ -5,6 +5,7 @@ except ImportError as e:
 from maze import *
 from maze_generator import *
 from display import *
+from helpers import *
 import random
 
 def display_maze(params):
@@ -79,15 +80,16 @@ def main() -> None:
     mlx = Mlx()
     mlx_ptr = mlx.mlx_init()
     _, screen_width, screen_height = mlx.mlx_get_screen_size(mlx_ptr)
-    win_ptr = mlx.mlx_new_window(mlx_ptr, 1600, 1600, "A-maze-ing")
+    window_width, window_height = CalculateWindowSize.calculate(screen_width, screen_height, maze.width, maze.height)
+    win_ptr = mlx.mlx_new_window(mlx_ptr, window_width, window_height, "A-maze-ing")
 
     mlx.mlx_key_hook(win_ptr, handle_key_hook, (mlx, mlx_ptr))
     client_message_event = 33
     mlx.mlx_hook(win_ptr, client_message_event, 0, handle_close, (mlx, mlx_ptr))
 
-    mlx.mlx_string_put(mlx_ptr, win_ptr, int(screen_width / 2), int(screen_height / 2) - 5, 0x00FFFFFF, "Hello world")
+    #mlx.mlx_string_put(mlx_ptr, win_ptr, int(screen_width / 2), int(screen_height / 2) - 5, 0x00FFFFFF, "Hello world")
 
-    mlx_maze_display = MlxMazeDisplay(mlx, mlx_ptr, win_ptr, 1600, 1600)
+    mlx_maze_display = MlxMazeDisplay(mlx, mlx_ptr, win_ptr, window_width, window_height)
     mlx.mlx_loop_hook(mlx_ptr, display_maze, (mlx_maze_display, maze))
 
     mlx.mlx_loop(mlx_ptr)
