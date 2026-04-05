@@ -10,7 +10,10 @@ import random
 import time
 
 def display_maze(params):
+    start = time.time()
     params[0].display(params[1], 0, 0)
+    end = time.time()
+    print(end-start)
 
 def handle_key_hook(keycode, params) -> None:
     if keycode == 0xFF1B or keycode == 0x71:
@@ -90,11 +93,13 @@ def main() -> None:
 
     #mlx.mlx_string_put(mlx_ptr, win_ptr, int(screen_width / 2), int(screen_height / 2) - 5, 0x00FFFFFF, "Hello world")
 
-    mlx_maze_display = MlxMazeDisplay(mlx, mlx_ptr, win_ptr, window_width, window_height)
+    img_ptr = mlx.mlx_new_image(mlx_ptr, window_width, window_height)
+    mlx_maze_display = MlxMazeDisplay(mlx, mlx_ptr, win_ptr, window_width, window_height, img_ptr)
     mlx.mlx_loop_hook(mlx_ptr, display_maze, (mlx_maze_display, maze))
 
     mlx.mlx_loop(mlx_ptr)
 
+    mlx.mlx_destroy_image(mlx_ptr, img_ptr)
     mlx.mlx_destroy_window(mlx_ptr, win_ptr)
     mlx.mlx_release(mlx_ptr)
 
