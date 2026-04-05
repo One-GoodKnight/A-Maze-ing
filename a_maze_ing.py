@@ -6,14 +6,15 @@ from maze import *
 from maze_generator import *
 from display import *
 from helpers import *
+from game import *
+from constants import *
 import random
 import time
 
-def display_maze(params):
-    start = time.time()
-    params[0].display(params[1], 0, 0)
-    end = time.time()
-    print(end-start)
+def display(params):
+    mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display = params
+    mlx_maze_display.display(maze, 0, 0)
+    mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
 def handle_key_hook(keycode, params) -> None:
     if keycode == 0xFF1B or keycode == 0x71:
@@ -81,6 +82,8 @@ def main() -> None:
         perfect=maze_generator.perfect
     )
 
+    player = Player(maze.entry[0], maze.entry[1], PLAYER_COLOR)
+
     mlx = Mlx()
     mlx_ptr = mlx.mlx_init()
     _, screen_width, screen_height = mlx.mlx_get_screen_size(mlx_ptr)
@@ -93,13 +96,13 @@ def main() -> None:
 
     #mlx.mlx_string_put(mlx_ptr, win_ptr, int(screen_width / 2), int(screen_height / 2) - 5, 0x00FFFFFF, "Hello world")
 
-    img_ptr = mlx.mlx_new_image(mlx_ptr, window_width, window_height)
-    mlx_maze_display = MlxMazeDisplay(mlx, mlx_ptr, win_ptr, window_width, window_height, img_ptr)
-    mlx.mlx_loop_hook(mlx_ptr, display_maze, (mlx_maze_display, maze))
+    image = Image(mlx, mlx_ptr, window_width, window_height)
+    mlx_maze_display = MlxMazeDisplay(mlx, image)
+    mlx.mlx_loop_hook(mlx_ptr, display, (mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display))
 
     mlx.mlx_loop(mlx_ptr)
 
-    mlx.mlx_destroy_image(mlx_ptr, img_ptr)
+    mlx.mlx_destroy_image(mlx_ptr, image.ptr)
     mlx.mlx_destroy_window(mlx_ptr, win_ptr)
     mlx.mlx_release(mlx_ptr)
 

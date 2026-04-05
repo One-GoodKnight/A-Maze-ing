@@ -6,28 +6,25 @@ from typing import Callable
 from ctypes import c_void_p, c_ubyte
 from maze import Maze
 from maze_generator import Cell
+from .image import Image
 import numpy as np
 import time
 import cProfile
+try:
+    import cv2
+except ImportError as e:
+    raise SystemExit(f"Unable to import cv2: {e}")
 
 class MlxMazeDisplay():
-    def __init__(self, mlx: Mlx, mlx_ptr: c_void_p, win_ptr: c_void_p,
-                 width: int, height: int, img_ptr: c_void_p) -> None:
+    def __init__(self, mlx: Mlx, image: Image) -> None:
         self.mlx = mlx
-        self.mlx_ptr = mlx_ptr
-        self.win_ptr = win_ptr
-        self.width = width
-        self.height = height
+        self.width = image.width
+        self.height = image.height
 
-        self.img_ptr = img_ptr
-        data, bpp, line_size, fmt = self.mlx.mlx_get_data_addr(img_ptr)
-        self.data = np.ctypeslib.as_array(data, np.uint8)
-        self.data = self.data.reshape(height, line_size)
-        self.bpp = bpp
-        self.line_size = line_size
-        self.fmt = fmt
-
-        self.colors = {}
+        self.image = image
+        self.data = image.data
+        self.bpp = image.bpp
+        self.fmt = image.fmt
 
     def draw_rect(self, start: tuple[int, int], end: tuple[int, int],
                   argb: int) -> None:
@@ -36,19 +33,19 @@ class MlxMazeDisplay():
 
         bytes_pp = self.bpp // 8
 
-        if (not argb in self.colors):
+        if (not argb in self.image.colors):
             if self.fmt == 1:
-                self.colors[argb] = np.array([
+                self.image.colors[argb] = np.array([
                     argb >> 24 & 0xFF, argb >> 16 & 0xFF,
                     argb >> 8 & 0xFF, argb & 0xFF],
                 dtype=np.uint8)
             else:
-                self.colors[argb] = np.array([
+                self.image.colors[argb] = np.array([
                     argb & 0xFF, argb >> 8 & 0xFF,
                     argb >> 16 & 0xFF, argb >> 24 & 0xFF],
                 dtype=np.uint8)
 
-        rect = np.tile(self.colors[argb], (y1 - y0, x1 - x0))
+        rect = np.tile(self.image.colors[argb], (y1 - y0, x1 - x0))
         self.data[y0 : y1, x0*bytes_pp : x1*bytes_pp] = rect
 
     def write_cell(self, cell: Cell,
@@ -102,7 +99,14 @@ class MlxMazeDisplay():
             for x, cell in enumerate(row):
                 self.write_cell(cell, cell_width, cell_height, x, y)
 
+    def rotate_image(self) -> None:
+        img = self.data.reshape(self.height, self.width, self.bpp // 8)
+        center = (self.width // 2, self.height // 2)
+        matrix = cv2.getRotationMatrix2D(center, -45, scale=(1 / 1.414))
+        rotated = cv2.warpAffine(img, matrix, (self.width, self.height))
+        self.data[:self.height, :self.width * (self.bpp // 8)] = rotated.reshape(self.height, self.width * (self.bpp // 8))
+
     def display(self, maze: Maze, x: int, y: int) -> None:
         #cProfile.runctx('self.maze_to_image(maze)', globals(), locals())
         self.maze_to_image(maze)
-        self.mlx.mlx_put_image_to_window(self.mlx_ptr, self.win_ptr, self.img_ptr, x, y)
+        self.rotate_image()

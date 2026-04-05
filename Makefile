@@ -1,7 +1,9 @@
 NAME	:= a_maze_ing.py
 
 install:
-	pip install mlx-2.2-py3-none-any.whl
+	pip install deps/opencv_python-4.13.0.92-cp37-abi3-manylinux_2_28_x86_64.whl
+	pip install deps/mlx-2.2-py3-none-any.whl
+	pip install pydantic
 
 run:
 	@if [ -z "$(CONF)" ]; then \
