@@ -94,17 +94,15 @@ class MlxMazeDisplay():
             color
         )
 
-    def maze_to_image(self, maze: Maze) -> c_void_p:
+    def maze_to_image(self, maze: Maze) -> None:
         self.set_to(0xFF_FF_FF_FF)
         cell_width = int(self.width / maze.width)
         cell_height = int(self.height / maze.height)
         for y, row in enumerate(maze.maze):
             for x, cell in enumerate(row):
                 self.write_cell(cell, cell_width, cell_height, x, y)
-        return self.img_ptr
 
     def display(self, maze: Maze, x: int, y: int) -> None:
-        self.npdata = np.zeros(len(self.data), dtype=np.uint8)
         #cProfile.runctx('self.maze_to_image(maze)', globals(), locals())
-        img_ptr = self.maze_to_image(maze)
-        self.mlx.mlx_put_image_to_window(self.mlx_ptr, self.win_ptr, img_ptr, x, y)
+        self.maze_to_image(maze)
+        self.mlx.mlx_put_image_to_window(self.mlx_ptr, self.win_ptr, self.img_ptr, x, y)

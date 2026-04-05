@@ -35,6 +35,7 @@ def main() -> None:
     filename = sys.argv[1]
     try:
         config = parse_config_file(filename)
+        random.seed(config['seed'] if 'seed' in config else 42)
         filename = "logo.42"
         parse_logo_data = parse_logo(filename, config['width'], config['height'])
         logo, logo_width, logo_height = parse_logo_data if parse_logo_data else (None, None, None)
@@ -45,7 +46,7 @@ def main() -> None:
         print(f"Cannot read config file '{filename}', permission denied")
         return 1
     except Exception as e:
-        print(f"An error occured during the file parsing: {e}")
+        print(f"An error occured during file parsing: {e}")
         return 1
 
     if (not logo or (len(logo) >= 1 and ((logo_width + 2 > config['width']) or (logo_height + 2 > config['height'])))):
@@ -61,7 +62,6 @@ def main() -> None:
         sys.stderr.write("Error: exit on logo, starting the maze without logo.\n")
         logo = []
 
-    random.seed(10)
     maze_generator = MazeGenerator(**config)
     maze_generated = maze_generator.build_maze(logo)
     try:

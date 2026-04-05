@@ -5,7 +5,7 @@ def parse_logo(filename: str, maze_width: int, maze_height: int) -> list[Cell]:
     lines: list[str] = []
     with open (filename, 'r') as f:
         for line in f.readlines():
-            lines.append(line[:-1])
+            lines.append(line.removesuffix('\n'))
     if (len(lines) == 0):
         return lines
     width = len(lines[0])

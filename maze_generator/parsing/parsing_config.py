@@ -8,12 +8,15 @@ class Key(StrEnum):
     EXIT        = 'exit'
     OUTPUT_FILE = 'output_file'
     PERFECT     = 'perfect'
+    SEED        = 'seed'
 
 def parse_config_file(filename: str) -> Dict[str, Any]:
     conf = {}
     with open(filename, 'r') as f:
         for line in f.readlines():
-            line = line[:-1]
+            line = line.removesuffix('\n')
+            if (line.find('#') == 0):
+                continue
             line_split = line.split('=')
             if (len(line_split) != 2):
                 raise ValueError("Each line of the config file should have 2 columns separated by an equal")
@@ -27,7 +30,7 @@ def parse_config_file(filename: str) -> Dict[str, Any]:
             value = line_split[1]
 
             match key:
-                case 'width' | 'height':
+                case 'width' | 'height' | 'seed':
                     try:
                         conf[key] = int(value)
                     except ValueError:
@@ -52,4 +55,7 @@ def parse_config_file(filename: str) -> Dict[str, Any]:
                     conf[key] = True if value == "True" else False
                 case _:
                     raise ValueError("Unexpected file, accepting only: KEY=VALUE")
+
+    if (set([key.value for key in Key]) != set([key for key in conf.keys()])):
+        raise ValueError(f"Missing keys {[key.name for key in Key if key.value not in conf.keys()]}, all keys must be present in the config file {[key.name for key in Key]}")
     return conf
