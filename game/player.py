@@ -1,5 +1,7 @@
+from maze_generator import Direction
+
 class Player():
-    def __init__(self, x: float, y: float, max_x: int, max_y: int, color: int):
+    def __init__(self, x: float, y: float, size: int, max_x: int, max_y: int, color: int):
         self.max_x = max_x
         self.max_y = max_y
 
@@ -8,7 +10,10 @@ class Player():
         self.x = x
         self.y = y
 
+        self.size = size
+
         self.color = color
+        self.direction = Direction.SOUTH
 
     @property
     def x(self) -> int:
@@ -25,3 +30,11 @@ class Player():
     @y.setter
     def y(self, value) -> None:
         self.__y = min(max(0, value), self.max_y)
+
+    @property
+    def center_x(self) -> int:
+        return self.__x + self.size / 2
+
+    @property
+    def center_y(self) -> int:
+        return self.__y + self.size / 2

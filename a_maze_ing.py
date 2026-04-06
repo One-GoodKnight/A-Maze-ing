@@ -14,7 +14,7 @@ import time
 def display(params):
     mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player = params
     mlx_maze_display.display_maze(maze, 0, 0)
-    display_player(image, player, maze.width, maze.height)
+    display_player(image, player)
     rotate_image(image, game.angle)
     mlx.mlx_clear_window(mlx_ptr, win_ptr)
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
@@ -26,7 +26,7 @@ def game_loop(params):
 
     #print(game.delta_time)
     game.rotate()
-    game.gravity(player)
+    game.gravity(maze.maze, player)
 
     display((mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player))
 
@@ -122,7 +122,7 @@ def main() -> None:
     mlx_maze_display = MazeDisplay(mlx, image)
 
     game = Game(maze.width, maze.height)
-    player = Player(maze.entry[0], maze.entry[1], image.width - cell_size, image.height - cell_size, PLAYER_COLOR)
+    player = Player(maze.entry[0], maze.entry[1], cell_size, image.width - cell_size, image.height - cell_size, PLAYER_COLOR)
 
     mlx.mlx_do_key_autorepeatoff(mlx_ptr)
 
