@@ -1,12 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Self
-from enum import StrEnum
-
-class Direction(StrEnum):
-    NORTH = 'north'
-    EAST = 'east'
-    SOUTH = 'south'
-    WEST = 'west'
+from .directions import Direction
 
 class Cell(BaseModel):
     x: int          = Field(ge=0)

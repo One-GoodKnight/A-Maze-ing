@@ -1,4 +1,5 @@
-from .cell import Cell, Direction
+from .cell import Cell
+from .directions import Direction
 from typing import Optional
 
 class WallBuilder():

@@ -14,17 +14,22 @@ import time
 def display(params):
     mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player = params
     mlx_maze_display.display_maze(maze, 0, 0)
-    display_player(image, player)
+    display_player(image, player, maze.width, maze.height)
     rotate_image(image, game.angle)
     mlx.mlx_clear_window(mlx_ptr, win_ptr)
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
 def game_loop(params):
-    mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player = params
-    print(game.delta_time)
     start = time.time()
+
+    mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player = params
+
+    #print(game.delta_time)
     game.rotate()
+    game.gravity(player)
+
     display((mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player))
+
     game.delta_time = time.time() - start
 
 # TODO generate new maze, change colors, etc
@@ -107,15 +112,17 @@ def main() -> None:
         perfect=maze_generator.perfect
     )
 
-    game = Game()
-    game.angle = 10
-    player = Player(maze.entry[0], maze.entry[1], PLAYER_COLOR)
-
     mlx = Mlx()
     mlx_ptr = mlx.mlx_init()
     _, screen_width, screen_height = mlx.mlx_get_screen_size(mlx_ptr)
-    window_width, window_height = CalculateWindowSize.calculate(screen_width, screen_height, maze.width, maze.height)
+    window_width, window_height, cell_size = CalculateSize.calculate(screen_width, screen_height, maze.width, maze.height)
     win_ptr = mlx.mlx_new_window(mlx_ptr, window_width, window_height, "A-maze-ing")
+
+    image = Image(mlx, mlx_ptr, window_width, window_height)
+    mlx_maze_display = MazeDisplay(mlx, image)
+
+    game = Game(maze.width, maze.height)
+    player = Player(maze.entry[0], maze.entry[1], image.width - cell_size, image.height - cell_size, PLAYER_COLOR)
 
     mlx.mlx_do_key_autorepeatoff(mlx_ptr)
 
@@ -129,9 +136,8 @@ def main() -> None:
 
     #mlx.mlx_string_put(mlx_ptr, win_ptr, int(screen_width / 2), int(screen_height / 2) - 5, 0x00FFFFFF, "Hello world")
 
-    image = Image(mlx, mlx_ptr, window_width, window_height)
-    mlx_maze_display = MazeDisplay(mlx, image)
     game.time = time.time()
+
     mlx.mlx_loop_hook(mlx_ptr, game_loop, (mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player))
 
     mlx.mlx_loop(mlx_ptr)

@@ -42,7 +42,11 @@ class MazeDisplay():
         xpos: int = cell_width * x
         ypos: int = cell_height * y
         if (cell.color != 0):
-            self.draw_rect((xpos, ypos), (xpos+cell_width, ypos+cell_height), cell.color)
+            self.draw_rect(
+                (xpos + vline_width, ypos + hline_width),
+                (xpos + cell_width - vline_width, ypos + cell_height - hline_width),
+                cell.color
+            )
         if cell.north:
             self.draw_rect(
                 (xpos              - vline_width, ypos - hline_width),
