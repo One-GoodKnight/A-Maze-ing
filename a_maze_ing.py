@@ -16,12 +16,35 @@ def display(params):
     mlx_maze_display.display_maze(maze, 0, 0)
     display_player(image, player)
     rotate_image(image, game.angle)
+    mlx.mlx_clear_window(mlx_ptr, win_ptr)
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
-def handle_key_hook(keycode, params) -> None:
+def game_loop(params):
+    mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player = params
+    print(game.delta_time)
+    start = time.time()
+    game.rotate()
+    display((mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player))
+    game.delta_time = time.time() - start
+
+# TODO generate new maze, change colors, etc
+def handle_key_press(keycode, params):
+    mlx, mlx_ptr, game = params
     if keycode == 0xFF1B or keycode == 0x71:
         params[0].mlx_loop_exit(params[1])
-    # TODO generate new maze, change colors, etc
+
+    if keycode == 0xff51:
+        game.left_rotate = True
+    if keycode == 0xff53:
+        game.right_rotate = True
+
+def handle_key_release(keycode, params):
+    mlx, mlx_ptr, game = params
+
+    if keycode == 0xff51:
+        game.left_rotate = False
+    if keycode == 0xff53:
+        game.right_rotate = False
 
 def handle_close(params):
     params[0].mlx_loop_exit(params[1])
@@ -94,19 +117,26 @@ def main() -> None:
     window_width, window_height = CalculateWindowSize.calculate(screen_width, screen_height, maze.width, maze.height)
     win_ptr = mlx.mlx_new_window(mlx_ptr, window_width, window_height, "A-maze-ing")
 
-    mlx.mlx_key_hook(win_ptr, handle_key_hook, (mlx, mlx_ptr))
+    mlx.mlx_do_key_autorepeatoff(mlx_ptr)
+
     client_message_event = 33
     mlx.mlx_hook(win_ptr, client_message_event, 0, handle_close, (mlx, mlx_ptr))
+
+    key_press_event, key_press_mask = (2, 1)
+    key_release_event, key_release_mask = (3, 2)
+    mlx.mlx_hook(win_ptr, key_press_event, key_press_mask, handle_key_press, (mlx, mlx_ptr, game))
+    mlx.mlx_hook(win_ptr, key_release_event, key_release_mask, handle_key_release, (mlx, mlx_ptr, game))
 
     #mlx.mlx_string_put(mlx_ptr, win_ptr, int(screen_width / 2), int(screen_height / 2) - 5, 0x00FFFFFF, "Hello world")
 
     image = Image(mlx, mlx_ptr, window_width, window_height)
     mlx_maze_display = MazeDisplay(mlx, image)
     game.time = time.time()
-    mlx.mlx_loop_hook(mlx_ptr, display, (mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player))
+    mlx.mlx_loop_hook(mlx_ptr, game_loop, (mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player))
 
     mlx.mlx_loop(mlx_ptr)
 
+    mlx.mlx_do_key_autorepeaton(mlx_ptr)
     mlx.mlx_destroy_image(mlx_ptr, image.ptr)
     mlx.mlx_destroy_window(mlx_ptr, win_ptr)
     mlx.mlx_release(mlx_ptr)
