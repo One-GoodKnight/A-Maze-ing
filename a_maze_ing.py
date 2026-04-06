@@ -12,8 +12,10 @@ import random
 import time
 
 def display(params):
-    mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display = params
-    mlx_maze_display.display(maze, 0, 0)
+    mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player = params
+    mlx_maze_display.display_maze(maze, 0, 0)
+    display_player(image, player)
+    rotate_image(image, game.angle)
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
 def handle_key_hook(keycode, params) -> None:
@@ -82,6 +84,8 @@ def main() -> None:
         perfect=maze_generator.perfect
     )
 
+    game = Game()
+    game.angle = 10
     player = Player(maze.entry[0], maze.entry[1], PLAYER_COLOR)
 
     mlx = Mlx()
@@ -97,8 +101,9 @@ def main() -> None:
     #mlx.mlx_string_put(mlx_ptr, win_ptr, int(screen_width / 2), int(screen_height / 2) - 5, 0x00FFFFFF, "Hello world")
 
     image = Image(mlx, mlx_ptr, window_width, window_height)
-    mlx_maze_display = MlxMazeDisplay(mlx, image)
-    mlx.mlx_loop_hook(mlx_ptr, display, (mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display))
+    mlx_maze_display = MazeDisplay(mlx, image)
+    game.time = time.time()
+    mlx.mlx_loop_hook(mlx_ptr, display, (mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player))
 
     mlx.mlx_loop(mlx_ptr)
 

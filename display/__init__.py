@@ -1,12 +1,16 @@
 __version__ = "1.0.0"
 __author__ = "Nifogi"
 
-from .mlx_maze_display import MlxMazeDisplay
 from .image import Image
+from .maze_display import MazeDisplay
+from .player_display import display_player
+from .rotation import rotate_image
 
 __all__ = [
     "__version__",
     "__author__",
-    'MlxMazeDisplay',
-    'Image'
+    'Image',
+    'MazeDisplay',
+    'display_player',
+    'rotate_image'
 ]
