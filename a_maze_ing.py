@@ -26,11 +26,11 @@ def game_loop(params):
 
     #print(game.delta_time)
     game.rotate()
-    game.gravity(maze.maze, player)
+    game.gravity(maze.maze, maze.cell_size, player)
 
     display((mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player))
 
-    game.delta_time = time.time() - start
+    game.deltatime = time.time() - start
 
 # TODO generate new maze, change colors, etc
 def handle_key_press(keycode, params):
@@ -115,14 +115,14 @@ def main() -> None:
     mlx = Mlx()
     mlx_ptr = mlx.mlx_init()
     _, screen_width, screen_height = mlx.mlx_get_screen_size(mlx_ptr)
-    window_width, window_height, cell_size = CalculateSize.calculate(screen_width, screen_height, maze.width, maze.height)
+    window_width, window_height, maze.cell_size = CalculateSize.calculate(screen_width, screen_height, maze.width, maze.height)
     win_ptr = mlx.mlx_new_window(mlx_ptr, window_width, window_height, "A-maze-ing")
 
     image = Image(mlx, mlx_ptr, window_width, window_height)
     mlx_maze_display = MazeDisplay(mlx, image)
 
     game = Game(maze.width, maze.height)
-    player = Player(maze.entry[0], maze.entry[1], cell_size, image.width - cell_size, image.height - cell_size, PLAYER_COLOR)
+    player = Player(maze.entry[0], maze.entry[1], min(PLAYER_SIZE, maze.cell_size), image.width, image.height, maze.cell_size, PLAYER_COLOR)
 
     mlx.mlx_do_key_autorepeatoff(mlx_ptr)
 

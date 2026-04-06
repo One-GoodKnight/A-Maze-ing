@@ -1,18 +1,18 @@
 from pydantic import BaseModel, Field, model_validator
 from typing import Self, ClassVar
 from maze_generator.cell import Cell
+from constants import *
 
 class Maze(BaseModel):
-    MAX_SIZE: ClassVar = 1000
-
     maze: list[list[Cell]]
     solution: str
-    width: int = Field(ge=1, le=MAX_SIZE)
-    height: int = Field(ge=1, le=MAX_SIZE)
+    width: int = Field(ge=1, le=MAX_MAZE_SIZE)
+    height: int = Field(ge=1, le=MAX_MAZE_SIZE)
     entry: tuple[int, int]
     exit: tuple[int, int]
     output_file: str
     perfect: bool = Field(default=False)
+    cell_size: int = Field(default=DEFAULT_CELL_SIZE)
 
     @model_validator(mode='after')
     def check_entry(self) -> Self:
