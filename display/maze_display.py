@@ -32,7 +32,7 @@ class MazeDisplay():
         
         color = endian_color(self.image, argb)
         
-        rect = np.tile(self.image.colors[argb], (y1 - y0, x1 - x0))
+        rect = np.tile(color, (y1 - y0, x1 - x0))
         self.data[y0 : y1, x0*bytes_pp : x1*bytes_pp] = rect
 
     def write_cell(self, cell: Cell,

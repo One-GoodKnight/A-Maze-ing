@@ -12,12 +12,16 @@ import random
 import time
 
 def display(params):
+    start = time.time()
     mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player = params
     mlx_maze_display.display_maze(maze, 0, 0)
     display_player(image, player)
     rotate_image(image, game.angle)
+    # makes the loop take twice as much time third of the time -> freezes
     mlx.mlx_clear_window(mlx_ptr, win_ptr)
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
+    end = time.time()
+    print(end-start)
 
 def game_loop(params):
     start = time.time()
@@ -122,8 +126,8 @@ def main() -> None:
     mlx_maze_display = MazeDisplay(mlx, image)
 
     game = Game(maze.width, maze.height)
-    player_size = min(PLAYER_SIZE, int(maze.cell_size * 0.8))
-    player = Player(maze.entry[0], maze.entry[1], player_size, image.width, image.height, maze.cell_size, PLAYER_COLOR)
+    player_size = int(maze.cell_size * PLAYER_SIZE)
+    player = Player(maze.entry[0], maze.entry[1], player_size, image.width, image.height, maze.cell_size)
 
     mlx.mlx_do_key_autorepeatoff(mlx_ptr)
 

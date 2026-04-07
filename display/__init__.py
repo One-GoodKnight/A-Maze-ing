@@ -12,5 +12,5 @@ __all__ = [
     'Image',
     'MazeDisplay',
     'display_player',
-    'rotate_image'
+    'rotate_image',
 ]

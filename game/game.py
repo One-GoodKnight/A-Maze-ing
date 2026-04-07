@@ -63,7 +63,7 @@ class Game():
             cur_cell_y = math.floor(player.bottom_left_corner.y / cell_size)
             tar_cell_y = math.floor((player.bottom_left_corner.y + (player.velocity.y + move_vector.y)) / cell_size)
             if (cur_cell_y != tar_cell_y):
-                player.y = (tar_cell_y * cell_size) - player.size
+                player.y = (tar_cell_y * cell_size) - player.size + 0.7
                 move_vector.y = 0
                 player.velocity.y = 0
 
@@ -84,7 +84,7 @@ class Game():
             cur_cell_x = math.floor(player.top_right_corner.x / cell_size)
             tar_cell_x = math.floor((player.top_right_corner.x + (player.velocity.x + move_vector.x)) / cell_size)
             if (cur_cell_x != tar_cell_x):
-                player.x = (tar_cell_x * cell_size) - player.size
+                player.x = (tar_cell_x * cell_size) - player.size + 0.7
                 move_vector.x = 0
                 player.velocity.x = 0
 

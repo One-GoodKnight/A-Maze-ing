@@ -2,7 +2,7 @@ from maze_generator import Direction
 from .Vector2 import Vector2
 
 class Player():
-    def __init__(self, x: float, y: float, size: int, maze_max_x: int, maze_max_y: int, cell_size: int, color: int):
+    def __init__(self, x: float, y: float, size: int, maze_max_x: int, maze_max_y: int, cell_size: int):
         self.max_x = maze_max_x - size
         self.max_y = maze_max_y - size
 
@@ -12,8 +12,6 @@ class Player():
         self.y = y * cell_size + cell_size / 2 - size / 2
 
         self.size = size
-
-        self.color = color
 
         self.velocity = Vector2(0, 0)
 
