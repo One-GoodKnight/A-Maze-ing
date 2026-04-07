@@ -34,17 +34,18 @@ class Game():
             direction += 1
         self.angle += direction * ROTATION_SPEED * self.deltatime
 
-    def wall_colisions(self, maze: list[list[Cell]], cell_size: int, player: Player) -> Tuple[bool, bool, bool, bool]:
+    def wall_collisions(self, maze: list[list[Cell]], cell_size: int, player: Player) -> Tuple[bool, bool, bool, bool]:
         top_left_cell = maze[math.floor(player.top_left_corner.y / cell_size)][math.floor(player.top_left_corner.x / cell_size)]
         top_right_cell = maze[math.floor(player.top_right_corner.y / cell_size)][math.floor(player.top_right_corner.x / cell_size)]
         bottom_left_cell = maze[math.floor(player.bottom_left_corner.y / cell_size)][math.floor(player.bottom_left_corner.x / cell_size)]
         bottom_right_cell = maze[math.floor(player.bottom_right_corner.y / cell_size)][math.floor(player.bottom_right_corner.x / cell_size)]
+        center_cell = maze[math.floor(player.center_y / cell_size)][math.floor(player.center_x / cell_size)]
 
         return (
-            (top_left_cell.north or top_right_cell.north),
-            (top_right_cell.east or bottom_right_cell.east),
-            (bottom_left_cell.south or bottom_right_cell.south),
-            (top_left_cell.west or bottom_left_cell.west),
+            (top_left_cell != top_right_cell or top_left_cell.north or (top_left_cell != center_cell)),
+            (top_right_cell != bottom_right_cell or top_right_cell.east or (top_right_cell != center_cell)),
+            (bottom_left_cell != bottom_right_cell or bottom_left_cell.south or (bottom_left_cell != center_cell)),
+            (top_left_cell != bottom_left_cell or top_left_cell.west or (top_left_cell != center_cell)),
         )
 
     def gravity(self, maze: list[list[Cell]], cell_size: int, player: Player) -> None:
@@ -56,31 +57,44 @@ class Game():
 
         move_vector = Vector2(normalized_dir.x * GRAVITY * self.deltatime, normalized_dir.y * GRAVITY * self.deltatime)
 
-        north_wall, east_wall, south_wall, west_wall = self.wall_colisions(maze, cell_size, player)
+        north_wall, east_wall, south_wall, west_wall = self.wall_collisions(maze, cell_size, player)
 
-        if (south_wall and move_vector.y > 0):
+        if (south_wall and (player.velocity.y + move_vector.y) > 0):
             cur_cell_y = math.floor(player.bottom_left_corner.y / cell_size)
-            tar_cell_y = math.floor((player.bottom_left_corner.y + move_vector.y) / cell_size)
+            tar_cell_y = math.floor((player.bottom_left_corner.y + (player.velocity.y + move_vector.y)) / cell_size)
             if (cur_cell_y != tar_cell_y):
-                move_vector.y = (tar_cell_y * cell_size) - player.bottom_left_corner.y - 0.001
+                player.y = (tar_cell_y * cell_size) - player.size
+                move_vector.y = 0
+                player.velocity.y = 0
 
-        if (east_wall and move_vector.x > 0):
-            cur_cell_x = math.floor(player.top_right_corner.x / cell_size)
-            tar_cell_x = math.floor((player.top_right_corner.x + move_vector.x) / cell_size)
-            if (cur_cell_x != tar_cell_x):
-                move_vector.x = (tar_cell_x * cell_size) - player.top_right_corner.x - 0.001
-
-        if (north_wall and move_vector.y < 0):
+        if (north_wall and (player.velocity.y + move_vector.y) < 0):
             cur_cell_y = math.floor(player.top_left_corner.y / cell_size)
-            tar_cell_y = math.floor((player.top_left_corner.y + move_vector.y) / cell_size)
+            tar_cell_y = math.floor((player.top_left_corner.y + (player.velocity.y + move_vector.y)) / cell_size)
             if (cur_cell_y != tar_cell_y):
-                move_vector.y = cur_cell_y * cell_size - player.top_left_corner.y
+                player.y = cur_cell_y * cell_size
+                move_vector.y = 0
+                player.velocity.y = 0
 
-        if (west_wall and move_vector.x < 0):
-            cur_cell_x = math.floor(player.top_left_corner.x / cell_size)
-            tar_cell_x = math.floor((player.top_left_corner.x + move_vector.x) / cell_size)
+        player.velocity.y += move_vector.y
+        player.y += player.velocity.y
+
+        north_wall, east_wall, south_wall, west_wall = self.wall_collisions(maze, cell_size, player)
+
+        if (east_wall and (player.velocity.x + move_vector.x) > 0):
+            cur_cell_x = math.floor(player.top_right_corner.x / cell_size)
+            tar_cell_x = math.floor((player.top_right_corner.x + (player.velocity.x + move_vector.x)) / cell_size)
             if (cur_cell_x != tar_cell_x):
-                move_vector.x = cur_cell_x * cell_size - player.top_left_corner.x
+                player.x = (tar_cell_x * cell_size) - player.size
+                move_vector.x = 0
+                player.velocity.x = 0
 
-        player.x += move_vector.x
-        player.y += move_vector.y
+        if (west_wall and (player.velocity.x + move_vector.x) < 0):
+            cur_cell_x = math.floor(player.top_left_corner.x / cell_size)
+            tar_cell_x = math.floor((player.top_left_corner.x + (player.velocity.x + move_vector.x)) / cell_size)
+            if (cur_cell_x != tar_cell_x):
+                player.x = cur_cell_x * cell_size
+                move_vector.x = 0
+                player.velocity.x = 0
+
+        player.velocity.x += move_vector.x
+        player.x += player.velocity.x

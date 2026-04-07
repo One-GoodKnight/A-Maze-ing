@@ -14,7 +14,8 @@ class Player():
         self.size = size
 
         self.color = color
-        self.direction = Direction.SOUTH
+
+        self.velocity = Vector2(0, 0)
 
     @property
     def x(self) -> int:

@@ -122,7 +122,8 @@ def main() -> None:
     mlx_maze_display = MazeDisplay(mlx, image)
 
     game = Game(maze.width, maze.height)
-    player = Player(maze.entry[0], maze.entry[1], min(PLAYER_SIZE, maze.cell_size), image.width, image.height, maze.cell_size, PLAYER_COLOR)
+    player_size = min(PLAYER_SIZE, int(maze.cell_size * 0.8))
+    player = Player(maze.entry[0], maze.entry[1], player_size, image.width, image.height, maze.cell_size, PLAYER_COLOR)
 
     mlx.mlx_do_key_autorepeatoff(mlx_ptr)
 
