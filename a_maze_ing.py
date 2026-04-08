@@ -10,42 +10,63 @@ from game import *
 from constants import *
 import random
 import time
+import numpy as np
+import cv2
 
-def display(params):
-    start = time.time()
+def display_generation(params):
+    mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display = params
+
+    clear_window(mlx, mlx_ptr, win_ptr, image)
+
+def display_play(params):
     mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player = params
+
     mlx_maze_display.display_maze(maze, 0, 0)
     display_player(image, player)
     rotate_image(image, game.angle)
-    # makes the loop take twice as much time third of the time -> freezes
-    mlx.mlx_clear_window(mlx_ptr, win_ptr)
+
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
-    end = time.time()
-    print(end-start)
+
+def display_end(params):
+    mlx, mlx_ptr, win_ptr, image = params
+
+    clear_window(mlx, mlx_ptr, win_ptr, image)
+
+    text = "GG - Press R to generate a new maze"
+    mlx.mlx_string_put(mlx_ptr, win_ptr, int(image.width / 2) - len(text) * 5, int(image.height / 2), 0x00FFFFFF, text)
 
 def game_loop(params):
     start = time.time()
 
     mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player = params
 
-    #print(game.delta_time)
-    game.rotate()
-    game.gravity(maze.maze, maze.cell_size, player)
-
-    display((mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player))
+    if game.state == State.GENERATION:
+        display_generation((mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display))
+    if game.state == State.PLAY:
+        game.rotate()
+        game.gravity(maze.maze, maze.cell_size, player)
+        display_play((mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player))
+        if (check_end(player, maze.cell_size, maze.exit)):
+            game.state = State.END
+    if game.state == State.END:
+        display_end((mlx, mlx_ptr, win_ptr, image))
 
     game.deltatime = time.time() - start
 
 # TODO generate new maze, change colors, etc
 def handle_key_press(keycode, params):
     mlx, mlx_ptr, game = params
-    if keycode == 0xFF1B or keycode == 0x71:
+    if keycode == 0xFF1B:
         params[0].mlx_loop_exit(params[1])
 
-    if keycode == 0xff51:
+    if game.state == State.PLAY and keycode == 0xff51:
         game.left_rotate = True
-    if keycode == 0xff53:
+    if game.state == State.PLAY and keycode == 0xff53:
         game.right_rotate = True
+
+    if game.state == State.END and keycode == 0x72:
+        game.angle = 0
+        game.state = State.GENERATION
 
 def handle_key_release(keycode, params):
     mlx, mlx_ptr, game = params
@@ -138,8 +159,6 @@ def main() -> None:
     key_release_event, key_release_mask = (3, 2)
     mlx.mlx_hook(win_ptr, key_press_event, key_press_mask, handle_key_press, (mlx, mlx_ptr, game))
     mlx.mlx_hook(win_ptr, key_release_event, key_release_mask, handle_key_release, (mlx, mlx_ptr, game))
-
-    #mlx.mlx_string_put(mlx_ptr, win_ptr, int(screen_width / 2), int(screen_height / 2) - 5, 0x00FFFFFF, "Hello world")
 
     game.time = time.time()
 

@@ -32,8 +32,7 @@ class MazeDisplay():
         
         color = endian_color(self.image, argb)
         
-        rect = np.tile(color, (y1 - y0, x1 - x0))
-        self.data[y0 : y1, x0*bytes_pp : x1*bytes_pp] = rect
+        self.data[y0 : y1, x0*bytes_pp : x1*bytes_pp] = np.tile(color, x1 - x0)
 
     def write_cell(self, cell: Cell,
                    cell_width: int, cell_height: int, x: int, y: int) -> None:

@@ -5,6 +5,7 @@ from .image import Image
 from .maze_display import MazeDisplay
 from .player_display import display_player
 from .rotation import rotate_image
+from .clear_window import clear_window
 
 __all__ = [
     "__version__",
@@ -13,4 +14,5 @@ __all__ = [
     'MazeDisplay',
     'display_player',
     'rotate_image',
+    'clear_window',
 ]

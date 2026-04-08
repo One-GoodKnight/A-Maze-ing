@@ -2,18 +2,20 @@ from constants import *
 from .player import Player
 from maze_generator import Cell, Direction
 from .Vector2 import Vector2
+from .state import State
 from typing import Tuple
 import math
 import sys
 
 class Game():
     def __init__(self, maze_width: int, maze_height: int):
-        self.deltatime = 0
-        self.__angle = 0
-        self.left_rotate = False
-        self.right_rotate = False
+        self.deltatime: float = 0
+        self.__angle: float = 0
+        self.left_rotate: bool = False
+        self.right_rotate: bool = False
         self.maze_width = maze_width
         self.maze_height = maze_height
+        self.state: State = State.PLAY
 
     @property
     def angle(self) -> float:
