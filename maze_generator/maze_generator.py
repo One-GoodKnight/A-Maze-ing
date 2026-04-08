@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, model_validator
-from typing import Tuple, Self, ClassVar
+from typing import Tuple, Self, Generator
 from .cell import Cell
 from .shape_mazester import ShapeMazester
 from constants import *
@@ -32,11 +32,9 @@ class MazeGenerator(BaseModel):
             raise ValueError("Exit and entry should not be at the same cell")
         return self
 
-    # check entry != exit
-
-    def build_maze(self, logo: list[Cell]) -> list[list[Cell]]:
-        maze: list[list[Cell]] = ShapeMazester.generate_maze(self.width, self.height, self.entry, self.exit, logo)
-        return maze
+    def get_maze_generator(self, logo: list[Cell]) -> Generator[list[list[Cell]], None, None]:
+        maze_generator: list[list[Cell]] = ShapeMazester.maze_generator(self.width, self.height, self.entry, self.exit, logo)
+        return maze_generator
 
     def build_output(self, maze: list[list[Cell]]) -> None:
         with open(self.output_file, 'w') as f:

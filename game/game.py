@@ -15,7 +15,7 @@ class Game():
         self.right_rotate: bool = False
         self.maze_width = maze_width
         self.maze_height = maze_height
-        self.state: State = State.PLAY
+        self.state: State = State.GENERATION
 
     @property
     def angle(self) -> float:
@@ -28,7 +28,9 @@ class Game():
 
         self.__angle = value % 360
 
-    def rotate(self) -> None:
+    def rotate(self, game_state: State) -> None:
+        if game_state != State.PLAY:
+            return
         direction = 0
         if (self.left_rotate):
             direction -= 1

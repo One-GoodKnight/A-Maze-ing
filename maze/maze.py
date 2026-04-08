@@ -1,10 +1,10 @@
 from pydantic import BaseModel, Field, model_validator
-from typing import Self, ClassVar
+from typing import Self
 from maze_generator.cell import Cell
 from constants import *
 
 class Maze(BaseModel):
-    maze: list[list[Cell]]
+    maze: list[list[Cell | None]]
     solution: str
     width: int = Field(ge=1, le=MAX_MAZE_SIZE)
     height: int = Field(ge=1, le=MAX_MAZE_SIZE)
@@ -59,6 +59,8 @@ class Maze(BaseModel):
         for row in self.maze:
             top = bot = ' '
             for cell in row:
+                if not cell:
+                    continue
                 top_left = top_right = bot_left = bot_right = '  '
                 if cell.north:
                     if cell.west:
@@ -93,10 +95,10 @@ class Maze(BaseModel):
             ret += top + '\n' + bot + '\n'
         return ret
 
-    def __repr__(self) -> str:
+    '''def __repr__(self) -> str:
         ret: str = ''
         for row in self.maze:
             for cell in row:
                 ret += cell.to_hex()
             ret += '\n'
-        return ret
+        return ret'''

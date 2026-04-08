@@ -91,7 +91,7 @@ class ShapeMazester():
             return
 
     @staticmethod
-    def generate_maze(width: int, height: int, entry: tuple[int, int], exit: tuple[int, int], logo: list[Cell]) -> list[list[Cell]]:
+    def maze_generator(width: int, height: int, entry: tuple[int, int], exit: tuple[int, int], logo: list[Cell]) -> Generator[list[list[Cell]], None, None]:
         max_x = width - 1
         max_y = height - 1
 
@@ -103,24 +103,23 @@ class ShapeMazester():
         opposite_exit = (max_x - exit[0], max_y - exit[1])
         cells.append(Cell(x=opposite_exit[0], y=opposite_exit[1]))
         maze[opposite_exit[1]][opposite_exit[0]] = cells[0]
+        WallBuilder.build_wall(maze)
+        yield maze
 
         cells_count = 1
         max_cells_count = width * height - len(logo)
         while (cells_count != max_cells_count):
             ShapeMazester.generate_cell(maze, cells, max_x, max_y, shape_gen, entry, logo)
+            WallBuilder.build_wall(maze)
+            yield maze
             cells_count += 1
             #print(cells_count)
 
         ShapeMazester.add_logo(maze, logo, cells_count)
-        ShapeMazester.add_color(maze, entry, exit)
         
         WallBuilder.build_wall(maze)
-        return maze
-
-    @staticmethod
-    def add_color(maze: list[list[Optional[Cell]]], entry: Tuple[int, int], exit: Tuple[int, int]) -> None:
-        maze[entry[1]][entry[0]].color = 0xFF_00_FF_00
-        maze[exit[1]][exit[0]].color = 0x_FF_FF_00_00
+        yield maze
+        yield False
 
     @staticmethod
     def add_logo(maze: list[list[Optional[Cell]]], logo: list[Cell], cells_count: int) -> None:

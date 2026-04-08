@@ -17,6 +17,10 @@ def display_generation(params):
     mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display = params
 
     clear_window(mlx, mlx_ptr, win_ptr, image)
+    mlx_maze_display.display_maze(maze, 0, 0)
+    rotate_image(image, 0)
+
+    mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
 def display_play(params):
     mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player = params
@@ -38,16 +42,25 @@ def display_end(params):
 def game_loop(params):
     start = time.time()
 
-    mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player = params
+    mlx, mlx_ptr, win_ptr, image, maze_generator, maze, mlx_maze_display, game, player = params
 
     if game.state == State.GENERATION:
-        display_generation((mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display))
+        new_maze = next(maze_generator)
+        if not new_maze:
+            game.state = State.PLAY
+        else:
+            maze.maze = new_maze
+            display_generation((mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display))
     if game.state == State.PLAY:
-        game.rotate()
+        game.rotate(game.state)
         game.gravity(maze.maze, maze.cell_size, player)
         display_play((mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player))
         if (check_end(player, maze.cell_size, maze.exit)):
             game.state = State.END
+            try:
+                maze_generator.build_output(maze_generated)
+            except PermissionError as _:
+                print(f"Cannot write to output '{maze.output_file}', permission denied")
     if game.state == State.END:
         display_end((mlx, mlx_ptr, win_ptr, image))
 
@@ -59,9 +72,9 @@ def handle_key_press(keycode, params):
     if keycode == 0xFF1B:
         params[0].mlx_loop_exit(params[1])
 
-    if game.state == State.PLAY and keycode == 0xff51:
+    if keycode == 0xff51:
         game.left_rotate = True
-    if game.state == State.PLAY and keycode == 0xff53:
+    if keycode == 0xff53:
         game.right_rotate = True
 
     if game.state == State.END and keycode == 0x72:
@@ -119,12 +132,9 @@ def main() -> None:
         logo = []
 
     maze_generator = MazeGenerator(**config)
-    maze_generated = maze_generator.build_maze(logo)
-    try:
-        maze_generator.build_output(maze_generated)
-    except PermissionError as _:
-        print(f"Cannot write to output '{maze.output_file}', permission denied")
-        return 1
+    maze_gen = maze_generator.get_maze_generator(logo)
+
+    maze_generated = next(maze_gen)
 
     maze = Maze(
         maze=maze_generated,
@@ -162,7 +172,7 @@ def main() -> None:
 
     game.time = time.time()
 
-    mlx.mlx_loop_hook(mlx_ptr, game_loop, (mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player))
+    mlx.mlx_loop_hook(mlx_ptr, game_loop, (mlx, mlx_ptr, win_ptr, image, maze_gen, maze, mlx_maze_display, game, player))
 
     mlx.mlx_loop(mlx_ptr)
 

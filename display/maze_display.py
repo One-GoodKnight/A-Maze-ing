@@ -84,7 +84,14 @@ class MazeDisplay():
         cell_height = int(self.height / maze.height)
         for y, row in enumerate(maze.maze):
             for x, cell in enumerate(row):
+                if not cell:
+                    continue
                 self.write_cell(cell, cell_width, cell_height, x, y)
+
+        start = Cell(x=maze.entry[0], y=maze.entry[1], color=GREEN)
+        end = Cell(x=maze.exit[0], y=maze.exit[1], color=RED)
+        self.write_cell(start, cell_width, cell_height, start.x, start.y)
+        self.write_cell(end, cell_width, cell_height, end.x, end.y)
 
     def display_maze(self, maze: Maze, x: int, y: int) -> None:
         #cProfile.runctx('self.maze_to_image(maze)', globals(), locals())
