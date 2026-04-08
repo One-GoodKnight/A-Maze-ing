@@ -52,7 +52,11 @@ def game_loop(params):
         game.state = State.GENERATION
 
     if game.state == State.GENERATION:
-        new_maze = next(maze_generator.gen)
+        cells_to_generate = int(max(1, game.deltatime / ANIMATION_SPEED * maze.width * maze.height))
+        for i in range(cells_to_generate):
+            new_maze = next(maze_generator.gen)
+            if not new_maze:
+                break
         if not new_maze:
             game.state = State.PLAY
         else:
