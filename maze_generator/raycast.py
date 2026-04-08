@@ -4,7 +4,7 @@ from random import randint
 
 class RayCast():
     @staticmethod
-    def cast_ray(start: Tuple[int, int], angle: float, max_x: int, max_y: int):
+    def cast_ray(start: Tuple[int, int], angle: float, max_x: int, max_y: int) -> list[Tuple[int, int]]:
         cells: list[Tuple[int, int]] = []
 
         dir_x = math.cos(angle)
