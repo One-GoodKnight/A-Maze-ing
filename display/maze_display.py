@@ -95,4 +95,6 @@ class MazeDisplay():
 
     def display_maze(self, maze: Maze, x: int, y: int) -> None:
         #cProfile.runctx('self.maze_to_image(maze)', globals(), locals())
+        if not maze:
+            return
         self.maze_to_image(maze)

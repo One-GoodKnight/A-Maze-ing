@@ -4,7 +4,7 @@ from maze_generator.cell import Cell
 from constants import *
 
 class Maze(BaseModel):
-    maze: list[list[Cell | None]]
+    maze: list[list[Cell | None]] | None
     solution: str
     width: int = Field(ge=1, le=MAX_MAZE_SIZE)
     height: int = Field(ge=1, le=MAX_MAZE_SIZE)

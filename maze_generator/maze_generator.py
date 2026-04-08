@@ -11,6 +11,7 @@ class MazeGenerator(BaseModel):
     exit: Tuple[int, int]
     output_file: str
     perfect: bool = Field(default=False)
+    gen: Generator[list[list[Cell | None]]] | None = Field(default=None)
 
     @model_validator(mode='after')
     def check_entry(self) -> Self:

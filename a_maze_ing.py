@@ -42,15 +42,23 @@ def display_end(params):
 def game_loop(params):
     start = time.time()
 
-    mlx, mlx_ptr, win_ptr, image, maze_generator, maze, mlx_maze_display, game, player = params
+    mlx, mlx_ptr, win_ptr, image, maze_generator, maze, mlx_maze_display, game, player, logo = params
+
+    if game.state == State.INIT:
+        maze_generator.gen = maze_generator.get_maze_generator(logo)
+        player.x, player.y = (maze.entry[0] * maze.cell_size, maze.entry[1] * maze.cell_size)
+        player.velocity.x, player.velocity.y = (0, 0)
+        game.angle = 0
+        game.state = State.GENERATION
 
     if game.state == State.GENERATION:
-        new_maze = next(maze_generator)
+        new_maze = next(maze_generator.gen)
         if not new_maze:
             game.state = State.PLAY
         else:
             maze.maze = new_maze
             display_generation((mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display))
+
     if game.state == State.PLAY:
         game.rotate(game.state)
         game.gravity(maze.maze, maze.cell_size, player)
@@ -58,9 +66,10 @@ def game_loop(params):
         if (check_end(player, maze.cell_size, maze.exit)):
             game.state = State.END
             try:
-                maze_generator.build_output(maze_generated)
+                maze_generator.build_output(maze.maze)
             except PermissionError as _:
                 print(f"Cannot write to output '{maze.output_file}', permission denied")
+
     if game.state == State.END:
         display_end((mlx, mlx_ptr, win_ptr, image))
 
@@ -68,7 +77,7 @@ def game_loop(params):
 
 # TODO generate new maze, change colors, etc
 def handle_key_press(keycode, params):
-    mlx, mlx_ptr, game = params
+    mlx, mlx_ptr, game, maze_generator = params
     if keycode == 0xFF1B:
         params[0].mlx_loop_exit(params[1])
 
@@ -78,8 +87,7 @@ def handle_key_press(keycode, params):
         game.right_rotate = True
 
     if game.state == State.END and keycode == 0x72:
-        game.angle = 0
-        game.state = State.GENERATION
+        game.state = State.INIT
 
 def handle_key_release(keycode, params):
     mlx, mlx_ptr, game = params
@@ -132,12 +140,9 @@ def main() -> None:
         logo = []
 
     maze_generator = MazeGenerator(**config)
-    maze_gen = maze_generator.get_maze_generator(logo)
-
-    maze_generated = next(maze_gen)
 
     maze = Maze(
-        maze=maze_generated,
+        maze=None,
         solution="",
         width=maze_generator.width,
         height=maze_generator.height,
@@ -167,12 +172,12 @@ def main() -> None:
 
     key_press_event, key_press_mask = (2, 1)
     key_release_event, key_release_mask = (3, 2)
-    mlx.mlx_hook(win_ptr, key_press_event, key_press_mask, handle_key_press, (mlx, mlx_ptr, game))
+    mlx.mlx_hook(win_ptr, key_press_event, key_press_mask, handle_key_press, (mlx, mlx_ptr, game, maze_generator))
     mlx.mlx_hook(win_ptr, key_release_event, key_release_mask, handle_key_release, (mlx, mlx_ptr, game))
 
     game.time = time.time()
 
-    mlx.mlx_loop_hook(mlx_ptr, game_loop, (mlx, mlx_ptr, win_ptr, image, maze_gen, maze, mlx_maze_display, game, player))
+    mlx.mlx_loop_hook(mlx_ptr, game_loop, (mlx, mlx_ptr, win_ptr, image, maze_generator, maze, mlx_maze_display, game, player, logo))
 
     mlx.mlx_loop(mlx_ptr)
 
