@@ -68,6 +68,8 @@ def game_loop(params):
                     break
             except StopIteration as e:
                 print(f"An error occurred during the generation of the maze: {e}")
+            except Exception as e:
+                print(f"An error occurred during the generation of the maze: {e}")
         if cells_that_should_be_generated_after_this_frame >= maze.width * maze.height and not new_maze:
             game.state = State.PLAY
         else:

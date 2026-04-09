@@ -20,19 +20,19 @@ class Circle():
 class ShapeMazester():
     @staticmethod
     def neighbors(maze: list[list[Optional[Cell]]], cell: Cell, max_x: int, max_y: int) -> Tuple[int, int, Direction]:
-        neighboring_positions = [
+        neighbor_positions = [
             (cell.x, cell.y - 1, Direction.NORTH),
             (cell.x + 1, cell.y, Direction.EAST),
             (cell.x, cell.y + 1, Direction.SOUTH),
             (cell.x - 1, cell.y, Direction.WEST)
         ]
-        neighboring_positions = [
-            pos for pos in neighboring_positions if
+        neighbor_positions = [
+            pos for pos in neighbor_positions if
             pos[0] >= 0 and pos[0] <= max_x and
             pos[1] >= 0 and pos[1] <= max_y
         ]
 
-        return neighboring_positions
+        return neighbor_positions
 
     @staticmethod
     def empty_neighbors(maze: list[list[Optional[Cell]]], cell: Cell, max_x: int, max_y: int, logo: list[Cell]) -> Tuple[int, int, Direction]:
@@ -81,32 +81,38 @@ class ShapeMazester():
             return None
 
     @staticmethod
-    def pick_cell(maze: list[list[Optional[Cell]]], cells: list[Cell], max_x: int, max_y: int, shape_gen: Generator[Tuple[float, float], None, None], exit: Tuple[int, int], logo: list[Cell]) -> Tuple[Optional[Cell], list[Tuple[int, int]]]:
+    def pick_cell(maze: list[list[Optional[Cell]]], cells: list[Cell], max_x: int, max_y: int, shape_gen: Generator[Tuple[float, float], None, None], exit: Tuple[int, int], logo: list[Cell]) -> Tuple[Optional[Cell], list[Tuple[int, int, float]]]:
+        angle = next(shape_gen)
         raycast = RayCast.cast_ray((exit[0], exit[1]), next(shape_gen), max_x, max_y)
 
         cell = ShapeMazester.find_valid_cell_in_raycast(maze, raycast, cells, logo)
         if cell:
-            return (cell, raycast)
+            return (cell, raycast, angle)
 
         # no reachable valid cell found, checking neighbors of each cell of the raycast
         cell = ShapeMazester.find_valid_neighbor_from_raycast(maze, max_x, max_y, raycast, logo)
         if cell:
-            return (cell, raycast)
+            return (cell, raycast, angle)
 
         cell = choice(cells)
         neighboring_positions = ShapeMazester.empty_neighbors(maze, cell, max_x, max_y, logo)
         while len(neighboring_positions) == 0:
             cell = choice(cells)
             neighboring_positions = ShapeMazester.empty_neighbors(maze, cell, max_x, max_y, logo)
-        return (cell, raycast)
+        return (cell, raycast, angle)
 
     @staticmethod
     def generate_cell(maze: list[list[Optional[Cell]]], cells: list[Cell], max_x: int, max_y: int, shape_gen: Generator[Tuple[float, float], None, None], exit: Tuple[int, int], logo: list[Cell]) -> Tuple[bool, Optional[list[Tuple[int, int]]]]:
         while (True):
-            cell, raycast = ShapeMazester.pick_cell(maze, cells, max_x, max_y, shape_gen, exit, logo)
-            neighboring_positions = ShapeMazester.empty_neighbors(maze, cell, max_x, max_y, logo)
+            cell, raycast, angle = ShapeMazester.pick_cell(maze, cells, max_x, max_y, shape_gen, exit, logo)
+            neighbor_positions = ShapeMazester.empty_neighbors(maze, cell, max_x, max_y, logo)
 
-            neighbor = choice(neighboring_positions)
+            deg_angle = math.degrees(angle)
+            # angle goes clockwise, prioritize the direction closest to +90° to follow the shape curve
+            angle_target = deg_angle + 90
+            angle_target %= 360
+            print(angle_target)
+            neighbor = choice(neighbor_positions)
             new_cell = Cell(x=neighbor[0], y=neighbor[1])
             match neighbor[2]:
                 case Direction.NORTH:
