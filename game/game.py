@@ -55,6 +55,9 @@ class Game():
     def gravity(self, maze: list[list[Cell]], cell_size: int, player: Player) -> None:
         rad = math.radians(self.angle)
 
+        player.velocity.x -= player.velocity.x * AIR_DRAG * self.deltatime
+        player.velocity.y -= player.velocity.y * AIR_DRAG * self.deltatime
+
         direction = Vector2(math.sin(rad), math.cos(rad))
         magnitude = math.sqrt(direction.x ** 2 + direction.y ** 2)
         normalized_dir = Vector2(direction.x / magnitude, direction.y / magnitude)
@@ -69,7 +72,7 @@ class Game():
             if (cur_cell_y != tar_cell_y):
                 player.y = (tar_cell_y * cell_size) - player.size + 0.999
                 move_vector.y = 0
-                player.velocity.y = min(0, -player.velocity.y * 0.8)
+                player.velocity.y = min(0, -player.velocity.y * PLAYER_BOUNCE)
 
         if (north_wall and (player.velocity.y + move_vector.y) < 0):
             cur_cell_y = math.floor(player.top_left_corner.y / cell_size)
@@ -77,7 +80,7 @@ class Game():
             if (cur_cell_y != tar_cell_y):
                 player.y = cur_cell_y * cell_size
                 move_vector.y = 0
-                player.velocity.y = max(0, -player.velocity.y * 0.8)
+                player.velocity.y = max(0, -player.velocity.y * PLAYER_BOUNCE)
 
         player.velocity.y += move_vector.y
         player.y += player.velocity.y
@@ -90,7 +93,7 @@ class Game():
             if (cur_cell_x != tar_cell_x):
                 player.x = (tar_cell_x * cell_size) - player.size + 0.999
                 move_vector.x = 0
-                player.velocity.x = min(0, -player.velocity.x * 0.8)
+                player.velocity.x = min(0, -player.velocity.x * PLAYER_BOUNCE)
 
         if (west_wall and (player.velocity.x + move_vector.x) < 0):
             cur_cell_x = math.floor(player.top_left_corner.x / cell_size)
@@ -98,7 +101,7 @@ class Game():
             if (cur_cell_x != tar_cell_x):
                 player.x = cur_cell_x * cell_size
                 move_vector.x = 0
-                player.velocity.x = max(0, -player.velocity.x * 0.8)
+                player.velocity.x = max(0, -player.velocity.x * PLAYER_BOUNCE)
 
         player.velocity.x += move_vector.x
         player.x += player.velocity.x
