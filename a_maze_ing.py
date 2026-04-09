@@ -12,6 +12,7 @@ import random
 import time
 import numpy as np
 import cv2
+import math
 
 def display_generation(params):
     mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display = params
@@ -46,21 +47,32 @@ def game_loop(params):
 
     if game.state == State.INIT:
         maze_generator.gen = maze_generator.get_maze_generator(logo)
+        maze.maze = [[None] * maze.width for _ in range(maze.height)]
+        maze.init_time = time.time()
         player.x, player.y = (maze.entry[0] * maze.cell_size, maze.entry[1] * maze.cell_size)
         player.velocity.x, player.velocity.y = (0, 0)
         game.angle = 0
         game.state = State.GENERATION
 
     if game.state == State.GENERATION:
-        cells_to_generate = int(max(1, game.deltatime / ANIMATION_SPEED * maze.width * maze.height))
-        for i in range(cells_to_generate):
-            new_maze = next(maze_generator.gen)
-            if not new_maze:
-                break
-        if not new_maze:
+        time_since_gen_start = time.time() - maze.init_time
+        cells_that_should_be_generated = time_since_gen_start / ANIMATION_SPEED * maze.width * maze.height
+        cells_that_should_be_generated_after_this_frame = cells_that_should_be_generated + game.deltatime / ANIMATION_SPEED * maze.width * maze.height
+        cells_to_generate = max(0, cells_that_should_be_generated_after_this_frame - cells_that_should_be_generated)
+
+        new_maze = None
+        for i in range(math.floor(cells_to_generate)):
+            try:
+                new_maze = next(maze_generator.gen)
+                if not new_maze:
+                    break
+            except StopIteration as e:
+                print(f"An error occurred during the generation of the maze: {e}")
+        if cells_that_should_be_generated_after_this_frame >= maze.width * maze.height and not new_maze:
             game.state = State.PLAY
         else:
-            maze.maze = new_maze
+            if new_maze:
+                maze.maze = new_maze
             display_generation((mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display))
 
     if game.state == State.PLAY:

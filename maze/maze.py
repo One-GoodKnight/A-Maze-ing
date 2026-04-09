@@ -13,6 +13,8 @@ class Maze(BaseModel):
     output_file: str
     perfect: bool = Field(default=False)
     cell_size: int = Field(default=DEFAULT_CELL_SIZE)
+    cell_counter: int = Field(default = 0)
+    init_time: float = 0
 
     @model_validator(mode='after')
     def check_entry(self) -> Self:
