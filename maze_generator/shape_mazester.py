@@ -14,6 +14,10 @@ class Shapes():
         return [vector[0] / magnitude, vector[1] / magnitude]
 
     @staticmethod
+    def triangle(max_x: int, max_y: int):
+        pass
+
+    @staticmethod
     def square(max_x: int, max_y: int) -> Generator[float, None, None]:
         direction = Direction.SOUTH
         vector = [1, 0]

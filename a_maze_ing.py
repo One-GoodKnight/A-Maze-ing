@@ -77,6 +77,10 @@ def game_loop(params):
                 print(f"An error occurred during the generation of the maze: {e}")
         if try_generate and not new_maze:
             game.state = State.PLAY
+            try:
+                maze_generator.build_output(maze.maze)
+            except PermissionError as _:
+                print(f"Cannot write to output '{maze.output_file}', permission denied")
         else:
             if new_maze:
                 maze.maze = new_maze
@@ -89,11 +93,7 @@ def game_loop(params):
         display_play((mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player))
         if (check_end(player, maze.cell_size, maze.exit)):
             game.state = State.END
-            try:
-                maze_generator.build_output(maze.maze)
-            except PermissionError as _:
-                print(f"Cannot write to output '{maze.output_file}', permission denied")
-
+            
     if game.state == State.END:
         display_end((mlx, mlx_ptr, win_ptr, image))
 
