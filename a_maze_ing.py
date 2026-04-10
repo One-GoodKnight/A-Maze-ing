@@ -13,6 +13,7 @@ import time
 import numpy as np
 import cv2
 import math
+import cProfile
 
 def display_generation(params):
     mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display = params
@@ -79,6 +80,7 @@ def game_loop(params):
         else:
             if new_maze:
                 maze.maze = new_maze
+                WallBuilder.build_wall(maze.maze)
             display_generation((mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display))
 
     if game.state == State.PLAY:

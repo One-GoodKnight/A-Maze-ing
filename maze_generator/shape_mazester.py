@@ -38,16 +38,19 @@ class ShapeMazester():
 
     @staticmethod
     def empty_neighbors(maze: list[list[Optional[Cell]]], cell: Cell, max_x: int, max_y: int, logo: list[Cell]) -> Tuple[int, int, Direction]:
+        logo_set = {(l.x, l.y) for l in logo}
+
         neighbor_positions = ShapeMazester.neighbors(maze, cell, max_x, max_y)
         neighbor_positions = [
             pos for pos in neighbor_positions if
             not maze[pos[1]][pos[0]] and
-            Cell(x=pos[0], y=pos[1]) not in logo
+            (pos[0], pos[1]) not in logo_set
         ]
         return neighbor_positions
 
     @staticmethod
     def find_valid_cell_in_raycast(maze: list[list[Optional[Cell]]], raycast: list[Tuple[int, int]], cells: list[Cell], logo: list[Cell]) -> Optional[Cell]:
+        logo_set = {(l.x, l.y) for l in logo}
         # add randomness to the algo by searching randomly from the end or from the start of the rayscast
         # prioritizes border towards center to help the algo get the shape wanted but still fill the inside of the maze
         towards_center = randint(0, 2)
@@ -56,7 +59,7 @@ class ShapeMazester():
         if towards_center > 0:
             for i in range(len(raycast) - 2, -1, -1):
                 cell = raycast[i]
-                if Cell(x=cell[0], y=cell[1]) in logo:
+                if (cell[0], cell[1]) in logo_set:
                     break
 
                 if not maze[cell[1]][cell[0]]:
@@ -68,7 +71,7 @@ class ShapeMazester():
         # no valid cell found, trying in the other direction
         for i in range(1, len(raycast)):
             cell = raycast[i]
-            if Cell(x=cell[0], y=cell[1]) in logo:
+            if (cell[0], cell[1]) in logo_set:
                 break
 
             if not maze[cell[1]][cell[0]]:
@@ -123,7 +126,6 @@ class ShapeMazester():
                 try_counter += 1
                 if try_counter >= 1000:
                     stuck = True
-                    print('stuck')
                 cell, raycast, angle = ShapeMazester.pick_cell(maze, cells, max_x, max_y, shape_gen, exit, logo, stuck)
             neighbors = ShapeMazester.empty_neighbors(maze, cell, max_x, max_y, logo)
 
@@ -194,7 +196,6 @@ class ShapeMazester():
             (generated, raycast, stuck) = ShapeMazester.generate_cell(maze, cells, max_x, max_y, shape_gen, exit, logo, stuck)
             while (not generated):
                 (generated, raycast, stuck) = ShapeMazester.generate_cell(maze, cells, max_x, max_y, shape_gen, exit, logo, stuck)
-            WallBuilder.build_wall(maze)
             ShapeMazester.toggle_raycast(maze, raycast, True)
             yield maze
             ShapeMazester.toggle_raycast(maze, raycast, False)
