@@ -94,9 +94,9 @@ class ShapeMazester():
         return None
 
     @staticmethod
-    def pick_cell(maze: list[list[Optional[Cell]]], cells: list[Cell], max_x: int, max_y: int, shape_gen: Generator[Tuple[float, float], None, None], exit: Tuple[int, int], logo: list[Cell], stuck: bool) -> Tuple[Optional[Cell], list[Tuple[int, int, float]]]:
+    def pick_cell(maze: list[list[Optional[Cell]]], cells: list[Cell], max_x: int, max_y: int, shape_gen: Generator[Tuple[float, float], None, None], start: Tuple[int, int], logo: list[Cell], stuck: bool) -> Tuple[Optional[Cell], list[Tuple[int, int, float]]]:
         angle = next(shape_gen)
-        raycast = RayCast.cast_ray((exit[0], exit[1]), next(shape_gen), max_x, max_y)
+        raycast = RayCast.cast_ray((start[0], start[1]), next(shape_gen), max_x, max_y)
 
         cell = ShapeMazester.find_valid_cell_in_raycast(maze, raycast, cells, logo)
         if cell:
@@ -118,15 +118,15 @@ class ShapeMazester():
         return (cell, raycast, angle)
 
     @staticmethod
-    def generate_cell(maze: list[list[Optional[Cell]]], cells: list[Cell], max_x: int, max_y: int, shape_gen: Generator[Tuple[float, float], None, None], exit: Tuple[int, int], logo: list[Cell], stuck: bool) -> Tuple[bool, Optional[list[Tuple[int, int]]], bool]:
+    def generate_cell(maze: list[list[Optional[Cell]]], cells: list[Cell], max_x: int, max_y: int, shape_gen: Generator[Tuple[float, float], None, None], start: Tuple[int, int], logo: list[Cell], stuck: bool) -> Tuple[bool, Optional[list[Tuple[int, int]]], bool]:
         while (True):
-            cell, raycast, angle = ShapeMazester.pick_cell(maze, cells, max_x, max_y, shape_gen, exit, logo, stuck)
+            cell, raycast, angle = ShapeMazester.pick_cell(maze, cells, max_x, max_y, shape_gen, start, logo, stuck)
             try_counter = 0
             while not cell:
                 try_counter += 1
                 if try_counter >= 1000:
                     stuck = True
-                cell, raycast, angle = ShapeMazester.pick_cell(maze, cells, max_x, max_y, shape_gen, exit, logo, stuck)
+                cell, raycast, angle = ShapeMazester.pick_cell(maze, cells, max_x, max_y, shape_gen, start, logo, stuck)
             neighbors = ShapeMazester.empty_neighbors(maze, cell, max_x, max_y, logo)
 
             deg_angle = math.degrees(angle)
@@ -174,6 +174,12 @@ class ShapeMazester():
             return (True, raycast, stuck)
 
     @staticmethod
+    def random_starting_pos(max_x: int, max_y: int) -> Tuple[int, int]:
+        min_rand_x, max_rand_x = (max_x // 4 * 1, max_x // 4 * 3)
+        min_rand_y, max_rand_y = (max_y // 4 * 1, max_y // 4 * 3)
+        return ((randint(min_rand_x, max_rand_x), randint(min_rand_y, max_rand_y)))
+
+    @staticmethod
     def maze_generator(width: int, height: int, entry: tuple[int, int], exit: tuple[int, int], logo: list[Cell]) -> Generator[list[list[Cell]], None, None]:
         max_x = width - 1
         max_y = height - 1
@@ -183,8 +189,9 @@ class ShapeMazester():
         maze: list[list[Optional[Cell]]] = [[None] * width for _ in range(height)]
         cells: list[Cell] = []
 
-        cells.append(Cell(x=exit[0], y=exit[1]))
-        maze[exit[1]][exit[0]] = cells[0]
+        start = ShapeMazester.random_starting_pos(max_x, max_y)
+        cells.append(Cell(x=start[0], y=start[1]))
+        maze[start[1]][start[0]] = cells[0]
         WallBuilder.build_wall(maze)
         yield maze
 
@@ -193,9 +200,9 @@ class ShapeMazester():
         stuck = False
 
         while (cells_count != max_cells_count):
-            (generated, raycast, stuck) = ShapeMazester.generate_cell(maze, cells, max_x, max_y, shape_gen, exit, logo, stuck)
+            (generated, raycast, stuck) = ShapeMazester.generate_cell(maze, cells, max_x, max_y, shape_gen, start, logo, stuck)
             while (not generated):
-                (generated, raycast, stuck) = ShapeMazester.generate_cell(maze, cells, max_x, max_y, shape_gen, exit, logo, stuck)
+                (generated, raycast, stuck) = ShapeMazester.generate_cell(maze, cells, max_x, max_y, shape_gen, start, logo, stuck)
             ShapeMazester.toggle_raycast(maze, raycast, True)
             yield maze
             ShapeMazester.toggle_raycast(maze, raycast, False)
