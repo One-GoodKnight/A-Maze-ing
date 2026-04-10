@@ -48,26 +48,26 @@ class MazeDisplay():
             )
         if cell.north:
             self.draw_rect(
-                (xpos              - vline_width, ypos - hline_width),
-                (xpos + cell_width + vline_width, ypos + hline_width),
+                (xpos             , ypos),
+                (xpos + cell_width, ypos + hline_width),
                 MAZE_BORDER_COLOR
             )
         if cell.east:
             self.draw_rect(
-                (xpos + cell_width - vline_width, ypos               - hline_width),
-                (xpos + cell_width + vline_width, ypos + cell_height + hline_width),
+                (xpos + cell_width - vline_width, ypos - hline_width),
+                (xpos + cell_width              , ypos + cell_height),
                 MAZE_BORDER_COLOR
             )
         if cell.south:
             self.draw_rect(
-                (xpos              - vline_width, ypos + cell_height - hline_width),
-                (xpos + cell_width + vline_width, ypos + cell_height + hline_width),
+                (xpos, ypos + cell_height - hline_width),
+                (xpos + cell_width, ypos + cell_height),
                 MAZE_BORDER_COLOR
             )
         if cell.west:
             self.draw_rect(
-                (xpos - vline_width, ypos               - hline_width),
-                (xpos + vline_width, ypos + cell_height + hline_width),
+                (xpos, ypos),
+                (xpos + vline_width, ypos + cell_height),
                 MAZE_BORDER_COLOR
             )
 

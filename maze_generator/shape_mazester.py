@@ -11,7 +11,7 @@ class Circle():
     @staticmethod
     def circle(max_x, max_y) -> Generator[float, None, None]:
         perimeter = (2 * (max_x + max_y + 2))
-        step_amount = (2 * math.pi) / perimeter * 0.6
+        step_amount = (2 * math.pi) / perimeter * 0.707
         step = 0
         while (True):
             yield (step % (2 * math.pi))

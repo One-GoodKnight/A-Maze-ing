@@ -99,7 +99,6 @@ def game_loop(params):
 
     game.deltatime = time.time() - start
 
-# TODO generate new maze, change colors, etc
 def handle_key_press(keycode, params):
     mlx, mlx_ptr, game, maze_generator = params
     if keycode == 0xFF1B:
@@ -180,6 +179,7 @@ def main() -> None:
     mlx_ptr = mlx.mlx_init()
     _, screen_width, screen_height = mlx.mlx_get_screen_size(mlx_ptr)
     window_width, window_height, maze.cell_size = CalculateSize.calculate(screen_width, screen_height, maze.width, maze.height)
+    window_width, window_height = (window_width + 1, window_height + 1)
     win_ptr = mlx.mlx_new_window(mlx_ptr, window_width, window_height, "A-maze-ing")
 
     image = Image(mlx, mlx_ptr, window_width, window_height)
