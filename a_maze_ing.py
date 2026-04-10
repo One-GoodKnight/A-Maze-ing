@@ -47,6 +47,7 @@ def game_loop(params):
 
     if game.state == State.INIT:
         maze_generator.gen = maze_generator.get_maze_generator(logo)
+        maze.cell_counter = 0
         maze.maze = [[None] * maze.width for _ in range(maze.height)]
         maze.init_time = time.time()
         player.x, player.y = (maze.entry[0] * maze.cell_size, maze.entry[1] * maze.cell_size)
@@ -58,19 +59,22 @@ def game_loop(params):
         time_since_gen_start = time.time() - maze.init_time
         cells_that_should_be_generated = time_since_gen_start / ANIMATION_SPEED * maze.width * maze.height
         cells_that_should_be_generated_after_this_frame = cells_that_should_be_generated + game.deltatime / ANIMATION_SPEED * maze.width * maze.height
-        cells_to_generate = max(0, cells_that_should_be_generated_after_this_frame - cells_that_should_be_generated)
+        cells_to_generate = max(0, cells_that_should_be_generated_after_this_frame - maze.cell_counter)
 
         new_maze = None
+        try_generate = False
         for i in range(math.floor(cells_to_generate)):
             try:
+                try_generate = True
                 new_maze = next(maze_generator.gen)
                 if not new_maze:
                     break
+                maze.cell_counter += 1
             except StopIteration as e:
                 print(f"An error occurred during the generation of the maze: {e}")
             except Exception as e:
                 print(f"An error occurred during the generation of the maze: {e}")
-        if cells_that_should_be_generated_after_this_frame >= maze.width * maze.height and not new_maze:
+        if try_generate and not new_maze:
             game.state = State.PLAY
         else:
             if new_maze:
