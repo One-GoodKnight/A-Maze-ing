@@ -174,10 +174,20 @@ class ShapeMazester():
             return (True, raycast, stuck)
 
     @staticmethod
-    def random_starting_pos(max_x: int, max_y: int) -> Tuple[int, int]:
+    def random_starting_pos(max_x: int, max_y: int, logo: list[Cell]) -> Tuple[int, int]:
+        logo_set = {(l.x, l.y) for l in logo}
+
         min_rand_x, max_rand_x = (max_x // 4 * 1, max_x // 4 * 3)
         min_rand_y, max_rand_y = (max_y // 4 * 1, max_y // 4 * 3)
-        return ((randint(min_rand_x, max_rand_x), randint(min_rand_y, max_rand_y)))
+
+        rand_pos = (randint(min_rand_x, max_rand_x), randint(min_rand_y, max_rand_y))
+        counter = 0
+        while rand_pos in logo_set:
+            rand_pos = (randint(min_rand_x, max_rand_x), randint(min_rand_y, max_rand_y))
+            counter += 1
+            if counter == 100:
+                return (0, 0)
+        return (rand_pos)
 
     @staticmethod
     def maze_generator(width: int, height: int, entry: tuple[int, int], exit: tuple[int, int], logo: list[Cell]) -> Generator[list[list[Cell]], None, None]:
@@ -189,7 +199,7 @@ class ShapeMazester():
         maze: list[list[Optional[Cell]]] = [[None] * width for _ in range(height)]
         cells: list[Cell] = []
 
-        start = ShapeMazester.random_starting_pos(max_x, max_y)
+        start = ShapeMazester.random_starting_pos(max_x, max_y, logo)
         cells.append(Cell(x=start[0], y=start[1]))
         maze[start[1]][start[0]] = cells[0]
         WallBuilder.build_wall(maze)
