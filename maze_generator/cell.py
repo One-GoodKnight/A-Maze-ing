@@ -42,6 +42,10 @@ class Cell(BaseModel):
             self.west
         )
 
+    @staticmethod
+    def manhattan_distance(c1: Self, c2: Self) -> int:
+        return abs(c1.x - c2.x) + abs(c1.y - c2.y)
+
     def __eq__(self, cell: Self) -> bool:
         return (self.x == cell.x and self.y == cell.y)
 
