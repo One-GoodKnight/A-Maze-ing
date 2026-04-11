@@ -16,4 +16,5 @@ __all__ = [
     "parse_logo",
     "Cell",
     "WallBuilder",
+    "Direction",
 ]

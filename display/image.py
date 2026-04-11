@@ -24,7 +24,9 @@ class Image():
         self.bytes_pp = bpp // 8
 
     @lru_cache
-    def endian_color(self, argb: int) -> NDArray[np.uint8]:
+    def endian_color(self, argb: int | None) -> NDArray[np.uint8] | None:
+        if argb is None:
+            return None
         if self.fmt == 1:
             color = np.array([
                     argb >> 24 & 0xFF, argb >> 16 & 0xFF,
@@ -41,11 +43,16 @@ class Image():
 
     def draw_rect(self, start: tuple[int, int], end: tuple[int, int],
                   argb: int) -> None:
-        x0, y0 = (min(self.width - 1, max(0, start[0])), min(self.height - 1, max(0, start[1])))
-        x1, y1 = (min(self.width - 1, max(0, end[0])), min(self.height - 1, max(0, end[1])))
+        x0 = min(self.width - 1, max(0, start[0]))
+        y0 = min(self.height - 1, max(0, start[1]))
+        x1 = min(self.width - 1, max(0, end[0]))
+        y1 = min(self.height - 1, max(0, end[1]))
         bytes_pp = self.bytes_pp
         color = self.endian_color(argb)
-        self.data[y0 : y1, x0*bytes_pp : x1*bytes_pp] = np.tile(color, x1 - x0)
+        self.data[
+            y0: y1,
+            x0*bytes_pp: x1*bytes_pp
+        ] = np.tile(color, x1 - x0)
 
     def set_to(self, color: int) -> None:
         self.draw_rect(
@@ -57,7 +64,15 @@ class Image():
     def rotate(self, angle: float) -> None:
         img = self.data.reshape(self.height, self.width, self.bytes_pp)
         center = (self.width // 2, self.height // 2)
-        matrix = cv2.getRotationMatrix2D(center, -angle, scale=(1 / 1.414) * MAZE_SCALE)
+        matrix = cv2.getRotationMatrix2D(
+            center, -angle, scale=(1 / 1.414) * MAZE_SCALE
+        )
         color = (0, 0, 0, 255) if self.fmt == 0 else (255, 0, 0, 0)
-        rotated = cv2.warpAffine(img, matrix, (self.width, self.height), borderMode=cv2.BORDER_CONSTANT, borderValue=color)
-        self.data[:self.height, :self.width * (self.bytes_pp)] = rotated.reshape(self.height, self.width * (self.bytes_pp))
+        rotated = cv2.warpAffine(
+            img, matrix, (self.width, self.height),
+            borderMode=cv2.BORDER_CONSTANT, borderValue=color
+        )
+        self.data[
+            :self.height,
+            :self.width * (self.bytes_pp)
+        ] = rotated.reshape(self.height, self.width * (self.bytes_pp))

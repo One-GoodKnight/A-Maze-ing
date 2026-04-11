@@ -1,10 +1,11 @@
 from typing import Tuple
 import math
-from random import randint
+
 
 class RayCast():
     @staticmethod
-    def cast_ray(start: Tuple[int, int], angle: float, max_x: int, max_y: int) -> list[Tuple[int, int]]:
+    def cast_ray(start: Tuple[int, int], angle: float,
+                 max_x: int, max_y: int) -> list[Tuple[int, int]]:
         cells: list[Tuple[int, int]] = []
 
         dir_x = math.cos(angle)
@@ -21,9 +22,6 @@ class RayCast():
 
         t_next_x = (0.5 / abs(dir_x)) if dir_x != 0 else math.inf
         t_next_y = (0.5 / abs(dir_y)) if dir_y != 0 else math.inf
-
-        max_check_x = max_x - start[0]
-        max_check_y = max_y - start[1]
 
         while (True):
             if (x < 0 or x > max_x or y < 0 or y > max_y):

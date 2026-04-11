@@ -1,7 +1,8 @@
 from pydantic import BaseModel, Field, model_validator
 from typing import Self
 from maze_generator.cell import Cell
-from constants import *
+from constants import MAX_MAZE_SIZE, DEFAULT_CELL_SIZE
+
 
 class Maze(BaseModel):
     maze: list[list[Cell | None]] | None
@@ -13,7 +14,7 @@ class Maze(BaseModel):
     output_file: str
     perfect: bool = Field(default=False)
     cell_size: int = Field(default=DEFAULT_CELL_SIZE)
-    cell_counter: int = Field(default = 0)
+    cell_counter: int = Field(default=0)
     init_time: float = 0
 
     @model_validator(mode='after')
@@ -67,7 +68,7 @@ class Maze(BaseModel):
         return self.maze[index]
 
     def __str__(self) -> str:
-        chars: list[str] = ["🬕🬂🬂🬨","▌  ▐","🬲🬭🬭🬷"]
+        chars: list[str] = ["🬕🬂🬂🬨", "▌  ▐", "🬲🬭🬭🬷"]
         ret: str = ''
         for row in self.maze:
             top = bot = ' '

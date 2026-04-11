@@ -1,9 +1,10 @@
 from constants import DEFAULT_CELL_SIZE, WINDOW_MARGIN
-from typing import Tuple
+
 
 class CalculateSize():
     @staticmethod
-    def calculate(screen_width: int, screen_height: int, cells_x: int, cells_y: int)-> Tuple[int, int, int]:
+    def calculate(screen_width: int, screen_height: int,
+                  cells_x: int, cells_y: int) -> tuple[int, int, int]:
         cell_size = DEFAULT_CELL_SIZE
 
         window_width = cells_x * cell_size

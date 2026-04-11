@@ -2,7 +2,8 @@ from pydantic import BaseModel, Field, model_validator
 from typing import Tuple, Self, Generator
 from .cell import Cell
 from .shape_mazester import ShapeMazester
-from constants import *
+from constants import MAX_MAZE_SIZE
+
 
 class MazeGenerator(BaseModel):
     width: int = Field(ge=1, le=MAX_MAZE_SIZE)
@@ -33,8 +34,11 @@ class MazeGenerator(BaseModel):
             raise ValueError("Exit and entry should not be at the same cell")
         return self
 
-    def get_maze_generator(self, logo: list[Cell]) -> Generator[list[list[Cell]], None, None]:
-        maze_generator: list[list[Cell]] = ShapeMazester.maze_generator(self.width, self.height, self.entry, self.exit, logo)
+    def get_maze_generator(self, logo: list[Cell]
+                           ) -> Generator[list[list[Cell]], None, None]:
+        maze_generator: list[list[Cell]] = ShapeMazester.maze_generator(
+            self.width, self.height, self.entry, self.exit, logo
+        )
         return maze_generator
 
     def build_output(self, maze: list[list[Cell]]) -> None:

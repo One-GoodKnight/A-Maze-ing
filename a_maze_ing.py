@@ -24,15 +24,17 @@ def display_play(params):
     mlx_maze_display.display_maze(maze, 0, 0)
     display_player(image, player)
     image.rotate(game.angle)
+    text = f"Maze rotation: {game.angle:.2f} degree"
+    font.print(image, 0, 0, text, color=WHITE)
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
 def display_end(params):
     mlx, mlx_ptr, win_ptr, image, font = params
     image.set_to(BLACK)
-    mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
     text = "GG - Press R to generate a new maze"
+    font.print(image, 0, 0, text, color=WHITE)
+    mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
     mlx.mlx_string_put(mlx_ptr, win_ptr, int(image.width / 2) - len(text) * 5, int(image.height / 2), 0x00FFFFFF, text)
-    #font.print(image, 10, 10, text, color=WHITE, bg_color=BLACK, size=2)
 
 def game_loop(params):
     game_start_loop_time = time.time()
