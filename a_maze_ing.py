@@ -42,9 +42,13 @@ def display_end(params):
     mlx.mlx_string_put(mlx_ptr, win_ptr, int(image.width / 2) - len(text) * 5, int(image.height / 2), 0x00FFFFFF, text)
 
 def game_loop(params):
-    start = time.time()
-
+    game_start_loop_time = time.time()
+    
     mlx, mlx_ptr, win_ptr, image, maze_generator, maze, mlx_maze_display, game, player, logo = params
+
+    time_between_loops = game_start_loop_time - (game.end_loop_time if game.end_loop_time != 0 else game_start_loop_time)
+    game.deltatime += time_between_loops
+    game.start_loop_time = game_start_loop_time
 
     if game.state == State.INIT:
         maze_generator.gen = maze_generator.get_maze_generator(logo)
@@ -54,6 +58,7 @@ def game_loop(params):
         player.x, player.y = (maze.entry[0] * maze.cell_size, maze.entry[1] * maze.cell_size)
         player.velocity.x, player.velocity.y = (0, 0)
         game.angle = 0
+        game.deltatime = 0
         game.state = State.GENERATION
 
     if game.state == State.GENERATION:
@@ -97,7 +102,8 @@ def game_loop(params):
     if game.state == State.END:
         display_end((mlx, mlx_ptr, win_ptr, image))
 
-    game.deltatime = time.time() - start
+    game.deltatime = time.time() - game.start_loop_time
+    game.end_loop_time = time.time()
 
 def handle_key_press(keycode, params):
     mlx, mlx_ptr, game, maze_generator = params
