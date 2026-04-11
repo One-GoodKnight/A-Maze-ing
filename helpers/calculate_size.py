@@ -1,4 +1,4 @@
-from constants import *
+from constants import DEFAULT_CELL_SIZE, WINDOW_MARGIN
 from typing import Tuple
 
 class CalculateSize():

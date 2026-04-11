@@ -1,8 +1,8 @@
 try:
-    from mlx import *
+    from mlx import Mlx
 except ImportError as e:
     raise SystemExit(f"Unable to import mlx: {e}")
-from maze import *
+from maze import Maze
 from maze_generator import *
 from display import *
 from helpers import *
@@ -10,41 +10,34 @@ from game import *
 from constants import *
 import random
 import time
-import numpy as np
-import cv2
 import math
-import cProfile
 
 def display_generation(params):
     mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display = params
-
-    clear_window(mlx, mlx_ptr, win_ptr, image)
+    image.set_to(BLACK)
     mlx_maze_display.display_maze(maze, 0, 0)
-    rotate_image(image, 0)
-
+    image.rotate(0)
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
 def display_play(params):
-    mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player = params
-
+    mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player, font = params
     mlx_maze_display.display_maze(maze, 0, 0)
     display_player(image, player)
-    rotate_image(image, game.angle)
-
+    image.rotate(game.angle)
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
 def display_end(params):
-    mlx, mlx_ptr, win_ptr, image = params
-
-    clear_window(mlx, mlx_ptr, win_ptr, image)
-
+    mlx, mlx_ptr, win_ptr, image, font = params
+    image.set_to(BLACK)
+    mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
     text = "GG - Press R to generate a new maze"
     mlx.mlx_string_put(mlx_ptr, win_ptr, int(image.width / 2) - len(text) * 5, int(image.height / 2), 0x00FFFFFF, text)
+    #font.print(image, 10, 10, text, color=WHITE, bg_color=BLACK, size=2)
 
 def game_loop(params):
     game_start_loop_time = time.time()
-    
-    mlx, mlx_ptr, win_ptr, image, maze_generator, maze, mlx_maze_display, game, player, logo = params
+
+    mlx, mlx_ptr, win_ptr, image, maze_generator, maze, mlx_maze_display, game, player, logo, font = params
 
     time_between_loops = game_start_loop_time - (game.end_loop_time if game.end_loop_time != 0 else game_start_loop_time)
     game.deltatime += time_between_loops
@@ -95,27 +88,27 @@ def game_loop(params):
     if game.state == State.PLAY:
         game.rotate(game.state)
         game.gravity(maze.maze, maze.cell_size, player)
-        display_play((mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player))
+        display_play((mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player, font))
         if (check_end(player, maze.cell_size, maze.exit)):
             game.state = State.END
-            
+
     if game.state == State.END:
-        display_end((mlx, mlx_ptr, win_ptr, image))
+        display_end((mlx, mlx_ptr, win_ptr, image, font))
 
     game.deltatime = time.time() - game.start_loop_time
     game.end_loop_time = time.time()
 
 def handle_key_press(keycode, params):
     mlx, mlx_ptr, game, maze_generator = params
-    if keycode == 0xFF1B:
-        params[0].mlx_loop_exit(params[1])
+    if keycode == 0xFF1B or keycode == ord('q'):
+        mlx.mlx_loop_exit(mlx_ptr)
 
     if keycode == 0xff51:
         game.left_rotate = True
     if keycode == 0xff53:
         game.right_rotate = True
 
-    if game.state == State.END and keycode == 0x72:
+    if game.state == State.END and keycode == ord('r'):
         game.state = State.INIT
 
 def handle_key_release(keycode, params):
@@ -127,7 +120,8 @@ def handle_key_release(keycode, params):
         game.right_rotate = False
 
 def handle_close(params):
-    params[0].mlx_loop_exit(params[1])
+    mlx, mlx_ptr = params
+    mlx.mlx_loop_exit(mlx_ptr)
 
 def main() -> None:
     import sys
@@ -145,7 +139,7 @@ def main() -> None:
         filename = "logo.42"
         parse_logo_data = parse_logo(filename, config['width'], config['height'])
         logo, logo_width, logo_height = parse_logo_data if parse_logo_data else (None, None, None)
-    except FileNotFoundError as _:
+    except FileNotFoundError as e:
         print(f"Could not find the file '{filename}'")
         return 1
     except PermissionError as _:
@@ -153,6 +147,12 @@ def main() -> None:
         return 1
     except Exception as e:
         print(f"An error occured during file parsing: {e}")
+        return 1
+    try:
+        fontname = 'display/DeterminationMono'
+        font = Font(fontname)
+    except FileNotFoundError:
+        print(f"Could not find the file '{fontname}'")
         return 1
 
     if (not logo or (len(logo) >= 1 and ((logo_width + 2 > config['width']) or (logo_height + 2 > config['height'])))):
@@ -207,7 +207,7 @@ def main() -> None:
 
     game.time = time.time()
 
-    mlx.mlx_loop_hook(mlx_ptr, game_loop, (mlx, mlx_ptr, win_ptr, image, maze_generator, maze, mlx_maze_display, game, player, logo))
+    mlx.mlx_loop_hook(mlx_ptr, game_loop, (mlx, mlx_ptr, win_ptr, image, maze_generator, maze, mlx_maze_display, game, player, logo, font))
 
     mlx.mlx_loop(mlx_ptr)
 
