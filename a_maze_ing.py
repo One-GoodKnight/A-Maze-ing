@@ -181,7 +181,7 @@ def main() -> None:
         entry=maze_generator.entry,
         exit=maze_generator.exit,
         output_file=maze_generator.output_file,
-        perfect=maze_generator.perfect
+        perfect=maze_generator.perfect,
     )
 
     mlx = Mlx()

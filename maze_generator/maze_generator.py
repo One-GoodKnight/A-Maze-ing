@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field, model_validator
 from typing import Tuple, Self, Generator
 from .cell import Cell
 from .shape_mazester.shape_mazester import ShapeMazester
+from .shape_mazester.shapes import Shape
 from constants import MAX_MAZE_SIZE
 
 
@@ -12,6 +13,7 @@ class MazeGenerator(BaseModel):
     exit: Tuple[int, int]
     output_file: str
     perfect: bool = Field(default=False)
+    shape: Shape = Field(default=Shape.CIRCLE)
     gen: Generator[list[list[Cell | None]]] | None = Field(default=None)
 
     @model_validator(mode='after')
@@ -37,7 +39,7 @@ class MazeGenerator(BaseModel):
     def get_maze_generator(self, logo: list[Cell]
                            ) -> Generator[list[list[Cell]], None, None]:
         maze_generator: list[list[Cell]] = ShapeMazester.maze_generator(
-            self.width, self.height, self.entry, self.exit, logo, self.perfect
+            self.width, self.height, self.entry, self.exit, logo, self.perfect, self.shape
         )
         return maze_generator
 

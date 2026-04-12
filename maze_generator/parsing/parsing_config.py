@@ -1,3 +1,4 @@
+from ..shape_mazester.shapes import Shape
 from typing import Dict, Any
 from enum import StrEnum
 
@@ -9,6 +10,7 @@ class Key(StrEnum):
     OUTPUT_FILE = 'output_file'
     PERFECT     = 'perfect'
     SEED        = 'seed'
+    SHAPE       = 'shape'
 
 def parse_config_file(filename: str) -> Dict[str, Any]:
     conf = {}
@@ -53,8 +55,12 @@ def parse_config_file(filename: str) -> Dict[str, Any]:
                     if (value != "True" and value != "False"):
                         raise ValueError("Perfect value should be 'True' or 'False'")
                     conf[key] = True if value == "True" else False
+                case 'shape':
+                    if value not in [shape.value for shape in Shape]:
+                        raise ValueError(f"Invalid shape, valid shapes for the maze generation are: {[shape.value for shape in Shape]}")
+                    conf[key] = value
                 case _:
-                    raise ValueError("Unexpected file, accepting only: KEY=VALUE")
+                    raise ValueError("Unexpected file format, accepting only: KEY=VALUE")
 
     if (set([key.value for key in Key]) != set([key for key in conf.keys()])):
         raise ValueError(f"Missing keys {[key.name for key in Key if key.value not in conf.keys()]}, all keys must be present in the config file {[key.name for key in Key]}")
