@@ -8,7 +8,8 @@ except ImportError as e:
     raise SystemExit(f"Unable to import cv2: {e}")
 import numpy as np
 from numpy.typing import NDArray
-from constants import MAZE_SCALE
+from constants import MAZE_SCALE, BLACK
+from .font import Font
 from functools import lru_cache
 
 
@@ -22,6 +23,7 @@ class Image():
         self.data = self.data.reshape(height, self.line_size)
         self.bits_pp = bpp
         self.bytes_pp = bpp // 8
+        self.font: Font | None = None
 
     @lru_cache
     def endian_color(self, argb: int | None) -> NDArray[np.uint8] | None:
@@ -76,3 +78,62 @@ class Image():
             :self.height,
             :self.width * (self.bytes_pp)
         ] = rotated.reshape(self.height, self.width * (self.bytes_pp))
+
+    def set_font(self, font: Font) -> None:
+        self.font = font
+
+    def print_char(self, x: int, y: int,
+                   char: str, **kwargs) -> None:
+        font = self.font
+        color = self.endian_color(kwargs.get('color', BLACK))
+        bg_color = self.endian_color(kwargs.get('bg_color', None))
+        size = kwargs.get('size', 1)
+        if size <= 0:
+            size = 1
+        letter = font.letters.get(char)
+        if letter is None:
+            return
+        for i in range(font.width * size):
+            for j in range(font.height * size):
+                x_coord = (x + i) * self.bytes_pp
+                y_coord = y + j
+                if (y_coord >= 0 and y_coord < self.height and x_coord >= 0
+                        and x_coord < self.width * self.bytes_pp):
+                    if letter[j // size][i // size] == '#':
+                        if color is not None:
+                            self.data[
+                                y_coord,
+                                x_coord: x_coord + self.bytes_pp
+                            ] = color
+                    else:
+                        if bg_color is not None:
+                            self.data[
+                                y_coord,
+                                x_coord: x_coord + self.bytes_pp
+                            ] = bg_color
+
+    def print(self, x: int, y: int, text: str, **kwargs) -> None:
+        if not text.isascii():
+            raise ValueError(f"Invalid text: '{text}' "
+                             "contains non ASCII characters")
+        font = self.font
+        color = kwargs.get('color', BLACK)
+        bg_color = kwargs.get('bg_color', None)
+        size = kwargs.get('size', 1)
+        if size <= 0:
+            size = 1
+        if x == -1:
+            x = (self.width // 2) - (len(text) * font.width * size // 2)
+        if y == -1:
+            y = (self.height // 2) - (font.height * size // 2)
+        for i, char in enumerate(text):
+            offset = i * font.width * size
+            if char == ' ' and bg_color is not None:
+                self.draw_rect(
+                    (x + offset, y),
+                    (x + offset + (font.width * size), y + font.height * size),
+                    bg_color
+                )
+            else:
+                self.print_char(x + offset, y, char, color=color,
+                                bg_color=bg_color, size=size)

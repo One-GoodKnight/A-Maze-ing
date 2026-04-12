@@ -20,26 +20,26 @@ def display_generation(params):
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
 def display_play(params):
-    mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player, font = params
+    mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player = params
     mlx_maze_display.display_maze(maze, 0, 0)
     display_player(image, player)
     image.rotate(game.angle)
-    text = f"Maze rotation: {game.angle:.2f} degree"
-    font.print(image, 0, 0, text, color=WHITE)
+    text = f"Maze rotation: {game.angle:06.2f} degree"
+    image.print(10, 10, text, color=WHITE, bg_color=None, size=3)
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
 def display_end(params):
-    mlx, mlx_ptr, win_ptr, image, font = params
+    mlx, mlx_ptr, win_ptr, image = params
     image.set_to(BLACK)
     text = "GG - Press R to generate a new maze"
-    font.print(image, 0, 0, text, color=WHITE)
+    image.print(-1, -1, text, color=WHITE, size=4)
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
-    mlx.mlx_string_put(mlx_ptr, win_ptr, int(image.width / 2) - len(text) * 5, int(image.height / 2), 0x00FFFFFF, text)
+    #mlx.mlx_string_put(mlx_ptr, win_ptr, int(image.width / 2) - len(text) * 5, int(image.height / 2), 0x00FFFFFF, text)
 
 def game_loop(params):
     game_start_loop_time = time.time()
 
-    mlx, mlx_ptr, win_ptr, image, maze_generator, maze, mlx_maze_display, game, player, logo, font = params
+    mlx, mlx_ptr, win_ptr, image, maze_generator, maze, mlx_maze_display, game, player, logo = params
 
     time_between_loops = game_start_loop_time - (game.end_loop_time if game.end_loop_time != 0 else game_start_loop_time)
     game.deltatime += time_between_loops
@@ -91,12 +91,12 @@ def game_loop(params):
     if game.state == State.PLAY:
         game.rotate(game.state)
         game.gravity(maze.maze, maze.cell_size, player)
-        display_play((mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player, font))
+        display_play((mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player))
         if (check_end(player, maze.cell_size, maze.exit)):
             game.state = State.END
 
     if game.state == State.END:
-        display_end((mlx, mlx_ptr, win_ptr, image, font))
+        display_end((mlx, mlx_ptr, win_ptr, image))
 
     game.deltatime = time.time() - game.start_loop_time
     game.end_loop_time = time.time()
@@ -192,6 +192,7 @@ def main() -> None:
     win_ptr = mlx.mlx_new_window(mlx_ptr, window_width, window_height, "A-maze-ing")
 
     image = Image(mlx, mlx_ptr, window_width, window_height)
+    image.set_font(font)
     mlx_maze_display = MazeDisplay(mlx, image)
 
     game = Game(maze.width, maze.height)
@@ -210,7 +211,7 @@ def main() -> None:
 
     game.time = time.time()
 
-    mlx.mlx_loop_hook(mlx_ptr, game_loop, (mlx, mlx_ptr, win_ptr, image, maze_generator, maze, mlx_maze_display, game, player, logo, font))
+    mlx.mlx_loop_hook(mlx_ptr, game_loop, (mlx, mlx_ptr, win_ptr, image, maze_generator, maze, mlx_maze_display, game, player, logo))
 
     mlx.mlx_loop(mlx_ptr)
 
