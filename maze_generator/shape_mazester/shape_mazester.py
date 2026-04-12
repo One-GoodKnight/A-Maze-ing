@@ -2,8 +2,8 @@ import math
 from random import randint, uniform, choice
 from typing import Optional, Tuple
 from collections.abc import Generator
-from .cell import Cell
-from .directions import Direction
+from ..cell import Cell
+from ..directions import Direction
 from .wall_builder import WallBuilder
 from .raycast import RayCast
 

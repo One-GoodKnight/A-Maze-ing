@@ -1,5 +1,5 @@
-from .cell import Cell
-from .directions import Direction
+from ..cell import Cell
+from ..directions import Direction
 from typing import Optional, Tuple
 from random import randint, choice
 

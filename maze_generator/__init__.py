@@ -6,7 +6,7 @@ from .directions import Direction
 from .cell import Cell
 from .parsing.parsing_config import parse_config_file
 from .parsing.parsing_logo import parse_logo
-from .wall_builder import WallBuilder
+from .shape_mazester.wall_builder import WallBuilder
 
 __all__ = [
     "__version__",

@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field, model_validator
 from typing import Tuple, Self, Generator
 from .cell import Cell
-from .shape_mazester import ShapeMazester
+from .shape_mazester.shape_mazester import ShapeMazester
 from constants import MAX_MAZE_SIZE
 
 
