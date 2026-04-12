@@ -5,4 +5,4 @@ EXIT=0,0
 OUTPUT_FILE=maze.txt
 PERFECT=True
 SEED=44
-SHAPE=circle
+SHAPE=triangle

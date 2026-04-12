@@ -186,7 +186,7 @@ class ShapeMazester():
         max_x = width - 1
         max_y = height - 1
 
-        shape_gen = shape.get_func()(max_x, max_y)
+        shape_gen = shape.get_func()()
         #shape_gen = Shapes.circle(max_x, max_y)
 
         maze: list[list[Optional[Cell]]] = [[None] * width for _ in range(height)]
