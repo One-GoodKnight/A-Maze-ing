@@ -76,6 +76,7 @@ def game_loop(params):
             except Exception as e:
                 print(f"An error occurred during the generation of the maze: {e}")
         if try_generate and not new_maze:
+
             game.state = State.PLAY
             try:
                 maze_generator.build_output(maze.maze)

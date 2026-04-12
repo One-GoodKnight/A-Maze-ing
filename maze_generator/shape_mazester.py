@@ -245,7 +245,7 @@ class ShapeMazester():
         return (rand_pos)
 
     @staticmethod
-    def maze_generator(width: int, height: int, entry: tuple[int, int], exit: tuple[int, int], logo: list[Cell]) -> Generator[list[list[Cell]], None, None]:
+    def maze_generator(width: int, height: int, entry: tuple[int, int], exit: tuple[int, int], logo: list[Cell], perfect: bool) -> Generator[list[list[Cell]], None, None]:
         max_x = width - 1
         max_y = height - 1
 
@@ -257,7 +257,6 @@ class ShapeMazester():
         start = ShapeMazester.random_starting_pos(max_x, max_y, logo)
         cells.append(Cell(x=start[0], y=start[1]))
         maze[start[1]][start[0]] = cells[0]
-        WallBuilder.build_wall(maze)
         yield maze
 
         cells_count = 1
@@ -276,6 +275,8 @@ class ShapeMazester():
         ShapeMazester.add_logo(maze, logo, cells_count)
 
         WallBuilder.build_wall(maze)
+        if not perfect:
+            WallBuilder.add_solutions(maze, logo, max_x, max_y, entry, exit)
         yield maze
         yield False
 

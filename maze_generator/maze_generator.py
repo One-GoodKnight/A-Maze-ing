@@ -37,7 +37,7 @@ class MazeGenerator(BaseModel):
     def get_maze_generator(self, logo: list[Cell]
                            ) -> Generator[list[list[Cell]], None, None]:
         maze_generator: list[list[Cell]] = ShapeMazester.maze_generator(
-            self.width, self.height, self.entry, self.exit, logo
+            self.width, self.height, self.entry, self.exit, logo, self.perfect
         )
         return maze_generator
 
