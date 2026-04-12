@@ -34,7 +34,6 @@ def display_end(params):
     text = "GG - Press R to generate a new maze"
     image.print(-1, -1, text, color=WHITE, size=4)
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
-    #mlx.mlx_string_put(mlx_ptr, win_ptr, int(image.width / 2) - len(text) * 5, int(image.height / 2), 0x00FFFFFF, text)
 
 def game_loop(params):
     game_start_loop_time = time.time()
@@ -151,8 +150,8 @@ def main() -> None:
     except Exception as e:
         print(f"An error occured during file parsing: {e}")
         return 1
+    fontname = 'display/DeterminationMono'
     try:
-        fontname = 'display/DeterminationMono'
         font = Font(fontname)
     except FileNotFoundError:
         print(f"Could not find the file '{fontname}'")
@@ -191,8 +190,7 @@ def main() -> None:
     window_width, window_height = (window_width + 1, window_height + 1)
     win_ptr = mlx.mlx_new_window(mlx_ptr, window_width, window_height, "A-maze-ing")
 
-    image = Image(mlx, mlx_ptr, window_width, window_height)
-    image.set_font(font)
+    image = Image(mlx, mlx_ptr, window_width, window_height, font)
     mlx_maze_display = MazeDisplay(mlx, image)
 
     game = Game(maze.width, maze.height)

@@ -14,7 +14,8 @@ from functools import lru_cache
 
 
 class Image():
-    def __init__(self, mlx: Mlx, mlx_ptr, width: int, height: int) -> None:
+    def __init__(self, mlx: Mlx, mlx_ptr, width: int, height: int,
+                 font: Font | None = None) -> None:
         self.width = width
         self.height = height
         self.ptr = mlx.mlx_new_image(mlx_ptr, width, height)
@@ -23,7 +24,7 @@ class Image():
         self.data = self.data.reshape(height, self.line_size)
         self.bits_pp = bpp
         self.bytes_pp = bpp // 8
-        self.font: Font | None = None
+        self.font: Font | None = font
 
     @lru_cache
     def endian_color(self, argb: int | None) -> NDArray[np.uint8] | None:
@@ -82,6 +83,8 @@ class Image():
         self.font = font
 
     def print_char(self, x: int, y: int, char: str, **kwargs) -> None:
+        if self.font is None:
+            return
         font = self.font
         color = kwargs.get('color', BLACK)
         size = max(kwargs.get('size', 1), 1)
@@ -96,6 +99,8 @@ class Image():
                     self.draw_rect(start, end, color)
 
     def print(self, x: int, y: int, string: str, **kwargs) -> None:
+        if self.font is None:
+            return
         font = self.font
         bg_color = kwargs.get('bg_color', None)
         size = max(kwargs.get('size', 1), 1)
