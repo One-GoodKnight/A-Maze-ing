@@ -9,6 +9,7 @@ from display import Image, Font, MazeDisplay, set_logo_color, display_player, \
     highlight_solution, clear_solution
 from helpers import CalculateSize
 from game import Game, State, Player, check_end
+from solver import solve
 from constants import WHITE, BLACK, PLAYER_SIZE, ANIMATION_SPEED
 import random
 import time
@@ -94,7 +95,7 @@ def game_loop(params):
                       f"generation of the maze: {e}")
         if try_generate and not new_maze:
             # TODO: calculate maze solution
-            maze.solution = 'EEE'
+            solve(maze)
             try:
                 maze_generator.build_output(maze.maze)
             except PermissionError:
@@ -115,7 +116,7 @@ def game_loop(params):
         game.angle = 0
         game.deltatime = 0
         game.state = State.PLAY
-        maze.player_solution = 'WWW'  # TODO: calculate player solution
+        solve(maze, player)  # TODO: calculate player solution
         maze.show_solutions = False
 
     elif game.state == State.PLAY:
@@ -130,7 +131,7 @@ def game_loop(params):
         if maze.show_solutions and (prev_x != new_x or prev_y != new_y):
             clear_solution(image, maze.maze,
                            (int(prev_x), int(prev_y)), maze.player_solution)
-            maze.player_solution = 'WWW'  # TODO: calculate new maze.p_solution
+            solve(maze, player)  # TODO: calculate new maze.p_solution
             highlight_solution(image, maze.maze,
                                (int(new_x), int(new_y)), maze.player_solution)
 
@@ -168,8 +169,8 @@ def handle_key_press(keycode, params):
             clear_solution(image, maze.maze, maze.entry, maze.solution)
             maze.show_solutions = False
         else:
-            highlight_solution(image, maze.maze, maze.entry, maze.solution)
-            maze.player_solution = 'WWW'  # TODO: calculate maze.p_solution
+            #highlight_solution(image, maze.maze, maze.entry, maze.solution)
+            solve(maze, player)  # TODO: calculate maze.p_solution
             highlight_solution(image, maze.maze,
                                (int(player.center_x // maze.cell_size),
                                 int(player.center_y // maze.cell_size)),

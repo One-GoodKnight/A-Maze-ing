@@ -17,8 +17,8 @@ class Maze(BaseModel):
     cell_counter: int = Field(default=0)
     init_time: float = 0
 
-    player_solution: str
-    show_solutions: bool
+    player_solution: str = Field(default='')
+    show_solutions: bool = Field(default=False)
 
     @model_validator(mode='after')
     def check_entry(self) -> Self:
@@ -60,12 +60,29 @@ class Maze(BaseModel):
                         height=len(maze), entry=entry, exit=exit,
                         output_file=filename)
     '''
+    def pixel_to_cell(self, x: int, y: int) -> Cell:
+        cell_x: int = x // self.cell_size
+        cell_y: int = y // self.cell_size
+        return Cell(x=cell_x, y=cell_y)
 
     def get_entry(self) -> Cell:
         return self.maze[self.entry[0]][self.entry[1]]
 
     def get_exit(self) -> Cell:
         return self.maze[self.exit[0]][self.exit[1]]
+
+    def get_neighbors(self, cell: Cell) -> list[Cell]:
+        neighbors: list[Cell] = []
+        x, y = (cell.x, cell.y)
+        if not cell.north and y - 1 >= 0:
+            neighbors.append(self.maze[y - 1][x])
+        if not cell.east and x + 1 < self.width:
+            neighbors.append(self.maze[y][x + 1])
+        if not cell.south and y + 1 < self.height:
+            neighbors.append(self.maze[y + 1][x])
+        if not cell.west and x - 1 >= 0:
+            neighbors.append(self.maze[y][x - 1])
+        return neighbors
 
     def __getitem__(self, index: int) -> Cell:
         return self.maze[index]

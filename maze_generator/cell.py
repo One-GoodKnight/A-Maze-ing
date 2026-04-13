@@ -53,7 +53,16 @@ class Cell(BaseModel):
         return self.to_hex()
 
     def __repr__(self) -> str:
-        return self.to_hex()
+        s = 'Cell {\n'
+        s += f'\thex = {self.to_hex()}\n'
+        s += f'\tx = {self.x}\n'
+        s += f'\ty = {self.y}\n'
+        s += f'\tnorth = {self.north}\n'
+        s += f'\teast = {self.east}\n'
+        s += f'\tsouth = {self.south}\n'
+        s += f'\twest = {self.west}\n'
+        s += '}'
+        return s
 
     def __hash__(self):
         return hash((self.x, self.y))

@@ -55,3 +55,14 @@ class Player():
     @property
     def bottom_right_corner(self) -> Vector2:
         return Vector2(self.x + self.size - 1, self.y + self.size - 1)
+
+    def __repr__(self) -> str:
+        s = 'Player {\n'
+        s += f'\tx = {self.x}\n'
+        s += f'\ty = {self.y}\n'
+        s += f'\tmax_x = {self.max_x}\n'
+        s += f'\tmax_y = {self.max_y}\n'
+        s += f'\tsize = {self.size}\n'
+        s += f'\tvelocity = {repr(self.velocity)}\n'
+        s += '}'
+        return s
