@@ -14,8 +14,8 @@ class RayCast():
         x = start[0]
         y = start[1]
 
-        step_x = 1 if dir_x >= 0 else -1
-        step_y = 1 if dir_y >= 0 else -1
+        step_dir_x = 1 if dir_x >= 0 else -1
+        step_dir_y = 1 if dir_y >= 0 else -1
 
         t_delta_x = abs(1 / dir_x) if dir_x != 0 else math.inf
         t_delta_y = abs(1 / dir_y) if dir_y != 0 else math.inf
@@ -29,7 +29,7 @@ class RayCast():
             cells.append((x, y))
             if (t_next_x < t_next_y):
                 t_next_x += t_delta_x
-                x += step_x
+                x += step_dir_x
             else:
                 t_next_y += t_delta_y
-                y += step_y
+                y += step_dir_y

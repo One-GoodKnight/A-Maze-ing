@@ -44,6 +44,7 @@ class Segment():
     def __repr__(self):
         return f"({self.v1}, {self.v2}, {self.length})"
 
+
 class Shapes():
     @staticmethod
     def normalize_vector(vector: list[float, float]) -> list[float, float]:
@@ -51,7 +52,8 @@ class Shapes():
         return [vector[0] / magnitude, vector[1] / magnitude]
 
     @staticmethod
-    def construct_shape_gen(verticies_tuple: Tuple[Tuple[float, float]]) -> Generator[float, None, None]:
+    def construct_shape_gen(verticies_tuple: Tuple[Tuple[float, float]]
+                            ) -> Generator[float, None, None]:
         coeff = 6
         coeff /= 1000
 
@@ -61,17 +63,21 @@ class Shapes():
 
         segments: list[Segment] = []
         for i in range(len(verticies) - 1):
-            segments.append(Segment(verticies[i], verticies[i + 1], Vertex.distance(verticies[i], verticies[i + 1])))
-        segments.append(Segment(verticies[-1], verticies[0], Vertex.distance(verticies[-1], verticies[0])))
+            new_seg = Segment(verticies[i], verticies[i + 1],
+                              Vertex.distance(verticies[i], verticies[i + 1]))
+            segments.append(new_seg)
+        new_seg = Segment(verticies[-1], verticies[0],
+                          Vertex.distance(verticies[-1], verticies[0]))
+        segments.append(new_seg)
 
         perimeter = sum([s.length for s in segments])
         step_amount = (perimeter) * coeff
 
         distance = 1
-        
+
         i_seg = 0
         cur_distance_seg = 0
-            
+
         while True:
             step_remaining = step_amount / distance
 
@@ -100,7 +106,8 @@ class Shapes():
             vector = [res_posx, res_posy]
             normed = Shapes.normalize_vector(vector)
 
-            yield math.acos(normed[0]) if normed[1] < 0 else -math.acos(normed[0])
+            yield (math.acos(normed[0]) if normed[1] < 0
+                   else -math.acos(normed[0]))
 
     @staticmethod
     def triangle() -> Generator[float, None, None]:
@@ -116,18 +123,20 @@ class Shapes():
         coeff /= 1000
         step_amount = (2 * (1 + 1)) * coeff
         step = 0
-        
+
         while True:
             distance = step // (2 * math.pi)
+            if distance < 1:
+                distance = 1
             match direction:
                 case Direction.SOUTH:
-                    vector[1] += step_amount / (distance if distance > 1 else 1)
+                    vector[1] += step_amount / distance
                 case Direction.NORTH:
-                    vector[1] -= step_amount / (distance if distance > 1 else 1)
+                    vector[1] -= step_amount / distance
                 case Direction.EAST:
-                    vector[0] += step_amount / (distance if distance > 1 else 1)
+                    vector[0] += step_amount / distance
                 case Direction.WEST:
-                    vector[0] -= step_amount / (distance if distance > 1 else 1)
+                    vector[0] -= step_amount / distance
 
             if vector[0] > 1:
                 vector[0] = 1
@@ -144,14 +153,20 @@ class Shapes():
 
             normed = Shapes.normalize_vector(vector)
             step += step_amount / (distance if distance > 1 else 1)
-            yield math.acos(normed[0]) if normed[1] >= 0 else -math.acos(normed[0])
+            yield (math.acos(normed[0]) if normed[1] >= 0
+                   else -math.acos(normed[0]))
 
     @staticmethod
     def circle() -> Generator[float, None, None]:
-        # coeff helps adding chaos to the maze, with a lower coeff, the maze can generate multiple cells using the same raycast
+        # coeff helps adding chaos to the maze, with a lower coeff,
+        # the maze can generate multiple cells using the same raycast
         # that helps breaking the uniformity of the maze
-        # with a high value, each cell generation will be independent of the other cells because there was not a cell generated right next
-        # to it that constrains it's generation that results in a maze full of straight lines towards the starting cell
+
+        # with a high value, each cell generation will be independent
+        # of the other cells because there wasn't a cell generated right next
+        # to it that constrains it's generation that results in a maze
+        # full of straight lines towards the starting cell
+
         coeff = 11
         coeff /= 1000
         step_amount = (2 * math.pi) * coeff

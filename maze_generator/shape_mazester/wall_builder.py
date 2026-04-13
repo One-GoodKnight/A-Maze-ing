@@ -3,6 +3,7 @@ from ..directions import Direction
 from typing import Optional, Tuple
 from random import randint, choice
 
+
 class WallBuilder():
     @staticmethod
     def build_wall(maze: list[list[Optional[Cell]]]) -> None:
@@ -14,10 +15,11 @@ class WallBuilder():
                 cell.east = not cell.dir_east
                 cell.south = not cell.dir_south
                 cell.west = not cell.dir_west
-    
+
     @staticmethod
-    def open_all_walls(maze: list[list[Optional[Cell]]], logo: list[Cell], max_x: int, max_y: int, cell: Cell) -> None:
-        logo_set = {(l.x, l.y) for l in logo}
+    def open_all_walls(maze: list[list[Optional[Cell]]], logo: list[Cell],
+                       max_x: int, max_y: int, cell: Cell) -> None:
+        logo_set = {(c.x, c.y) for c in logo}
 
         if (cell.x, cell.y) in logo_set:
             return
@@ -27,13 +29,13 @@ class WallBuilder():
             if n not in logo_set:
                 cell.west = False
                 n.east = False
-        
+
         if cell.x != max_x:
             n = maze[cell.y][cell.x + 1]
             if n not in logo_set:
                 cell.east = False
                 n.west = False
-        
+
         if cell.y != 0:
             n = maze[cell.y - 1][cell.x]
             if n not in logo_set:
@@ -47,7 +49,9 @@ class WallBuilder():
                 n.north = False
 
     @staticmethod
-    def destructible_walls(maze: list[list[Optional[Cell]]], logo: list[Cell], max_x: int, max_y: int, cell: Cell) -> list[Direction]:
+    def destructible_walls(maze: list[list[Optional[Cell]]], logo: list[Cell],
+                           max_x: int, max_y: int, cell: Cell
+                           ) -> list[Direction]:
         destructible_walls = []
 
         if cell.north and cell.y != 0:
@@ -62,13 +66,15 @@ class WallBuilder():
         return destructible_walls
 
     @staticmethod
-    def open_single_wall(maze: list[list[Optional[Cell]]], logo: list[Cell], max_x: int, max_y: int, cell: Cell) -> None:
-        logo_set = {(l.x, l.y) for l in logo}
+    def open_single_wall(maze: list[list[Optional[Cell]]], logo: list[Cell],
+                         max_x: int, max_y: int, cell: Cell) -> None:
+        logo_set = {(c.x, c.y) for c in logo}
 
         if (cell.x, cell.y) in logo_set:
             return
 
-        destructible_walls = WallBuilder.destructible_walls(maze, logo, max_x, max_y, cell)
+        destructible_walls = WallBuilder.destructible_walls(maze, logo,
+                                                            max_x, max_y, cell)
         if len(destructible_walls) < 2:
             return
 
@@ -79,7 +85,8 @@ class WallBuilder():
                 n = maze[cell.y - 1][cell.x]
                 if (n.x, n.y) in logo_set:
                     return
-                if len(WallBuilder.destructible_walls(maze, logo, max_x, max_y, n)) < 2:
+                if len(WallBuilder.destructible_walls(maze, logo,
+                                                      max_x, max_y, n)) < 2:
                     return
                 cell.north = False
                 n.south = False
@@ -87,7 +94,8 @@ class WallBuilder():
                 n = maze[cell.y][cell.x + 1]
                 if (n.x, n.y) in logo_set:
                     return
-                if len(WallBuilder.destructible_walls(maze, logo, max_x, max_y, n)) < 2:
+                if len(WallBuilder.destructible_walls(maze, logo,
+                                                      max_x, max_y, n)) < 2:
                     return
                 cell.east = False
                 n.west = False
@@ -95,7 +103,8 @@ class WallBuilder():
                 n = maze[cell.y + 1][cell.x]
                 if (n.x, n.y) in logo_set:
                     return
-                if len(WallBuilder.destructible_walls(maze, logo, max_x, max_y, n)) < 2:
+                if len(WallBuilder.destructible_walls(maze, logo,
+                                                      max_x, max_y, n)) < 2:
                     return
                 cell.south = False
                 n.north = False
@@ -103,15 +112,16 @@ class WallBuilder():
                 n = maze[cell.y][cell.x - 1]
                 if (n.x, n.y) in logo_set:
                     return
-                if len(WallBuilder.destructible_walls(maze, logo, max_x, max_y, n)) < 2:
+                if len(WallBuilder.destructible_walls(maze, logo,
+                                                      max_x, max_y, n)) < 2:
                     return
                 cell.west = False
                 n.east = False
 
     @staticmethod
-    def add_solutions(maze: list[list[Optional[Cell]]], logo: list[Cell], max_x: int, max_y: int, entry: Tuple[int, int], exit: Tuple[int, int]) -> None:
-        logo_set = {(l.x, l.y) for l in logo}
-
+    def add_solutions(maze: list[list[Optional[Cell]]], logo: list[Cell],
+                      max_x: int, max_y: int, entry: Tuple[int, int],
+                      exit: Tuple[int, int]) -> None:
         width, height = (max_x + 1, max_y + 1)
 
         entry_cell = maze[entry[1]][entry[0]]
@@ -123,5 +133,5 @@ class WallBuilder():
         n = int(width * height * 0.5)
         for i in range(n):
             rand_x, rand_y = (randint(0, max_x), randint(0, max_y))
-            WallBuilder.open_single_wall(maze, logo, max_x, max_y, maze[rand_y][rand_x])
-        
+            WallBuilder.open_single_wall(maze, logo, max_x,
+                                         max_y, maze[rand_y][rand_x])

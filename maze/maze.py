@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, model_validator
-from typing import Self, Tuple
+from typing import Self
 from maze_generator.cell import Cell
 from constants import MAX_MAZE_SIZE, DEFAULT_CELL_SIZE
 

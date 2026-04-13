@@ -1,17 +1,18 @@
 import math
-from random import randint, uniform, choice
+from random import randint, choice
 from typing import Optional, Tuple
 from collections.abc import Generator
 from ..cell import Cell
 from ..directions import Direction
 from .wall_builder import WallBuilder
 from .raycast import RayCast
-from .shapes import Shapes, Shape
+from .shapes import Shape
 
 
 class ShapeMazester():
     @staticmethod
-    def neighbors(maze: list[list[Optional[Cell]]], cell: Cell, max_x: int, max_y: int) -> list[Tuple[int, int, Direction]]:
+    def neighbors(maze: list[list[Optional[Cell]]], cell: Cell,
+                  max_x: int, max_y: int) -> list[Tuple[int, int, Direction]]:
         if not cell:
             return []
         neighbor_positions = [
@@ -29,8 +30,10 @@ class ShapeMazester():
         return neighbor_positions
 
     @staticmethod
-    def empty_neighbors(maze: list[list[Optional[Cell]]], cell: Cell, max_x: int, max_y: int, logo: list[Cell]) -> Tuple[int, int, Direction]:
-        logo_set = {(l.x, l.y) for l in logo}
+    def empty_neighbors(maze: list[list[Optional[Cell]]], cell: Cell,
+                        max_x: int, max_y: int, logo: list[Cell]
+                        ) -> Tuple[int, int, Direction]:
+        logo_set = {(c.x, c.y) for c in logo}
 
         neighbor_positions = ShapeMazester.neighbors(maze, cell, max_x, max_y)
         neighbor_positions = [
@@ -41,10 +44,15 @@ class ShapeMazester():
         return neighbor_positions
 
     @staticmethod
-    def find_valid_cell_in_raycast(maze: list[list[Optional[Cell]]], raycast: list[Tuple[int, int]], cells: list[Cell], logo: list[Cell]) -> Optional[Cell]:
-        logo_set = {(l.x, l.y) for l in logo}
-        # add randomness to the algo by searching randomly from the end or from the start of the rayscast
-        # prioritizes border towards center to help the algo get the shape wanted but still fill the inside of the maze
+    def find_valid_cell_in_raycast(maze: list[list[Optional[Cell]]],
+                                   raycast: list[Tuple[int, int]],
+                                   cells: list[Cell], logo: list[Cell]
+                                   ) -> Optional[Cell]:
+        logo_set = {(c.x, c.y) for c in logo}
+        # add randomness to the algo by searching randomly from
+        # the end or from the start of the rayscast.
+        # prioritizes border towards center to help the algo get
+        # the shape wanted but still fill the inside of the maze.
         towards_center = randint(0, 2)
 
         # iterating the raycast from border to point
@@ -69,10 +77,13 @@ class ShapeMazester():
             if not maze[cell[1]][cell[0]]:
                 last_cell = raycast[i - 1]
                 return maze[last_cell[1]][last_cell[0]]
-        
+
         return None
 
-    def find_valid_neighbor_from_raycast(maze: list[list[Optional[Cell]]], max_x: int, max_y: int, raycast: list[Tuple[int, int]], logo: list[Cell]) -> Optional[Cell]:
+    def find_valid_neighbor_from_raycast(maze: list[list[Optional[Cell]]],
+                                         max_x: int, max_y: int,
+                                         raycast: list[Tuple[int, int]],
+                                         logo: list[Cell]) -> Optional[Cell]:
         for i in range(len(raycast)):
             pos = (raycast[i][0], raycast[i][1])
             cell = maze[pos[1]][pos[0]]
@@ -81,21 +92,31 @@ class ShapeMazester():
                 neighbor_cell = maze[neighbor[1]][neighbor[0]]
                 if not neighbor_cell:
                     continue
-                if len(ShapeMazester.empty_neighbors(maze, neighbor_cell, max_x, max_y, logo)) != 0:
+                if len(ShapeMazester.empty_neighbors(maze, neighbor_cell,
+                                                     max_x, max_y, logo)) != 0:
                     return neighbor_cell
         return None
 
     @staticmethod
-    def pick_cell(maze: list[list[Optional[Cell]]], cells: list[Cell], max_x: int, max_y: int, shape_gen: Generator[Tuple[float, float], None, None], start: Tuple[int, int], logo: list[Cell], stuck: bool) -> Tuple[Optional[Cell], list[Tuple[int, int, float]]]:
+    def pick_cell(maze: list[list[Optional[Cell]]], cells: list[Cell],
+                  max_x: int, max_y: int,
+                  shape_gen: Generator[Tuple[float, float], None, None],
+                  start: Tuple[int, int], logo: list[Cell], stuck: bool
+                  ) -> Tuple[Optional[Cell], list[Tuple[int, int, float]]]:
         angle = next(shape_gen)
-        raycast = RayCast.cast_ray((start[0], start[1]), next(shape_gen), max_x, max_y)
+        raycast = RayCast.cast_ray((start[0], start[1]),
+                                   next(shape_gen), max_x, max_y)
 
-        cell = ShapeMazester.find_valid_cell_in_raycast(maze, raycast, cells, logo)
+        cell = ShapeMazester.find_valid_cell_in_raycast(maze, raycast,
+                                                        cells, logo)
         if cell:
             return (cell, raycast, angle)
 
-        # no reachable valid cell found, checking neighbors of each cell of the raycast
-        cell = ShapeMazester.find_valid_neighbor_from_raycast(maze, max_x, max_y, raycast, logo)
+        # no reachable valid cell found,
+        # checking neighbors of each cell of the raycast
+        cell = ShapeMazester.find_valid_neighbor_from_raycast(
+            maze, max_x, max_y, raycast, logo
+        )
         if cell:
             return (cell, raycast, angle)
 
@@ -103,31 +124,46 @@ class ShapeMazester():
             return (None, raycast, angle)
 
         cell = choice(cells)
-        neighbor_positions = ShapeMazester.empty_neighbors(maze, cell, max_x, max_y, logo)
+        neighbor_positions = ShapeMazester.empty_neighbors(
+            maze, cell, max_x, max_y, logo
+        )
         while len(neighbor_positions) == 0:
             cell = choice(cells)
-            neighbor_positions = ShapeMazester.empty_neighbors(maze, cell, max_x, max_y, logo)
+            neighbor_positions = ShapeMazester.empty_neighbors(
+                maze, cell, max_x, max_y, logo
+            )
         return (cell, raycast, angle)
 
     @staticmethod
-    def generate_cell(maze: list[list[Optional[Cell]]], cells: list[Cell], max_x: int, max_y: int, shape_gen: Generator[Tuple[float, float], None, None], start: Tuple[int, int], logo: list[Cell], stuck: bool) -> Tuple[bool, Optional[list[Tuple[int, int]]], bool]:
+    def generate_cell(maze: list[list[Optional[Cell]]],
+                      cells: list[Cell], max_x: int, max_y: int,
+                      shape_gen: Generator[Tuple[float, float], None, None],
+                      start: Tuple[int, int], logo: list[Cell], stuck: bool
+                      ) -> Tuple[bool, Optional[list[Tuple[int, int]]], bool]:
         while (True):
-            cell, raycast, angle = ShapeMazester.pick_cell(maze, cells, max_x, max_y, shape_gen, start, logo, stuck)
+            cell, raycast, angle = ShapeMazester.pick_cell(
+                maze, cells, max_x, max_y, shape_gen, start, logo, stuck
+            )
             try_counter = 0
             while not cell:
                 try_counter += 1
                 if try_counter >= 1000:
                     stuck = True
-                cell, raycast, angle = ShapeMazester.pick_cell(maze, cells, max_x, max_y, shape_gen, start, logo, stuck)
-            neighbors = ShapeMazester.empty_neighbors(maze, cell, max_x, max_y, logo)
+                cell, raycast, angle = ShapeMazester.pick_cell(
+                    maze, cells, max_x, max_y, shape_gen, start, logo, stuck
+                )
+            neighbors = ShapeMazester.empty_neighbors(maze, cell,
+                                                      max_x, max_y, logo)
 
             deg_angle = math.degrees(angle)
-            # angle goes clockwise, prioritize the direction closest to +90° to follow the curve of the shape
+            # angle goes clockwise, prioritize the direction closest
+            # to +90° to follow the curve of the shape
             angle_target = deg_angle + 90
             angle_target %= 360
 
             direction = None
-            if ((angle_target >= 315 and angle_target <= 360) or (angle_target >= 0 and angle_target <= 45)):
+            if ((angle_target >= 315 and angle_target <= 360) or
+                    (angle_target >= 0 and angle_target <= 45)):
                 direction = Direction.EAST
             elif (angle_target >= 45 and angle_target <= 135):
                 direction = Direction.SOUTH
@@ -166,30 +202,37 @@ class ShapeMazester():
             return (True, raycast, stuck)
 
     @staticmethod
-    def random_starting_pos(max_x: int, max_y: int, logo: list[Cell]) -> Tuple[int, int]:
-        logo_set = {(l.x, l.y) for l in logo}
+    def random_starting_pos(max_x: int, max_y: int,
+                            logo: list[Cell]) -> Tuple[int, int]:
+        logo_set = {(c.x, c.y) for c in logo}
 
         min_rand_x, max_rand_x = (max_x // 4 * 1, max_x // 4 * 3)
         min_rand_y, max_rand_y = (max_y // 4 * 1, max_y // 4 * 3)
 
-        rand_pos = (randint(min_rand_x, max_rand_x), randint(min_rand_y, max_rand_y))
+        rand_pos = (randint(min_rand_x, max_rand_x),
+                    randint(min_rand_y, max_rand_y))
         counter = 0
         while rand_pos in logo_set:
-            rand_pos = (randint(min_rand_x, max_rand_x), randint(min_rand_y, max_rand_y))
+            rand_pos = (randint(min_rand_x, max_rand_x),
+                        randint(min_rand_y, max_rand_y))
             counter += 1
             if counter == 100:
                 return (0, 0)
         return (rand_pos)
 
     @staticmethod
-    def maze_generator(width: int, height: int, entry: tuple[int, int], exit: tuple[int, int], logo: list[Cell], perfect: bool, shape: Shape) -> Generator[list[list[Cell]], None, None]:
+    def maze_generator(width: int, height: int, entry: tuple[int, int],
+                       exit: tuple[int, int], logo: list[Cell],
+                       perfect: bool, shape: Shape
+                       ) -> Generator[list[list[Cell]], None, None]:
         max_x = width - 1
         max_y = height - 1
 
         shape_gen = shape.get_func()()
-        #shape_gen = Shapes.circle(max_x, max_y)
 
-        maze: list[list[Optional[Cell]]] = [[None] * width for _ in range(height)]
+        maze: list[list[Optional[Cell]]] = [
+            [None] * width for _ in range(height)
+        ]
         cells: list[Cell] = []
 
         start = ShapeMazester.random_starting_pos(max_x, max_y, logo)
@@ -202,9 +245,13 @@ class ShapeMazester():
         stuck = False
 
         while (cells_count != max_cells_count):
-            (generated, raycast, stuck) = ShapeMazester.generate_cell(maze, cells, max_x, max_y, shape_gen, start, logo, stuck)
+            (generated, raycast, stuck) = ShapeMazester.generate_cell(
+                maze, cells, max_x, max_y, shape_gen, start, logo, stuck
+            )
             while (not generated):
-                (generated, raycast, stuck) = ShapeMazester.generate_cell(maze, cells, max_x, max_y, shape_gen, start, logo, stuck)
+                (generated, raycast, stuck) = ShapeMazester.generate_cell(
+                    maze, cells, max_x, max_y, shape_gen, start, logo, stuck
+                )
             ShapeMazester.toggle_raycast(maze, raycast, True)
             yield maze
             ShapeMazester.toggle_raycast(maze, raycast, False)
@@ -220,12 +267,15 @@ class ShapeMazester():
         yield False
 
     @staticmethod
-    def add_logo(maze: list[list[Optional[Cell]]], logo: list[Cell], cells_count: int) -> None:
+    def add_logo(maze: list[list[Optional[Cell]]],
+                 logo: list[Cell], cells_count: int) -> None:
         for cell in logo:
             maze[cell.y][cell.x] = cell
 
     @staticmethod
-    def toggle_raycast(maze: list[list[Optional[Cell]]], raycast: Optional[list[Tuple[int, int]]], on: bool) -> None:
+    def toggle_raycast(maze: list[list[Optional[Cell]]],
+                       raycast: Optional[list[Tuple[int, int]]],
+                       on: bool) -> None:
         if not raycast:
             return
         if on:
