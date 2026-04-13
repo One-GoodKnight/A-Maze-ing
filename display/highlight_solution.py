@@ -26,3 +26,7 @@ def highlight_solution(image: Image, maze: list[list[Cell]], start: Tuple[int, i
                 cur_cell[0] -=1
 
         maze[cur_cell[1]][cur_cell[0]].color = color
+
+
+def clear_solution(image: Image, maze: list[list[Cell]], start: Tuple[int, int], solution: str):
+    highlight_solution(image, maze, start, solution, False)

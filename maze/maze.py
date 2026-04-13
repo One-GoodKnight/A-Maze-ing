@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, model_validator
-from typing import Self
+from typing import Self, Tuple
 from maze_generator.cell import Cell
 from constants import MAX_MAZE_SIZE, DEFAULT_CELL_SIZE
 
@@ -16,6 +16,8 @@ class Maze(BaseModel):
     cell_size: int = Field(default=DEFAULT_CELL_SIZE)
     cell_counter: int = Field(default=0)
     init_time: float = 0
+
+    player_solution: str
 
     @model_validator(mode='after')
     def check_entry(self) -> Self:

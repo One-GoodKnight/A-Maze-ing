@@ -24,7 +24,8 @@ def display_play(params):
 
     mlx_maze_display.display_maze(maze, 0, 0)
     display_player(image, player)
-    highlight_solution(image, maze.maze, maze.entry, 'EEE', True)
+
+    highlight_solution(image, maze.maze, maze.entry, maze.solution)
 
     image.rotate(game.angle)
 
@@ -52,6 +53,7 @@ def game_loop(params):
 
     if game.state == State.INIT_GENERATION:
         maze_generator.gen = maze_generator.get_maze_generator(logo)
+        maze.player_solution = ''
         maze.cell_counter = 0
         maze.maze = [[None] * maze.width for _ in range(maze.height)]
         maze.init_time = time.time()
@@ -77,11 +79,13 @@ def game_loop(params):
             except Exception as e:
                 print(f"An error occurred during the generation of the maze: {e}")
         if try_generate and not new_maze:
-            game.state = State.INIT_PLAY
+            # TODO: calculate maze solution
+            maze.solution = 'EEE'
             try:
                 maze_generator.build_output(maze.maze)
             except PermissionError as _:
                 print(f"Cannot write to output '{maze.output_file}', permission denied")
+            game.state = State.INIT_PLAY
         else:
             if new_maze:
                 maze.maze = new_maze
@@ -94,10 +98,20 @@ def game_loop(params):
         game.angle = 0
         game.deltatime = 0
         game.state = State.PLAY
+        maze.player_solution = 'SSS' # TODO: calculate player solution
 
     elif game.state == State.PLAY:
         game.rotate(game.state)
+
+        prev_x, prev_y = (player.center_x // maze.cell_size, player.center_y // maze.cell_size)
         game.gravity(maze.maze, maze.cell_size, player)
+        new_x, new_y = (player.center_x // maze.cell_size, player.center_y // maze.cell_size)
+
+        if prev_x != new_x or prev_y != new_y:
+            clear_solution(image, maze.maze, (int(prev_x), int(prev_y)), maze.player_solution)
+            maze.player_solution = 'SSS' # TODO: calculate new maze.player_solution
+            highlight_solution(image, maze.maze, (int(new_x), int(new_y)), maze.player_solution)
+
         display_play((mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player))
         if (check_end(player, maze.cell_size, maze.exit)):
             game.state = State.END
@@ -195,6 +209,7 @@ def main() -> None:
         exit=maze_generator.exit,
         output_file=maze_generator.output_file,
         perfect=maze_generator.perfect,
+        player_solution="",
     )
 
     mlx = Mlx()
