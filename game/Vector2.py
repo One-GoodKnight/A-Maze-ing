@@ -1,5 +1,6 @@
 from typing import Self
 
+
 class Vector2():
     def __init__(self, x: int, y: int):
         self.x = x

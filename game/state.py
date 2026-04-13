@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class State(Enum):
     INIT_GENERATION = 'init_generation',
     GENERATION = 'generation',

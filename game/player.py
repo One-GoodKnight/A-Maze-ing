@@ -1,8 +1,9 @@
-from maze_generator import Direction
 from .Vector2 import Vector2
 
+
 class Player():
-    def __init__(self, x: float, y: float, size: int, maze_max_x: int, maze_max_y: int, cell_size: int):
+    def __init__(self, x: float, y: float, size: int,
+                 maze_max_x: int, maze_max_y: int, cell_size: int):
         self.max_x = maze_max_x - size
         self.max_y = maze_max_y - size
 
@@ -38,14 +39,10 @@ class Player():
     @property
     def center_y(self) -> int:
         return self.__y + self.size / 2
-    
+
     @property
     def top_left_corner(self) -> Vector2:
         return Vector2(self.x, self.y)
-
-    @property
-    def top_right_corner(self) -> Vector2:
-        return Vector2(self.x + self.size - 1, self.y)
 
     @property
     def top_right_corner(self) -> Vector2:

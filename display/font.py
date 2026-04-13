@@ -4,16 +4,20 @@ class Font:
         self.height = 14
         self.characters_supported = ord('~') - ord('!') + 1
         self.chars: dict[str, list[str]] = {}
+
         with open(fontname, 'r') as f:
             raw_font = f.read()
         lines = raw_font.splitlines()
         if len(lines) == 0:
             raise ValueError("Font file should not be empty")
         if any([len(line) != len(lines[0]) for line in lines]):
-            raise ValueError("Every line of the font file must have the same size")
+            raise ValueError("Every line of the font file"
+                             "must have the same size")
         if len(lines[0]) != self.characters_supported * self.width:
-            raise ValueError(f"The font file should support {self.characters_supported} "
-                             f"characters {self.width} chars long and {self.height} chars tall")
+            raise ValueError(f"The font file should support "
+                             f"{self.characters_supported} characters "
+                             f"{self.width} chars long and "
+                             f"{self.height} chars tall")
         if len(lines) != self.height != 0:
             raise ValueError(f"The font file must have {self.height} lines")
         for i, char in enumerate(range(ord('!'), ord('~') + 1)):

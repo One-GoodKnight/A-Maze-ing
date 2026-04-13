@@ -3,7 +3,10 @@ from .image import Image
 from constants import MAZE_SOLUTION_COLOR, MAZE_BACKGROUND_COLOR
 from typing import Tuple
 
-def highlight_solution(image: Image, maze: list[list[Cell]], start: Tuple[int, int], solution: str, on: bool = True) -> None:
+
+def highlight_solution(image: Image, maze: list[list[Cell]],
+                       start: Tuple[int, int], solution: str,
+                       on: bool = True) -> None:
     if not solution:
         return
 
@@ -26,7 +29,7 @@ def highlight_solution(image: Image, maze: list[list[Cell]], start: Tuple[int, i
             case 'S':
                 cur_cell[1] += 1
             case 'W':
-                cur_cell[0] -=1
+                cur_cell[0] -= 1
 
         if (cur_cell[0] < 0 or cur_cell[0] > max_x):
             return
@@ -36,5 +39,6 @@ def highlight_solution(image: Image, maze: list[list[Cell]], start: Tuple[int, i
         maze[cur_cell[1]][cur_cell[0]].color = color
 
 
-def clear_solution(image: Image, maze: list[list[Cell]], start: Tuple[int, int], solution: str):
+def clear_solution(image: Image, maze: list[list[Cell]],
+                   start: Tuple[int, int], solution: str):
     highlight_solution(image, maze, start, solution, False)
