@@ -28,5 +28,5 @@ def logo_to_cells(lines: list[str], width: int, height: int, maze_width: int, ma
     for y, line in enumerate(lines):
         for x, c in enumerate(line):
             if (c == 'x'):
-                cells.append(Cell(x=x + offset_x, y=y + offset_y, color=0xFF_FF_A5_00))
+                cells.append(Cell(x=x + offset_x, y=y + offset_y))
     return (cells, width, height)

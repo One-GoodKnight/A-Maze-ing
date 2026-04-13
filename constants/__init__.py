@@ -6,7 +6,8 @@ from .constants import MAZE_BORDER_WIDTH_PERCENT, DEFAULT_CELL_SIZE
 from .constants import WINDOW_MARGIN, ROTATION_SPEED, GRAVITY, PLAYER_BOUNCE
 from .constants import AIR_DRAG, FRICTION, PLAYER_SIZE, PLAYER_BORDER
 from .constants import MAZE_BORDER_COLOR, MAZE_BACKGROUND_COLOR, PLAYER_COLOR
-from .constants import PLAYER_BORDER_COLOR, BLACK, WHITE, GREEN, RED
+from .constants import PLAYER_BORDER_COLOR, BLACK, WHITE, GREEN, RED, TURQUOISE
+from .constants import MAZE_SOLUTION_COLOR, ORANGE, LOGO_COLOR
 
 __all__ = [
     "__version__",
@@ -26,10 +27,14 @@ __all__ = [
     'PLAYER_BORDER',
     'MAZE_BORDER_COLOR',
     'MAZE_BACKGROUND_COLOR',
+    'MAZE_SOLUTION_COLOR',
+    'LOGO_COLOR',
     'PLAYER_COLOR',
     'PLAYER_BORDER_COLOR',
     'BLACK',
     'WHITE',
     'GREEN',
     'RED',
+    'TURQUOISE',
+    'ORANGE',
 ]

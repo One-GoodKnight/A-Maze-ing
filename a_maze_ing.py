@@ -21,11 +21,16 @@ def display_generation(params):
 
 def display_play(params):
     mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player = params
+
     mlx_maze_display.display_maze(maze, 0, 0)
     display_player(image, player)
+    highlight_solution(image, maze.maze, maze.entry, 'EEE', True)
+
     image.rotate(game.angle)
+
     text = f"Maze rotation: {game.angle:06.2f} degree"
     image.print(10, 10, text, color=WHITE, bg_color=None, size=3)
+
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
 def display_end(params):
@@ -201,6 +206,7 @@ def main() -> None:
 
     image = Image(mlx, mlx_ptr, window_width, window_height, font)
     mlx_maze_display = MazeDisplay(mlx, image)
+    set_logo_color(image, logo)
 
     game = Game(maze.width, maze.height)
     player_size = int(maze.cell_size * PLAYER_SIZE)

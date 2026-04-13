@@ -44,6 +44,18 @@ class Image():
             )
         return color
 
+    @lru_cache
+    def endian_color_int(self, argb: int | None) -> int | None:
+        if argb is None:
+            return None
+        if self.fmt == 1:
+            return  argb
+        else:
+            return  (argb >> 0 & 0xFF           |
+                    (argb >> 8 & 0xFF)  << 8    |
+                    (argb >> 16 & 0xFF) << 16   |
+                    (argb >> 24 & 0xFF) << 24)
+
     def draw_rect(self, start: tuple[int, int], end: tuple[int, int],
                   argb: int) -> None:
         x0 = min(self.width - 1, max(0, start[0]))
