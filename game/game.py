@@ -42,17 +42,48 @@ class Game():
         self.angle += direction * ROTATION_SPEED * self.deltatime
 
     def wall_collisions(self, maze: list[list[Cell]], cell_size: int, player: Player) -> Tuple[bool, bool, bool, bool]:
+        max_x = len(maze[0]) - 1
+        max_y = len(maze) - 1
+
         top_left_cell = maze[math.floor(player.top_left_corner.y / cell_size)][math.floor(player.top_left_corner.x / cell_size)]
         top_right_cell = maze[math.floor(player.top_right_corner.y / cell_size)][math.floor(player.top_right_corner.x / cell_size)]
         bottom_left_cell = maze[math.floor(player.bottom_left_corner.y / cell_size)][math.floor(player.bottom_left_corner.x / cell_size)]
         bottom_right_cell = maze[math.floor(player.bottom_right_corner.y / cell_size)][math.floor(player.bottom_right_corner.x / cell_size)]
-        center_cell = maze[math.floor(player.center_y / cell_size)][math.floor(player.center_x / cell_size)]
+
+        direct_top_wall = top_left_cell.north or top_right_cell.north
+        direct_east_wall = top_right_cell.east or bottom_right_cell.east
+        direct_south_wall = bottom_left_cell.south or bottom_right_cell.south
+        direct_west_wall = top_left_cell.west or bottom_left_cell.west
+
+        orthogonal_top_wall = False
+        if top_left_cell != top_right_cell and player.y // cell_size > 0:
+            top_top_left_cell = maze[top_left_cell.y - 1][top_left_cell.x]
+            top_top_right_cell = maze[top_right_cell.y - 1][top_right_cell.x]
+            orthogonal_top_wall = top_top_left_cell.east or top_top_right_cell.west
+
+        orthogonal_east_wall = False
+        if top_right_cell != bottom_right_cell and player.x // cell_size < max_x:
+            top_right_right_cell = maze[top_right_cell.y][top_right_cell.x + 1]
+            bottom_right_right_cell = maze[bottom_right_cell.y][bottom_right_cell.x + 1]
+            orthogonal_east_wall = top_right_right_cell.south or bottom_right_right_cell.north
+
+        orthogonal_south_wall = False
+        if bottom_left_cell != bottom_right_cell and player.y // cell_size < max_y:
+            bottom_bottom_left_cell = maze[bottom_left_cell.y + 1][bottom_left_cell.x]
+            bottom_bottom_right_cell = maze[bottom_right_cell.y + 1][bottom_right_cell.x]
+            orthogonal_south_wall = bottom_bottom_left_cell.east or bottom_bottom_right_cell.west
+
+        orthogonal_west_wall = False
+        if top_left_cell != bottom_left_cell and player.x // cell_size > 0:
+            top_left_left_cell = maze[top_left_cell.y][top_left_cell.x - 1]
+            bottom_left_left_cell = maze[bottom_left_cell.y][bottom_left_cell.x - 1]
+            orthogonal_west_wall = top_left_left_cell.south or bottom_left_left_cell.north
 
         return (
-            (top_left_cell != top_right_cell or top_left_cell.north or top_right_cell.north),
-            (top_right_cell != bottom_right_cell or top_right_cell.east or bottom_right_cell.east),
-            (bottom_left_cell != bottom_right_cell or bottom_left_cell.south or bottom_right_cell.south),
-            (top_left_cell != bottom_left_cell or top_left_cell.west or bottom_left_cell.west),
+            direct_top_wall or orthogonal_top_wall,
+            direct_east_wall or orthogonal_east_wall,
+            direct_south_wall or orthogonal_south_wall,
+            direct_west_wall or orthogonal_west_wall,
         )
 
     def gravity(self, maze: list[list[Cell]], cell_size: int, player: Player) -> None:
