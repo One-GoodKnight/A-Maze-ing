@@ -156,8 +156,14 @@ def main() -> None:
     fontname = 'display/DeterminationMono'
     try:
         font = Font(fontname)
-    except FileNotFoundError:
+    except FileNotFoundError as _:
         print(f"Could not find the file '{fontname}'")
+        return 1
+    except PermissionError as _:
+        print(f"Cannot read font file '{fontname}', permission denied")
+        return 1
+    except Exception as e:
+        print(f"An error occured during file parsing: {e}")
         return 1
 
     if (not logo or (len(logo) >= 1 and ((logo_width + 2 > config['width']) or (logo_height + 2 > config['height'])))):
