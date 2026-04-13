@@ -72,7 +72,6 @@ def game_loop(params):
             except Exception as e:
                 print(f"An error occurred during the generation of the maze: {e}")
         if try_generate and not new_maze:
-
             game.state = State.INIT_PLAY
             try:
                 maze_generator.build_output(maze.maze)
@@ -115,7 +114,7 @@ def handle_key_press(keycode, params):
         game.right_rotate = True
 
     if game.state == State.END and keycode == ord('r'):
-        game.state = State.INIT
+        game.state = State.INIT_GENERATION
 
 def handle_key_release(keycode, params):
     mlx, mlx_ptr, game = params

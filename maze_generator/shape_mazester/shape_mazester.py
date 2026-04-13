@@ -210,12 +210,13 @@ class ShapeMazester():
             ShapeMazester.toggle_raycast(maze, raycast, False)
             cells_count += 1
 
-        ShapeMazester.add_logo(maze, logo, cells_count)
+        yield maze
 
+        ShapeMazester.add_logo(maze, logo, cells_count)
         WallBuilder.build_wall(maze)
         if not perfect:
             WallBuilder.add_solutions(maze, logo, max_x, max_y, entry, exit)
-        yield maze
+
         yield False
 
     @staticmethod
