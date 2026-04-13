@@ -25,8 +25,6 @@ def display_play(params):
     mlx_maze_display.display_maze(maze, 0, 0)
     display_player(image, player)
 
-    highlight_solution(image, maze.maze, maze.entry, maze.solution)
-
     image.rotate(game.angle)
 
     text = f"Maze rotation: {game.angle:06.2f} degree"
@@ -98,7 +96,8 @@ def game_loop(params):
         game.angle = 0
         game.deltatime = 0
         game.state = State.PLAY
-        maze.player_solution = 'SSS' # TODO: calculate player solution
+        maze.player_solution = 'WWW' # TODO: calculate player solution
+        maze.show_solutions = False
 
     elif game.state == State.PLAY:
         game.rotate(game.state)
@@ -107,9 +106,9 @@ def game_loop(params):
         game.gravity(maze.maze, maze.cell_size, player)
         new_x, new_y = (player.center_x // maze.cell_size, player.center_y // maze.cell_size)
 
-        if prev_x != new_x or prev_y != new_y:
+        if maze.show_solutions and (prev_x != new_x or prev_y != new_y):
             clear_solution(image, maze.maze, (int(prev_x), int(prev_y)), maze.player_solution)
-            maze.player_solution = 'SSS' # TODO: calculate new maze.player_solution
+            maze.player_solution = 'WWW' # TODO: calculate new maze.player_solution
             highlight_solution(image, maze.maze, (int(new_x), int(new_y)), maze.player_solution)
 
         display_play((mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player))
@@ -123,7 +122,7 @@ def game_loop(params):
     game.end_loop_time = time.time()
 
 def handle_key_press(keycode, params):
-    mlx, mlx_ptr, game, maze_generator = params
+    mlx, mlx_ptr, game, maze_generator, image, maze, player = params
     if keycode == 0xFF1B or keycode == ord('q'):
         mlx.mlx_loop_exit(mlx_ptr)
 
@@ -135,17 +134,31 @@ def handle_key_press(keycode, params):
     if game.state == State.END and keycode == ord('r'):
         game.state = State.INIT_GENERATION
 
+    if game.state == State.PLAY and keycode == ord('h'):
+        if maze.show_solutions:
+            clear_solution(image, maze.maze, (int(player.center_x // maze.cell_size), int(player.center_y // maze.cell_size)), maze.player_solution)
+            clear_solution(image, maze.maze, maze.entry, maze.solution)
+            maze.show_solutions = False
+        else:
+            highlight_solution(image, maze.maze, maze.entry, maze.solution)
+            maze.player_solution = 'WWW' # TODO: calculate maze.player_solution
+            highlight_solution(image, maze.maze, (int(player.center_x // maze.cell_size), int(player.center_y // maze.cell_size)), maze.player_solution)
+            maze.show_solutions = True
+
+
 def handle_key_release(keycode, params):
-    mlx, mlx_ptr, game = params
+    mlx, mlx_ptr, game, image, maze, player = params
 
     if keycode == 0xff51:
         game.left_rotate = False
     if keycode == 0xff53:
         game.right_rotate = False
 
+
 def handle_close(params):
     mlx, mlx_ptr = params
     mlx.mlx_loop_exit(mlx_ptr)
+
 
 def main() -> None:
     import sys
@@ -210,6 +223,7 @@ def main() -> None:
         output_file=maze_generator.output_file,
         perfect=maze_generator.perfect,
         player_solution="",
+        show_solutions=False
     )
 
     mlx = Mlx()
@@ -234,8 +248,8 @@ def main() -> None:
 
     key_press_event, key_press_mask = (2, 1)
     key_release_event, key_release_mask = (3, 2)
-    mlx.mlx_hook(win_ptr, key_press_event, key_press_mask, handle_key_press, (mlx, mlx_ptr, game, maze_generator))
-    mlx.mlx_hook(win_ptr, key_release_event, key_release_mask, handle_key_release, (mlx, mlx_ptr, game))
+    mlx.mlx_hook(win_ptr, key_press_event, key_press_mask, handle_key_press, (mlx, mlx_ptr, game, maze_generator, image, maze, player))
+    mlx.mlx_hook(win_ptr, key_release_event, key_release_mask, handle_key_release, (mlx, mlx_ptr, game, image, maze, player))
 
     game.time = time.time()
 

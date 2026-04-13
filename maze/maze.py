@@ -18,6 +18,7 @@ class Maze(BaseModel):
     init_time: float = 0
 
     player_solution: str
+    show_solutions: bool
 
     @model_validator(mode='after')
     def check_entry(self) -> Self:
