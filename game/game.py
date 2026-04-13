@@ -17,7 +17,7 @@ class Game():
         self.right_rotate: bool = False
         self.maze_width = maze_width
         self.maze_height = maze_height
-        self.state: State = State.INIT
+        self.state: State = State.INIT_GENERATION
         self.total_time = 0
 
     @property
@@ -49,10 +49,10 @@ class Game():
         center_cell = maze[math.floor(player.center_y / cell_size)][math.floor(player.center_x / cell_size)]
 
         return (
-            (top_left_cell != top_right_cell or top_left_cell.north or (top_left_cell != center_cell)),
-            (top_right_cell != bottom_right_cell or top_right_cell.east or (top_right_cell != center_cell)),
-            (bottom_left_cell != bottom_right_cell or bottom_left_cell.south or (bottom_left_cell != center_cell)),
-            (top_left_cell != bottom_left_cell or top_left_cell.west or (top_left_cell != center_cell)),
+            (top_left_cell != top_right_cell or top_left_cell.north or top_right_cell.north),
+            (top_right_cell != bottom_right_cell or top_right_cell.east or bottom_right_cell.east),
+            (bottom_left_cell != bottom_right_cell or bottom_left_cell.south or bottom_right_cell.south),
+            (top_left_cell != bottom_left_cell or top_left_cell.west or bottom_left_cell.west),
         )
 
     def gravity(self, maze: list[list[Cell]], cell_size: int, player: Player) -> None:

@@ -39,23 +39,20 @@ def game_loop(params):
     game_start_loop_time = time.time()
 
     mlx, mlx_ptr, win_ptr, image, maze_generator, maze, mlx_maze_display, game, player, logo = params
+    #print(game.deltatime)
 
     time_between_loops = game_start_loop_time - (game.end_loop_time if game.end_loop_time != 0 else game_start_loop_time)
     game.deltatime += time_between_loops
     game.start_loop_time = game_start_loop_time
 
-    if game.state == State.INIT:
+    if game.state == State.INIT_GENERATION:
         maze_generator.gen = maze_generator.get_maze_generator(logo)
         maze.cell_counter = 0
         maze.maze = [[None] * maze.width for _ in range(maze.height)]
         maze.init_time = time.time()
-        player.x, player.y = (maze.entry[0] * maze.cell_size, maze.entry[1] * maze.cell_size)
-        player.velocity.x, player.velocity.y = (0, 0)
-        game.angle = 0
-        game.deltatime = 0
         game.state = State.GENERATION
 
-    if game.state == State.GENERATION:
+    elif game.state == State.GENERATION:
         time_since_gen_start = time.time() - maze.init_time
         cells_that_should_be_generated = time_since_gen_start / ANIMATION_SPEED * maze.width * maze.height
         cells_that_should_be_generated_after_this_frame = cells_that_should_be_generated + game.deltatime / ANIMATION_SPEED * maze.width * maze.height
@@ -76,7 +73,7 @@ def game_loop(params):
                 print(f"An error occurred during the generation of the maze: {e}")
         if try_generate and not new_maze:
 
-            game.state = State.PLAY
+            game.state = State.INIT_PLAY
             try:
                 maze_generator.build_output(maze.maze)
             except PermissionError as _:
@@ -87,14 +84,21 @@ def game_loop(params):
                 WallBuilder.build_wall(maze.maze)
             display_generation((mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display))
 
-    if game.state == State.PLAY:
+    elif game.state == State.INIT_PLAY:
+        player.x, player.y = (maze.entry[0] * maze.cell_size, maze.entry[1] * maze.cell_size)
+        player.velocity.x, player.velocity.y = (0, 0)
+        game.angle = 0
+        game.deltatime = 0
+        game.state = State.PLAY
+
+    elif game.state == State.PLAY:
         game.rotate(game.state)
         game.gravity(maze.maze, maze.cell_size, player)
         display_play((mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player))
         if (check_end(player, maze.cell_size, maze.exit)):
             game.state = State.END
 
-    if game.state == State.END:
+    elif game.state == State.END:
         display_end((mlx, mlx_ptr, win_ptr, image))
 
     game.deltatime = time.time() - game.start_loop_time
