@@ -24,6 +24,10 @@ class Cell(BaseModel):
         west = nb >> 3 & 1
         return Cell(x=x, y=y, north=north, east=east, south=south, west=west)
 
+    @staticmethod
+    def from_tuple(coords: tuple[int, int]) -> Self:
+        return Cell(x=coords[0], y=coords[1])
+
     def to_int(self) -> int:
         north = int(self.north)
         east = int(self.east) << 1

@@ -94,7 +94,6 @@ def game_loop(params):
                 print("An error occurred during the "
                       f"generation of the maze: {e}")
         if try_generate and not new_maze:
-            # TODO: calculate maze solution
             solve(maze)
             try:
                 maze_generator.build_output(maze.maze)
@@ -116,7 +115,7 @@ def game_loop(params):
         game.angle = 0
         game.deltatime = 0
         game.state = State.PLAY
-        solve(maze, player)  # TODO: calculate player solution
+        solve(maze, player)
         maze.show_solutions = False
 
     elif game.state == State.PLAY:
@@ -129,11 +128,9 @@ def game_loop(params):
                         player.center_y // maze.cell_size)
 
         if maze.show_solutions and (prev_x != new_x or prev_y != new_y):
-            clear_solution(image, maze.maze,
-                           (int(prev_x), int(prev_y)), maze.player_solution)
-            solve(maze, player)  # TODO: calculate new maze.p_solution
-            highlight_solution(image, maze.maze,
-                               (int(new_x), int(new_y)), maze.player_solution)
+            clear_solution(maze, player)
+            solve(maze, player)
+            highlight_solution(maze, player)
 
         display_play((mlx, mlx_ptr, win_ptr, image,
                       maze, mlx_maze_display, game, player))
@@ -162,19 +159,13 @@ def handle_key_press(keycode, params):
 
     if game.state == State.PLAY and keycode == ord('h'):
         if maze.show_solutions:
-            clear_solution(image, maze.maze,
-                           (int(player.center_x // maze.cell_size),
-                            int(player.center_y // maze.cell_size)),
-                           maze.player_solution)
-            clear_solution(image, maze.maze, maze.entry, maze.solution)
+            clear_solution(maze)
+            clear_solution(maze, player)
             maze.show_solutions = False
         else:
-            #highlight_solution(image, maze.maze, maze.entry, maze.solution)
-            solve(maze, player)  # TODO: calculate maze.p_solution
-            highlight_solution(image, maze.maze,
-                               (int(player.center_x // maze.cell_size),
-                                int(player.center_y // maze.cell_size)),
-                               maze.player_solution)
+            #highlight_solution(maze)
+            solve(maze, player)
+            highlight_solution(maze, player)
             maze.show_solutions = True
 
 
