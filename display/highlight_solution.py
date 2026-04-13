@@ -7,10 +7,10 @@ def highlight_solution(image: Image, maze: list[list[Cell]], start: Tuple[int, i
     if not solution:
         return
 
-    color = image.endian_color_int(MAZE_SOLUTION_COLOR)
+    color = MAZE_SOLUTION_COLOR
 
     if not on:
-        color = image.endian_color_int(MAZE_BACKGROUND_COLOR)
+        color = MAZE_BACKGROUND_COLOR
 
     cur_cell: list[int, int] = [start[0], start[1]]
 
