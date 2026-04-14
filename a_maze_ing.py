@@ -37,7 +37,8 @@ def display_play(params):
     image.print(10, 10, rot, color=WHITE, bg_color=None, size=3)
 
     timer = f"Timer: {game.timer:.2f}s"
-    image.print(10, image.height - 45, timer, color=WHITE, bg_color=None, size=3)
+    image.print(10, image.height - 45, timer,
+                color=WHITE, bg_color=None, size=3)
 
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
@@ -225,7 +226,8 @@ def main() -> None:
 
     argc = len(sys.argv)
     if argc != 2:
-        print("The program should be run with: python3 a_maze_ing.py config_file_name")
+        print("The program should be run with: "
+              "python3 a_maze_ing.py config_file_name")
         return 1
 
     config = {}

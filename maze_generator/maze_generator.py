@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, model_validator
-from typing import Tuple, Self, Generator, ClassVar
+from typing import Tuple, Self, Generator, ClassVar, Optional
 from .cell import Cell
 from .shape_mazester.shape_mazester import ShapeMazester
 from .shape_mazester.shapes import Shape
@@ -48,7 +48,7 @@ class MazeGenerator(BaseModel):
             maze = new_maze
             new_maze = next(gen)
         return maze
-    
+
     def get_solution(self, maze: list[list[Cell]]) -> str:
         return solve(maze, self.entry, self.exit)
 
@@ -58,7 +58,7 @@ class MazeGenerator(BaseModel):
                 self.shape = s
 
     def change_seed(self, seed: int) -> None:
-        if type(seed) != int:
+        if not isinstance(seed, int):
             return
         random.seed(seed)
 
