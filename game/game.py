@@ -19,7 +19,7 @@ class Game():
         self.maze_width = maze_width
         self.maze_height = maze_height
         self.state: State = State.INIT_GENERATION
-        self.total_time = 0
+        self.timer = 0
 
     @property
     def angle(self) -> float:

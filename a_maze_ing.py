@@ -32,16 +32,19 @@ def display_play(params):
 
     image.rotate(game.angle)
 
-    text = f"Maze rotation: {game.angle:06.2f} degree"
-    image.print(10, 10, text, color=WHITE, bg_color=None, size=3)
+    rot = f"Maze rotation: {game.angle:06.2f} degree"
+    image.print(10, 10, rot, color=WHITE, bg_color=None, size=3)
+
+    timer = f"Timer: {game.timer:.2f}s"
+    image.print(10, image.height - 45, timer, color=WHITE, bg_color=None, size=3)
 
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
 
 def display_end(params):
-    mlx, mlx_ptr, win_ptr, image = params
+    mlx, mlx_ptr, win_ptr, image, game = params
     image.set_to(BLACK)
-    text = "GG - Press R to generate a new maze"
+    text = f"GG - {game.timer:.2f}s - Press R to generate a new maze"
     image.print(-1, -1, text, color=WHITE, size=4)
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
@@ -115,6 +118,7 @@ def game_loop(params):
         player.velocity.x, player.velocity.y = (0, 0)
         game.angle = 0
         game.deltatime = 0
+        game.timer = 0
         game.state = State.PLAY
         maze.player_solution = solve(
             maze.maze,
@@ -125,6 +129,8 @@ def game_loop(params):
         maze.show_solutions = False
 
     elif game.state == State.PLAY:
+        game.timer += game.deltatime
+
         game.rotate(game.state)
 
         prev_x, prev_y = (player.center_x // maze.cell_size,
@@ -157,7 +163,7 @@ def game_loop(params):
             game.state = State.END
 
     elif game.state == State.END:
-        display_end((mlx, mlx_ptr, win_ptr, image))
+        display_end((mlx, mlx_ptr, win_ptr, image, game))
 
     game.deltatime = time.time() - game.start_loop_time
     game.end_loop_time = time.time()
