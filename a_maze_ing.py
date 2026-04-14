@@ -4,7 +4,8 @@ except ImportError as e:
     raise SystemExit(f"Unable to import mlx: {e}")
 from maze import Maze
 from maze_generator import MazeGenerator, Cell, \
-    WallBuilder, parse_config_file, parse_logo, solve
+    WallBuilder, solve
+from parsing import parse_config_file, parse_logo
 from display import Image, Font, MazeDisplay, set_logo_color, display_player, \
     highlight_solution, clear_solution
 from helpers import CalculateSize
@@ -97,7 +98,6 @@ def game_loop(params):
                 print("An error occurred during the "
                       f"generation of the maze: {e}")
         if try_generate and not new_maze:
-            # TODO: calculate maze solution
             maze.solution = solve(maze.maze, maze.entry, maze.exit)
             try:
                 maze_generator.build_output(maze.maze)
@@ -225,7 +225,7 @@ def main() -> None:
 
     argc = len(sys.argv)
     if argc != 2:
-        print("The program should be run with: python3 a_maze_ing.py filename")
+        print("The program should be run with: python3 a_maze_ing.py config_file_name")
         return 1
 
     config = {}

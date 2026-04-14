@@ -1,4 +1,4 @@
-from ..shape_mazester.shapes import Shape
+from maze_generator import Shape
 from typing import Dict, Any
 from enum import StrEnum
 

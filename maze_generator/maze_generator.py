@@ -3,6 +3,7 @@ from typing import Tuple, Self, Generator, ClassVar
 from .cell import Cell
 from .shape_mazester.shape_mazester import ShapeMazester
 from .shape_mazester.shapes import Shape
+from .solver.solver import solve
 
 
 class MazeGenerator(BaseModel):
@@ -56,4 +57,4 @@ class MazeGenerator(BaseModel):
             f.write("\n")
             f.write(str(self.exit[0]) + ',' + str(self.exit[1]))
             f.write("\n")
-            f.write("temp(should be the solution to the maze)")
+            f.write(solve(maze, self.entry, self.exit))

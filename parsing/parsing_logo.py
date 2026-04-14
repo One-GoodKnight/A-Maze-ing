@@ -1,4 +1,4 @@
-from ..cell import Cell
+from maze_generator import Cell
 from typing import Tuple, Optional
 
 
