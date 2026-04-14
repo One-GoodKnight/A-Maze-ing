@@ -15,9 +15,10 @@ from constants import WHITE, BLACK, PLAYER_SIZE, ANIMATION_SPEED, \
 import random
 import time
 import math
+from typing import cast
 
 
-def display_generation(params):
+def display_generation(params) -> None:
     mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display = params
     image.set_to(BLACK)
     mlx_maze_display.display_maze(maze, 0, 0)
@@ -25,7 +26,7 @@ def display_generation(params):
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
 
-def display_play(params):
+def display_play(params) -> None:
     mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player = params
 
     mlx_maze_display.display_maze(maze, 0, 0)
@@ -43,7 +44,7 @@ def display_play(params):
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
 
-def display_end(params):
+def display_end(params) -> None:
     mlx, mlx_ptr, win_ptr, image, game = params
     image.set_to(BLACK)
     text = f"GG - {game.timer:.2f}s - Press R to generate a new maze"
@@ -51,7 +52,7 @@ def display_end(params):
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
 
-def game_loop(params):
+def game_loop(params) -> None:
     game_start_loop_time = time.time()
 
     (mlx, mlx_ptr, win_ptr, image, maze_generator, maze,
@@ -170,7 +171,7 @@ def game_loop(params):
     game.end_loop_time = time.time()
 
 
-def handle_key_press(keycode, params):
+def handle_key_press(keycode, params) -> None:
     mlx, mlx_ptr, game, maze_generator, image, maze, player = params
     if keycode == 0xFF1B or keycode == ord('q'):
         mlx.mlx_loop_exit(mlx_ptr)
@@ -207,7 +208,7 @@ def handle_key_press(keycode, params):
             maze.show_solutions = True
 
 
-def handle_key_release(keycode, params):
+def handle_key_release(keycode, params) -> None:
     mlx, mlx_ptr, game, image, maze, player = params
 
     if keycode == 0xff51:
@@ -216,12 +217,12 @@ def handle_key_release(keycode, params):
         game.right_rotate = False
 
 
-def handle_close(params):
+def handle_close(params) -> None:
     mlx, mlx_ptr = params
     mlx.mlx_loop_exit(mlx_ptr)
 
 
-def main() -> None:
+def main() -> int:
     import sys
 
     argc = len(sys.argv)
@@ -238,8 +239,14 @@ def main() -> None:
         filename = "logo.42"
         parse_logo_data = parse_logo(filename, config['width'],
                                      config['height'])
-        logo, logo_width, logo_height = \
-            parse_logo_data if parse_logo_data else (None, None, None)
+
+        logo: list[Cell]
+        logo_width: int
+        logo_height: int
+        if parse_logo_data:
+            logo, logo_width, logo_height = parse_logo_data
+        else:
+            logo, logo_width, logo_height = [], 0, 0
     except FileNotFoundError:
         print(f"Could not find the file '{filename}'")
         return 1
@@ -263,8 +270,8 @@ def main() -> None:
         return 1
 
     if logo:
-        too_big = ((logo_width + 2 > config['width']) or
-                   (logo_height + 2 > config['height']))
+        too_big = ((isinstance(logo_width, int) and logo_width + 2 > config['width']) or
+                   (isinstance(logo_height, int) and logo_height + 2 > config['height']))
         if (too_big):
             sys.stderr.write("Error, maze too small for the logo, "
                              "starting the maze without it.\n")
@@ -272,11 +279,11 @@ def main() -> None:
 
         temp_entry = Cell(x=config['entry'][0], y=config['entry'][1])
         temp_exit = Cell(x=config['exit'][0], y=config['exit'][1])
-        if (temp_entry in logo):
+        if (isinstance(logo, list) and temp_entry in logo):
             sys.stderr.write("Error: entry on logo, "
                              "starting the maze without logo.\n")
             logo = []
-        elif (temp_exit in logo):
+        elif (isinstance(logo, list) and temp_exit in logo):
             sys.stderr.write("Error: exit on logo, "
                              "starting the maze without logo.\n")
             logo = []
@@ -332,8 +339,6 @@ def main() -> None:
                  key_release_mask, handle_key_release,
                  (mlx, mlx_ptr, game, image, maze, player))
 
-    game.time = time.time()
-
     mlx.mlx_loop_hook(mlx_ptr, game_loop,
                       (mlx, mlx_ptr, win_ptr, image, maze_generator,
                        maze, mlx_maze_display, game, player, logo))
@@ -344,6 +349,7 @@ def main() -> None:
     mlx.mlx_destroy_image(mlx_ptr, image.ptr)
     mlx.mlx_destroy_window(mlx_ptr, win_ptr)
     mlx.mlx_release(mlx_ptr)
+    return 0
 
 
 if __name__ == "__main__":

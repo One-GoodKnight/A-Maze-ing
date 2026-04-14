@@ -1,5 +1,5 @@
 try:
-    from mlx import Mlx
+    from mlx import Mlx  # type: ignore[import-untyped]
 except ImportError as e:
     raise SystemExit(f"Unable to import mlx: {e}")
 from constants import MAZE_BORDER_WIDTH_PERCENT, MAZE_BORDER_COLOR
@@ -69,6 +69,8 @@ class MazeDisplay():
         self.image.set_to(MAZE_BACKGROUND_COLOR)
         cell_width = int(self.width / maze.width)
         cell_height = int(self.height / maze.height)
+        if not maze.maze:
+            return
         for y, row in enumerate(maze.maze):
             for x, cell in enumerate(row):
                 if not cell:
