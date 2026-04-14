@@ -1,6 +1,6 @@
 import math
 from random import randint, choice
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Callable
 from collections.abc import Generator
 from ..cell import Cell
 from ..directions import Direction
@@ -137,7 +137,7 @@ class ShapeMazester():
     @staticmethod
     def generate_cell(maze: list[list[Optional[Cell]]],
                       cells: list[Cell], max_x: int, max_y: int,
-                      shape_gen: Generator[Tuple[float, float], None, None],
+                      shape_gen: Generator[float, None, None],
                       start: Tuple[int, int], logo: list[Cell], stuck: bool
                       ) -> Tuple[bool, Optional[list[Tuple[int, int]]], bool]:
         while (True):
@@ -224,11 +224,12 @@ class ShapeMazester():
     def maze_generator(width: int, height: int, entry: tuple[int, int],
                        exit: tuple[int, int], logo: list[Cell],
                        perfect: bool, shape: Shape
-                       ) -> Generator[list[list[Cell]] | bool, None, None]:
+                       ) -> Generator[list[list[Cell | None]] | bool, None, None]:
         max_x = width - 1
         max_y = height - 1
 
-        shape_gen = shape.get_func()()
+        shape_func: Callable[[], Generator[float, None, None]] = shape.get_func()
+        shape_gen: Generator[float, None, None] = shape_func()
 
         maze: list[list[Optional[Cell]]] = [
             [None] * width for _ in range(height)

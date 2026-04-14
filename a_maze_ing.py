@@ -210,7 +210,7 @@ def handle_key_press(keycode: int, params: Tuple[Mlx, c_void_p, Game, MazeGenera
             maze.show_solutions = True
 
 
-def handle_key_release(keycode: int, params: Tuple[Game]) -> None:
+def handle_key_release(keycode: int, params: Game) -> None:
     game = params
 
     if keycode == 0xff51:

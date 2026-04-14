@@ -10,7 +10,7 @@ class Shape(Enum):
     SQUARE = 'square'
     CIRCLE = 'circle'
 
-    def get_func(self):
+    def get_func(self) -> Callalbe[[], Generator[float, None, None]]:
         return {
             Shape.TRIANGLE: Shapes.triangle,
             Shape.SQUARE: Shapes.square,

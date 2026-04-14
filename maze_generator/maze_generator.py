@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, model_validator
-from typing import Tuple, Self, Generator, ClassVar, Optional
+from typing import Tuple, Self, Generator, ClassVar, Optional, cast
 from .cell import Cell
 from .shape_mazester.shape_mazester import ShapeMazester
 from .shape_mazester.shapes import Shape
@@ -40,14 +40,14 @@ class MazeGenerator(BaseModel):
         return self
 
     def generate_full_maze(self) -> list[list[Cell]]:
-        gen = self.get_maze_generator([])
-        maze: list[list[Cell]] = []
-        new_maze: Optional[list[list[Cell]]] = None
+        gen: Generator[list[list[Cell | None]] | bool, None, None] = self.get_maze_generator([])
+        maze: list[list[Cell | None]] = []
+        new_maze: list[list[Cell | None]] | bool
         new_maze = next(gen)
         while new_maze:
-            maze = new_maze
+            maze = cast(list[list[Cell | None]], new_maze)
             new_maze = next(gen)
-        return maze
+        return cast(list[list[Cell]], maze)
 
     def get_solution(self, maze: list[list[Cell]]) -> str:
         return solve(maze, self.entry, self.exit)
@@ -63,8 +63,8 @@ class MazeGenerator(BaseModel):
         random.seed(seed)
 
     def get_maze_generator(self, logo: list[Cell]
-                           ) -> Generator[list[list[Cell]], None, None]:
-        maze_generator: Generator[list[list[Cell]], None, None] = ShapeMazester.maze_generator(
+                           ) -> Generator[list[list[Cell | None]] | bool, None, None]:
+        maze_generator: Generator[list[list[Cell | None]] | bool, None, None] = ShapeMazester.maze_generator(
             self.width, self.height, self.entry,
             self.exit, logo, self.perfect, self.shape
         )
