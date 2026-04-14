@@ -13,6 +13,7 @@ def display_border(image: Image, player: Player, hline_width: int,
     x1 = int(player.x + player_width + vline_width)
     y1 = int(player.y + player_height + hline_width)
     color = image.endian_color(PLAYER_BORDER_COLOR)
+    assert color is not None
     rect = np.tile(color, (y1 - y0, x1 - x0))
     image.data[y0: y1, x0*image.bytes_pp: x1*image.bytes_pp] = rect
 
@@ -30,5 +31,6 @@ def display_player(image: Image, player: Player) -> None:
     x1 = int(player.x + player_width + vline_width - border_thickness)
     y1 = int(player.y + player_height + hline_width - border_thickness)
     color = image.endian_color(PLAYER_COLOR)
+    assert color is not None
     rect = np.tile(color, (y1 - y0, x1 - x0))
     image.data[y0: y1, x0*image.bytes_pp: x1*image.bytes_pp] = rect

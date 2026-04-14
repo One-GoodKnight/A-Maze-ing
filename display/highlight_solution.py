@@ -18,7 +18,7 @@ def highlight_solution(image: Image, maze: list[list[Cell]],
     if not on or not sol_color:
         color = MAZE_BACKGROUND_COLOR
 
-    cur_cell: list[int, int] = [start[0], start[1]]
+    cur_cell: list[int] = [start[0], start[1]]
 
     for c in solution:
         match c:
@@ -36,9 +36,10 @@ def highlight_solution(image: Image, maze: list[list[Cell]],
         if (cur_cell[1] < 0 or cur_cell[1] > max_y):
             return
 
-        maze[cur_cell[1]][cur_cell[0]].color = color
+        if color:
+            maze[cur_cell[1]][cur_cell[0]].color = color
 
 
 def clear_solution(image: Image, maze: list[list[Cell]],
-                   start: Tuple[int, int], solution: str):
+                   start: Tuple[int, int], solution: str) -> None:
     highlight_solution(image, maze, start, solution, None, False)

@@ -1,5 +1,5 @@
 try:
-    from mlx import Mlx
+    from mlx import Mlx  # type: ignore[import-untyped]
 except ImportError as e:
     raise SystemExit(f"Unable to import mlx: {e}")
 try:
@@ -11,16 +11,18 @@ from numpy.typing import NDArray
 from constants import MAZE_SCALE, BLACK
 from .font import Font
 from functools import lru_cache
+from typing import Any
+from ctypes import c_void_p
 
 
 class Image():
-    def __init__(self, mlx: Mlx, mlx_ptr, width: int, height: int,
+    def __init__(self, mlx: Mlx, mlx_ptr: c_void_p, width: int, height: int,
                  font: Font | None = None) -> None:
         self.width = width
         self.height = height
         self.ptr = mlx.mlx_new_image(mlx_ptr, width, height)
         data, bpp, self.line_size, self.fmt = mlx.mlx_get_data_addr(self.ptr)
-        self.data = np.ctypeslib.as_array(data, np.uint8)
+        self.data = np.ctypeslib.as_array(data, np.uint8)  # type: ignore[call-overload]
         self.data = self.data.reshape(height, self.line_size)
         self.bits_pp = bpp
         self.bytes_pp = bpp // 8
@@ -51,6 +53,7 @@ class Image():
         x1 = min(self.width - 1, max(0, end[0]))
         y1 = min(self.height - 1, max(0, end[1]))
         color = self.endian_color(argb)
+        assert(color is not None)
         self.data[
             y0: y1,
             x0 * self.bytes_pp: x1 * self.bytes_pp
@@ -82,23 +85,23 @@ class Image():
     def set_font(self, font: Font) -> None:
         self.font = font
 
-    def print_char(self, x: int, y: int, char: str, **kwargs) -> None:
+    def print_char(self, x: int, y: int, char: str, **kwargs: Any) -> None:
         if self.font is None:
             return
         font = self.font
         color = kwargs.get('color', BLACK)
         size = max(kwargs.get('size', 1), 1)
-        char = font.chars.get(char)
-        if char is None:
+        char_dict = font.chars.get(char)
+        if char_dict is None:
             return
         for i in range(font.width):
             for j in range(font.height):
-                if char[j][i] == '#' and color is not None:
+                if char_dict[j][i] == '#' and color is not None:
                     start = (x + i * size, y + j * size)
                     end = (start[0] + size, start[1] + size)
                     self.draw_rect(start, end, color)
 
-    def print(self, x: int, y: int, string: str, **kwargs) -> None:
+    def print(self, x: int, y: int, string: str, **kwargs: Any) -> None:
         if self.font is None:
             return
         font = self.font

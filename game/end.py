@@ -1,4 +1,4 @@
-from .game import Player
+from .player import Player
 from typing import Tuple
 
 

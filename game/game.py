@@ -48,7 +48,7 @@ class Game():
         max_x = len(maze[0]) - 1
         max_y = len(maze) - 1
 
-        def cell_at(pos: Vector2):
+        def cell_at(pos: Vector2) -> Cell:
             y = math.floor(pos.y / cell_size)
             x = math.floor(pos.x / cell_size)
             return maze[y][x]
@@ -64,7 +64,7 @@ class Game():
         direct_west_wall = top_left_cell.west or bottom_left_cell.west
 
         # neighbor cell
-        def n_cell(cell: Cell, offset: Tuple[int, int]):
+        def n_cell(cell: Cell, offset: Tuple[int, int]) -> Cell:
             return maze[cell.y + offset[1]][cell.x + offset[0]]
 
         x = player.x // cell_size
