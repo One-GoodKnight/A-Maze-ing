@@ -4,6 +4,7 @@ from .cell import Cell
 from .shape_mazester.shape_mazester import ShapeMazester
 from .shape_mazester.shapes import Shape
 from .solver.solver import solve
+import random
 
 
 class MazeGenerator(BaseModel):
@@ -37,6 +38,29 @@ class MazeGenerator(BaseModel):
         if (self.entry[0] == self.exit[0] and self.entry[1] == self.exit[1]):
             raise ValueError("Exit and entry should not be at the same cell")
         return self
+
+    def generate_full_maze(self) -> list[list[Cell]]:
+        gen = self.get_maze_generator([])
+        maze: list[list[Cell]] = []
+        new_maze: Optional[list[list[Cell]]] = None
+        new_maze = next(gen)
+        while new_maze:
+            maze = new_maze
+            new_maze = next(gen)
+        return maze
+    
+    def get_solution(self, maze: list[list[Cell]]) -> str:
+        return solve(maze, self.entry, self.exit)
+
+    def chose_shape(self, shape: str) -> None:
+        for s in Shape:
+            if s.value == shape:
+                self.shape = s
+
+    def change_seed(self, seed: int) -> None:
+        if type(seed) != int:
+            return
+        random.seed(seed)
 
     def get_maze_generator(self, logo: list[Cell]
                            ) -> Generator[list[list[Cell]], None, None]:
