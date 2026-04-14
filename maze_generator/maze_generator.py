@@ -10,7 +10,6 @@ import random
 
 class MazeGenerator(BaseModel):
     MAX_MAZE_SIZE: ClassVar[int] = 50
-    DEFAULT_SEED: ClassVar[int] = 42
 
     width: int = Field(ge=1, le=MAX_MAZE_SIZE)
     height: int = Field(ge=1, le=MAX_MAZE_SIZE)
@@ -44,7 +43,7 @@ class MazeGenerator(BaseModel):
     @classmethod
     def from_file(cls, filename: str) -> Self:
         config = parse_config_file(filename)
-        random.seed(config['seed'] if 'seed' in config else cls.DEFAULT_SEED)
+        random.seed(config['seed'])
         return MazeGenerator(**config)
 
     def to_dict(self) -> dict[str, Any]:

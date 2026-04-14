@@ -2,7 +2,7 @@ from .directions import Direction
 from collections.abc import Generator
 from math import sqrt, acos, pi
 from enum import Enum
-from typing import Self
+from typing import Self, Callable
 
 
 class Shape(Enum):
@@ -10,7 +10,7 @@ class Shape(Enum):
     SQUARE = 'square'
     CIRCLE = 'circle'
 
-    def get_func(self) -> Callalbe[[], Generator[float, None, None]]:
+    def get_func(self) -> Callable[[], Generator[float, None, None]]:
         return {
             Shape.TRIANGLE: Shapes.triangle,
             Shape.SQUARE: Shapes.square,

@@ -186,21 +186,21 @@ def handle_key_press(keycode: int, params: Tuple[Mlx, c_void_p, Game, MazeGenera
 
     if game.state == State.PLAY and keycode == ord('h'):
         if maze.show_solutions:
-            clear_solution(image, cast(list[list[Cell]], maze.maze),
+            clear_solution(cast(list[list[Cell]], maze.maze),
                            (int(player.center_x // maze.cell_size),
                             int(player.center_y // maze.cell_size)),
                            maze.player_solution)
-            clear_solution(image, cast(list[list[Cell]], maze.maze), maze.entry, maze.solution)
+            clear_solution(cast(list[list[Cell]], maze.maze), maze.entry, maze.solution)
             maze.show_solutions = False
         else:
-            highlight_solution(image, cast(list[list[Cell]], maze.maze), maze.entry,
+            highlight_solution(cast(list[list[Cell]], maze.maze), maze.entry,
                                maze.solution, MAZE_SOLUTION_COLOR)
             maze.player_solution = solve(
                 cast(list[list[Cell]], maze.maze),
                 (int(player.center_x // maze.cell_size),
                  int(player.center_y // maze.cell_size)),
                 maze.exit)
-            highlight_solution(image, cast(list[list[Cell]], maze.maze),
+            highlight_solution(cast(list[list[Cell]], maze.maze),
                                (int(player.center_x // maze.cell_size),
                                 int(player.center_y // maze.cell_size)),
                                maze.player_solution,
@@ -235,8 +235,8 @@ def main() -> int:
     try:
         maze_generator = MazeGenerator.from_file(filename)
         filename = "logo.42"
-        parse_logo_data = parse_logo(filename, config['width'],
-                                     config['height'])
+        parse_logo_data = parse_logo(filename, maze_generator.width,
+                                     maze_generator.height)
 
         logo: list[Cell]
         logo_width: int
