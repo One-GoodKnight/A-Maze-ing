@@ -10,16 +10,16 @@ import math
 
 class Game():
     def __init__(self, maze_width: int, maze_height: int):
-        self.start_loop_time = 0
-        self.end_loop_time = 0
+        self.start_loop_time: float = 0
+        self.end_loop_time: float = 0
         self.deltatime: float = 0
         self.__angle: float = 0
         self.left_rotate: bool = False
         self.right_rotate: bool = False
-        self.maze_width = maze_width
-        self.maze_height = maze_height
+        self.maze_width: int = maze_width
+        self.maze_height: int = maze_height
         self.state: State = State.INIT_GENERATION
-        self.timer = 0
+        self.timer: float = 0
 
     @property
     def angle(self) -> float:

@@ -1,5 +1,5 @@
 try:
-    from mlx import Mlx
+    from mlx import Mlx  # type: ignore[import-untyped]
 except ImportError as e:
     raise SystemExit(f"Unable to import mlx: {e}")
 from maze import Maze
@@ -15,10 +15,11 @@ from constants import WHITE, BLACK, PLAYER_SIZE, ANIMATION_SPEED, \
 import random
 import time
 import math
-from typing import cast
+from typing import cast, Any, Tuple, Generator
+from ctypes import c_void_p
 
 
-def display_generation(params) -> None:
+def display_generation(params: tuple[Mlx, c_void_p, c_void_p, Image, Maze, MazeDisplay]) -> None:
     mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display = params
     image.set_to(BLACK)
     mlx_maze_display.display_maze(maze, 0, 0)
@@ -26,7 +27,7 @@ def display_generation(params) -> None:
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
 
-def display_play(params) -> None:
+def display_play(params: tuple[Mlx, c_void_p, c_void_p, Image, Maze, MazeDisplay, Game, Player]) -> None:
     mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player = params
 
     mlx_maze_display.display_maze(maze, 0, 0)
@@ -44,7 +45,7 @@ def display_play(params) -> None:
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
 
-def display_end(params) -> None:
+def display_end(params: tuple[Mlx, c_void_p, c_void_p, Image, Game]) -> None:
     mlx, mlx_ptr, win_ptr, image, game = params
     image.set_to(BLACK)
     text = f"GG - {game.timer:.2f}s - Press R to generate a new maze"
@@ -52,7 +53,7 @@ def display_end(params) -> None:
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
 
-def game_loop(params) -> None:
+def game_loop(params: Tuple[Mlx, c_void_p, c_void_p, Image, MazeGenerator, Maze, MazeDisplay, Game, Player, list[Cell]]) -> None:
     game_start_loop_time = time.time()
 
     (mlx, mlx_ptr, win_ptr, image, maze_generator, maze,
@@ -65,7 +66,8 @@ def game_loop(params) -> None:
     game.start_loop_time = game_start_loop_time
 
     if game.state == State.INIT_GENERATION:
-        maze_generator.gen = maze_generator.get_maze_generator(logo)
+        maze_generator.gen = cast(Generator[list[list[Cell | None]], None, None],
+                          maze_generator.get_maze_generator(logo))
         maze.player_solution = ''
         maze.cell_counter = 0
         maze.maze = [[None] * maze.width for _ in range(maze.height)]
@@ -89,7 +91,7 @@ def game_loop(params) -> None:
         for i in range(math.floor(cells_to_generate)):
             try:
                 try_generate = True
-                new_maze = next(maze_generator.gen)
+                new_maze = next(cast(Generator[list[list[Cell]]], maze_generator.gen))
                 if not new_maze:
                     break
                 maze.cell_counter += 1
@@ -100,16 +102,16 @@ def game_loop(params) -> None:
                 print("An error occurred during the "
                       f"generation of the maze: {e}")
         if try_generate and not new_maze:
-            maze.solution = solve(maze.maze, maze.entry, maze.exit)
+            maze.solution = solve(cast(list[list[Cell]], maze.maze), maze.entry, maze.exit)
             try:
-                maze_generator.build_output(maze.maze)
+                maze_generator.build_output(cast(list[list[Cell]], maze.maze))
             except PermissionError:
                 print(f"Cannot write to output '{maze.output_file}', "
                       "permission denied")
             game.state = State.INIT_PLAY
         else:
             if new_maze:
-                maze.maze = new_maze
+                maze.maze = cast(list[list[Cell | None]], new_maze)
                 WallBuilder.build_wall(maze.maze)
             display_generation((mlx, mlx_ptr, win_ptr,
                                 image, maze, mlx_maze_display))
@@ -123,7 +125,7 @@ def game_loop(params) -> None:
         game.timer = 0
         game.state = State.PLAY
         maze.player_solution = solve(
-            maze.maze,
+            cast(list[list[Cell]], maze.maze),
             (int(player.center_x // maze.cell_size),
              int(player.center_y // maze.cell_size)),
             maze.exit
@@ -137,24 +139,24 @@ def game_loop(params) -> None:
 
         prev_x, prev_y = (player.center_x // maze.cell_size,
                           player.center_y // maze.cell_size)
-        game.gravity(maze.maze, maze.cell_size, player)
+        game.gravity(cast(list[list[Cell]], maze.maze), maze.cell_size, player)
         new_x, new_y = (player.center_x // maze.cell_size,
                         player.center_y // maze.cell_size)
 
         if maze.show_solutions and (prev_x != new_x or prev_y != new_y):
-            clear_solution(image, maze.maze,
+            clear_solution(image, cast(list[list[Cell]], maze.maze),
                            (int(prev_x), int(prev_y)), maze.player_solution)
             # highlight solution from maze entry back after clear
             # for when the player was on
-            highlight_solution(image, maze.maze, maze.entry,
+            highlight_solution(image, cast(list[list[Cell]], maze.maze), maze.entry,
                                maze.solution, MAZE_SOLUTION_COLOR)
             maze.player_solution = solve(
-                maze.maze,
+                cast(list[list[Cell]], maze.maze),
                 (int(player.center_x // maze.cell_size),
                  int(player.center_y // maze.cell_size)),
                 maze.exit
             )
-            highlight_solution(image, maze.maze,
+            highlight_solution(image, cast(list[list[Cell]], maze.maze),
                                (int(new_x), int(new_y)),
                                maze.player_solution,
                                MAZE_PLAYER_SOLUTION_COLOR)
@@ -171,7 +173,7 @@ def game_loop(params) -> None:
     game.end_loop_time = time.time()
 
 
-def handle_key_press(keycode, params) -> None:
+def handle_key_press(keycode: int, params: Tuple[Mlx, c_void_p, Game, MazeGenerator, Image, Maze, Player]) -> None:
     mlx, mlx_ptr, game, maze_generator, image, maze, player = params
     if keycode == 0xFF1B or keycode == ord('q'):
         mlx.mlx_loop_exit(mlx_ptr)
@@ -186,21 +188,21 @@ def handle_key_press(keycode, params) -> None:
 
     if game.state == State.PLAY and keycode == ord('h'):
         if maze.show_solutions:
-            clear_solution(image, maze.maze,
+            clear_solution(image, cast(list[list[Cell]], maze.maze),
                            (int(player.center_x // maze.cell_size),
                             int(player.center_y // maze.cell_size)),
                            maze.player_solution)
-            clear_solution(image, maze.maze, maze.entry, maze.solution)
+            clear_solution(image, cast(list[list[Cell]], maze.maze), maze.entry, maze.solution)
             maze.show_solutions = False
         else:
-            highlight_solution(image, maze.maze, maze.entry,
+            highlight_solution(image, cast(list[list[Cell]], maze.maze), maze.entry,
                                maze.solution, MAZE_SOLUTION_COLOR)
             maze.player_solution = solve(
-                maze.maze,
+                cast(list[list[Cell]], maze.maze),
                 (int(player.center_x // maze.cell_size),
                  int(player.center_y // maze.cell_size)),
                 maze.exit)
-            highlight_solution(image, maze.maze,
+            highlight_solution(image, cast(list[list[Cell]], maze.maze),
                                (int(player.center_x // maze.cell_size),
                                 int(player.center_y // maze.cell_size)),
                                maze.player_solution,
@@ -208,8 +210,8 @@ def handle_key_press(keycode, params) -> None:
             maze.show_solutions = True
 
 
-def handle_key_release(keycode, params) -> None:
-    mlx, mlx_ptr, game, image, maze, player = params
+def handle_key_release(keycode: int, params: Tuple[Game]) -> None:
+    game = params[0]
 
     if keycode == 0xff51:
         game.left_rotate = False
@@ -217,7 +219,7 @@ def handle_key_release(keycode, params) -> None:
         game.right_rotate = False
 
 
-def handle_close(params) -> None:
+def handle_close(params: Tuple[Mlx, c_void_p]) -> None:
     mlx, mlx_ptr = params
     mlx.mlx_loop_exit(mlx_ptr)
 
@@ -337,7 +339,7 @@ def main() -> int:
                  (mlx, mlx_ptr, game, maze_generator, image, maze, player))
     mlx.mlx_hook(win_ptr, key_release_event,
                  key_release_mask, handle_key_release,
-                 (mlx, mlx_ptr, game, image, maze, player))
+                 (game))
 
     mlx.mlx_loop_hook(mlx_ptr, game_loop,
                       (mlx, mlx_ptr, win_ptr, image, maze_generator,
