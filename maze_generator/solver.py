@@ -1,4 +1,4 @@
-from typing import Self
+from typing import Self, Any
 from collections.abc import Callable
 from .cell import Cell
 
@@ -20,10 +20,10 @@ class Node:
     def y(self) -> int:
         return self.cell.y
 
-    def __eq__(self, cell: Cell) -> bool:
-        if cell == self.cell:
-            return True
-        return False
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, Cell):
+            return False
+        return (self.cell == other)
 
 
 class AStar:
@@ -68,6 +68,8 @@ class AStar:
         while current.parent is not None:
             c = current
             p = c.parent
+            if p is None:
+                return path
             if c.x == p.x and c.y < p.y:
                 path += 'N'
             elif c.x == p.x and c.y > p.y:

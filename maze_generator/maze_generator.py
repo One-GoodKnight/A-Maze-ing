@@ -18,7 +18,9 @@ class MazeGenerator(BaseModel):
     output_file: str
     perfect: bool = Field(default=False)
     shape: Shape = Field(default=Shape.CIRCLE)
-    gen: Generator[list[list[Cell | None]] | bool, None, None] | None = Field(default=None)
+    gen: Generator[
+        list[list[Cell | None]] | bool, None, None
+    ] | None = Field(default=None)
 
     @model_validator(mode='after')
     def check_entry(self) -> Self:
@@ -41,7 +43,7 @@ class MazeGenerator(BaseModel):
         return self
 
     @classmethod
-    def from_file(cls, filename: str) -> Self:
+    def from_file(cls, filename: str) -> "MazeGenerator":
         config = parse_config_file(filename)
         random.seed(config['seed'])
         return MazeGenerator(**config)
@@ -57,7 +59,9 @@ class MazeGenerator(BaseModel):
         }
 
     def generate_full_maze(self) -> list[list[Cell]]:
-        gen: Generator[list[list[Cell | None]] | bool, None, None] = self.get_maze_generator([])
+        gen: Generator[
+            list[list[Cell | None]] | bool, None, None
+        ] = self.get_maze_generator([])
         maze: list[list[Cell | None]] = []
         new_maze: list[list[Cell | None]] | bool
         new_maze = next(gen)
@@ -79,9 +83,12 @@ class MazeGenerator(BaseModel):
             return
         random.seed(seed)
 
-    def get_maze_generator(self, logo: list[Cell]
-                           ) -> Generator[list[list[Cell | None]] | bool, None, None]:
-        maze_generator: Generator[list[list[Cell | None]] | bool, None, None] = ShapeMazester.maze_generator(
+    def get_maze_generator(
+        self, logo: list[Cell]
+    ) -> Generator[list[list[Cell | None]] | bool, None, None]:
+        maze_generator: Generator[
+            list[list[Cell | None]] | bool, None, None
+        ] = ShapeMazester.maze_generator(
             self.width, self.height, self.entry,
             self.exit, logo, self.perfect, self.shape
         )

@@ -32,7 +32,7 @@ class Font:
     def __getitem__(self, index: str) -> list[str]:
         return self.chars[index]
 
-    def __str__(self, char: str) -> str:
+    def __str__(self) -> str:
         s: str = ''
         for char in self.chars:
             for line in char:

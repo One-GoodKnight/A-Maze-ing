@@ -3,8 +3,10 @@ from math import cos, sin, inf
 
 class RayCast():
     @staticmethod
-    def cast_ray(start: tuple[int, int], angle: float,
-                 max_x: int, max_y: int) -> list[tuple[int, int]]:
+    def cast_ray(
+        start: tuple[int, int], angle: float,
+        max_x: int, max_y: int
+    ) -> list[tuple[int, int]]:
         cells: list[tuple[int, int]] = []
 
         dir_x = cos(angle)

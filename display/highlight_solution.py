@@ -1,12 +1,13 @@
 from maze_generator import Cell
 from constants import MAZE_BACKGROUND_COLOR
-from typing import Tuple, Optional
+from typing import Tuple, Optional, cast
 
 
-def highlight_solution(maze: list[list[Cell]],
-                       start: Tuple[int, int], solution: str,
-                       sol_color: Optional[int], on: bool = True) -> None:
-    if not solution:
+def highlight_solution(
+    maze: list[list[Cell | None]] | None, start: Tuple[int, int],
+    solution: str, sol_color: Optional[int], on: bool = True
+) -> None:
+    if not solution or maze is None or maze[0] is None:
         return
 
     max_x = len(maze[0]) - 1
@@ -36,9 +37,10 @@ def highlight_solution(maze: list[list[Cell]],
             return
 
         if color:
-            maze[cur_cell[1]][cur_cell[0]].color = color
+            cast(Cell, maze[cur_cell[1]][cur_cell[0]]).color = color
 
 
-def clear_solution(maze: list[list[Cell]],
-                   start: Tuple[int, int], solution: str):
+def clear_solution(
+    maze: list[list[Cell | None]] | None, start: Tuple[int, int], solution: str
+) -> None:
     highlight_solution(maze, start, solution, None, False)

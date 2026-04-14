@@ -65,19 +65,25 @@ class Maze(BaseModel):
         cell_y: int = y // self.cell_size
         return Cell(x=cell_x, y=cell_y)
 
-    def get_entry(self) -> Cell:
-        return self.maze[self.entry[0]][self.entry[1]]
+    def get_entry(self) -> Cell | None:
+        if self.maze is not None:
+            return self.maze[self.entry[0]][self.entry[1]]
+        return None
 
-    def get_exit(self) -> Cell:
-        return self.maze[self.exit[0]][self.exit[1]]
+    def get_exit(self) -> Cell | None:
+        if self.maze is not None:
+            return self.maze[self.exit[0]][self.exit[1]]
+        return None
 
-    def __getitem__(self, index: int) -> Cell:
-        return self.maze[index]
+    def __getitem__(self, index: int) -> list[Cell | None] | None:
+        if self.maze is not None:
+            return self.maze[index]
+        return None
 
     def __str__(self) -> str:
         chars: list[str] = ["🬕🬂🬂🬨", "▌  ▐", "🬲🬭🬭🬷"]
         ret: str = ''
-        for row in self.maze:
+        for row in self.maze if self.maze is not None else []:
             top = bot = ' '
             for cell in row:
                 if not cell:

@@ -1,15 +1,14 @@
-from typing import Self
 
 
 class Vector2():
-    def __init__(self, x: float, y: float):
+    def __init__(self, x: float, y: float) -> None:
         self.x = x
         self.y = y
 
-    def __mul__(self, v2: "Vector2") -> Self:
+    def __mul__(self, v2: "Vector2") -> "Vector2":
         return Vector2(self.x * v2.x, self.y * v2.y)
 
-    def __sub__(self, v2: "Vector2") -> Self:
+    def __sub__(self, v2: "Vector2") -> "Vector2":
         return Vector2(self.x - v2.x, self.y - v2.y)
 
     def __repr__(self) -> str:

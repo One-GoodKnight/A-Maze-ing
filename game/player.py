@@ -3,7 +3,7 @@ from .Vector2 import Vector2
 
 class Player():
     def __init__(self, x: float, y: float, size: int,
-                 maze_max_x: int, maze_max_y: int, cell_size: int):
+                 maze_max_x: int, maze_max_y: int, cell_size: int) -> None:
         self.max_x = maze_max_x - size
         self.max_y = maze_max_y - size
 
@@ -21,23 +21,23 @@ class Player():
         return self.__x
 
     @x.setter
-    def x(self, value) -> None:
-        self.__x = min(max(0, value), self.max_x)
+    def x(self, value: float | int) -> None:
+        self.__x = int(min(max(0, value), self.max_x))
 
     @property
     def y(self) -> int:
         return self.__y
 
     @y.setter
-    def y(self, value) -> None:
-        self.__y = min(max(0, value), self.max_y)
+    def y(self, value: float | int) -> None:
+        self.__y = int(min(max(0, value), self.max_y))
 
     @property
-    def center_x(self) -> int:
+    def center_x(self) -> float:
         return self.__x + self.size / 2
 
     @property
-    def center_y(self) -> int:
+    def center_y(self) -> float:
         return self.__y + self.size / 2
 
     @property

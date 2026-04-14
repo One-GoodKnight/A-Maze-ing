@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Self
+from typing import Any
 
 
 class Cell(BaseModel):
@@ -16,16 +16,16 @@ class Cell(BaseModel):
     color: int = Field(default=0)
 
     @staticmethod
-    def from_hex(hex: str, x: int, y: int) -> Self:
+    def from_hex(hex: str, x: int, y: int) -> "Cell":
         nb = int(hex, 16)
-        north = nb & 1
-        east = nb >> 1 & 1
-        south = nb >> 2 & 1
-        west = nb >> 3 & 1
+        north = bool(nb & 1)
+        east = bool(nb >> 1 & 1)
+        south = bool(nb >> 2 & 1)
+        west = bool(nb >> 3 & 1)
         return Cell(x=x, y=y, north=north, east=east, south=south, west=west)
 
     @staticmethod
-    def from_tuple(coords: tuple[int, int]) -> Self:
+    def from_tuple(coords: tuple[int, int]) -> "Cell":
         return Cell(x=coords[0], y=coords[1])
 
     def to_int(self) -> int:
@@ -47,11 +47,13 @@ class Cell(BaseModel):
         )
 
     @staticmethod
-    def manhattan_distance(c1: Self, c2: Self) -> int:
+    def manhattan_distance(c1: "Cell", c2: "Cell") -> int:
         return abs(c1.x - c2.x) + abs(c1.y - c2.y)
 
-    def __eq__(self, cell: Self) -> bool:
-        return (self.x == cell.x and self.y == cell.y)
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, Cell):
+            return False
+        return (self.x == other.x and self.y == other.y)
 
     def __str__(self) -> str:
         return self.to_hex()
@@ -68,5 +70,5 @@ class Cell(BaseModel):
         s += '}'
         return s
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.x, self.y))

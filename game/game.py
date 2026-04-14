@@ -63,7 +63,7 @@ class Game():
         direct_west_wall = top_left_cell.west or bottom_left_cell.west
 
         # neighbor cell
-        def n_cell(cell: Cell, offset: tuple[int, int]):
+        def n_cell(cell: Cell, offset: tuple[int, int]) -> Cell:
             return maze[cell.y + offset[1]][cell.x + offset[0]]
 
         x = player.x // cell_size

@@ -2,7 +2,9 @@ from maze_generator import Cell
 from typing import Optional
 
 
-def parse_logo(filename: str, maze_width: int, maze_height: int) -> Optional[tuple[list[Cell], int, int]]:
+def parse_logo(
+    filename: str, maze_width: int, maze_height: int
+) -> Optional[tuple[list[Cell], int, int]]:
     lines: list[str] = []
     with open(filename, 'r') as f:
         for line in f.readlines():

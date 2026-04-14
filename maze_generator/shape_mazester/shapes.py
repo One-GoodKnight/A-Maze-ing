@@ -2,7 +2,7 @@ from .directions import Direction
 from collections.abc import Generator
 from math import sqrt, acos, pi
 from enum import Enum
-from typing import Self, Callable
+from typing import Callable
 
 
 class Shape(Enum):
@@ -19,15 +19,15 @@ class Shape(Enum):
 
 
 class Vertex():
-    def __init__(self, x: int, y: int):
+    def __init__(self, x: int, y: int) -> None:
         self.x = x
         self.y = y
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"({self.x}, {self.y})"
 
     @staticmethod
-    def distance(v1: Self, v2: Self) -> float:
+    def distance(v1: "Vertex", v2: "Vertex") -> float:
         dx = abs(v2.x - v1.x)
         dy = abs(v2.y - v1.y)
 
@@ -36,30 +36,31 @@ class Vertex():
 
 
 class Segment():
-    def __init__(self, v1: Vertex, v2: Vertex, length: float):
+    def __init__(self, v1: Vertex, v2: Vertex, length: float) -> None:
         self.v1 = v1
         self.v2 = v2
         self.length = length
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"({self.v1}, {self.v2}, {self.length})"
 
 
 class Shapes():
     @staticmethod
-    def normalize_vector(vector: list[float, float]) -> list[float, float]:
+    def normalize_vector(vector: tuple[float, float]) -> tuple[float, float]:
         magnitude = sqrt(vector[0] ** 2 + vector[1] ** 2)
-        return [vector[0] / magnitude, vector[1] / magnitude]
+        return (vector[0] / magnitude, vector[1] / magnitude)
 
     @staticmethod
-    def construct_shape_gen(verticies_tuple: tuple[tuple[float, float]]
-                            ) -> Generator[float, None, None]:
-        coeff = 6
+    def construct_shape_gen(
+        verticies_tuple: list[tuple[float, float]]
+    ) -> Generator[float, None, None]:
+        coeff: float = 6.
         coeff /= 1000
 
         verticies: list[Vertex] = []
         for v in verticies_tuple:
-            verticies.append(Vertex(x=v[0], y=v[1]))
+            verticies.append(Vertex(x=int(v[0]), y=int(v[1])))
 
         segments: list[Segment] = []
         for i in range(len(verticies) - 1):
@@ -71,12 +72,12 @@ class Shapes():
         segments.append(new_seg)
 
         perimeter = sum([s.length for s in segments])
-        step_amount = (perimeter) * coeff
+        step_amount: float = (perimeter) * coeff
 
         distance = 1
 
         i_seg = 0
-        cur_distance_seg = 0
+        cur_distance_seg: float = 0.
 
         while True:
             step_remaining = step_amount / distance
@@ -103,7 +104,7 @@ class Shapes():
             res_posx = cur_seg.v1.x + dx * t
             res_posy = cur_seg.v1.y + dy * t
 
-            vector = [res_posx, res_posy]
+            vector = (res_posx, res_posy)
             normed = Shapes.normalize_vector(vector)
 
             yield (acos(normed[0]) if normed[1] < 0
@@ -111,18 +112,19 @@ class Shapes():
 
     @staticmethod
     def triangle() -> Generator[float, None, None]:
-        triangle = Shapes.construct_shape_gen(((0, 1), (1, -1), (-1, -1)))
+        triangle = Shapes.construct_shape_gen(
+            [(0., 1.), (1., -1.), (-1., -1.)]
+        )
         while True:
             yield next(triangle)
 
     @staticmethod
     def square() -> Generator[float, None, None]:
         direction = Direction.SOUTH
-        vector = [1, 0]
-        coeff = 7
-        coeff /= 1000
-        step_amount = (2 * (1 + 1)) * coeff
-        step = 0
+        vector: list[float] = [1., 0.]
+        coeff: float = 7 / 1000
+        step_amount: float = (2 * (1 + 1)) * coeff
+        step: float = 0.
 
         while True:
             distance = step // (2 * pi)
@@ -151,7 +153,7 @@ class Shapes():
                 vector[1] = 1
                 direction = Direction.WEST
 
-            normed = Shapes.normalize_vector(vector)
+            normed = Shapes.normalize_vector((vector[0], vector[1]))
             step += step_amount / (distance if distance > 1 else 1)
             yield (acos(normed[0]) if normed[1] >= 0
                    else -acos(normed[0]))
@@ -167,10 +169,9 @@ class Shapes():
         # to it that constrains it's generation that results in a maze
         # full of straight lines towards the starting cell
 
-        coeff = 11
-        coeff /= 1000
-        step_amount = (2 * pi) * coeff
-        step = 0
+        coeff: float = 11 / 1000
+        step_amount: float = (2 * pi) * coeff
+        step: float = 0.
         while (True):
             yield (step % (2 * pi))
             distance = step // (2 * pi)

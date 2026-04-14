@@ -26,25 +26,25 @@ class WallBuilder():
 
         if cell.x != 0:
             n = maze[cell.y][cell.x - 1]
-            if n not in logo_set:
+            if n is not None and n not in logo_set:
                 cell.west = False
                 n.east = False
 
         if cell.x != max_x:
             n = maze[cell.y][cell.x + 1]
-            if n not in logo_set:
+            if n is not None and n not in logo_set:
                 cell.east = False
                 n.west = False
 
         if cell.y != 0:
             n = maze[cell.y - 1][cell.x]
-            if n not in logo_set:
+            if n is not None and n not in logo_set:
                 cell.north = False
                 n.south = False
 
         if cell.y != max_y:
             n = maze[cell.y + 1][cell.x]
-            if n not in logo_set:
+            if n is not None and n not in logo_set:
                 cell.south = False
                 n.north = False
 
@@ -83,6 +83,8 @@ class WallBuilder():
         match random_wall:
             case Direction.NORTH:
                 n = maze[cell.y - 1][cell.x]
+                if n is None:
+                    return
                 if (n.x, n.y) in logo_set:
                     return
                 if len(WallBuilder.destructible_walls(maze, logo,
@@ -92,6 +94,8 @@ class WallBuilder():
                 n.south = False
             case Direction.EAST:
                 n = maze[cell.y][cell.x + 1]
+                if n is None:
+                    return
                 if (n.x, n.y) in logo_set:
                     return
                 if len(WallBuilder.destructible_walls(maze, logo,
@@ -101,6 +105,8 @@ class WallBuilder():
                 n.west = False
             case Direction.SOUTH:
                 n = maze[cell.y + 1][cell.x]
+                if n is None:
+                    return
                 if (n.x, n.y) in logo_set:
                     return
                 if len(WallBuilder.destructible_walls(maze, logo,
@@ -110,6 +116,8 @@ class WallBuilder():
                 n.north = False
             case Direction.WEST:
                 n = maze[cell.y][cell.x - 1]
+                if n is None:
+                    return
                 if (n.x, n.y) in logo_set:
                     return
                 if len(WallBuilder.destructible_walls(maze, logo,
@@ -126,6 +134,8 @@ class WallBuilder():
 
         entry_cell = maze[entry[1]][entry[0]]
         exit_cell = maze[exit[1]][exit[0]]
+        if entry_cell is None or exit_cell is None:
+            return
 
         WallBuilder.open_all_walls(maze, logo, max_x, max_y, entry_cell)
         WallBuilder.open_all_walls(maze, logo, max_x, max_y, exit_cell)
@@ -133,5 +143,7 @@ class WallBuilder():
         n = int(width * height * 0.5)
         for i in range(n):
             rand_x, rand_y = (randint(0, max_x), randint(0, max_y))
-            WallBuilder.open_single_wall(maze, logo, max_x,
-                                         max_y, maze[rand_y][rand_x])
+            cell = maze[rand_y][rand_x]
+            if cell is None:
+                return
+            WallBuilder.open_single_wall(maze, logo, max_x, max_y, cell)
