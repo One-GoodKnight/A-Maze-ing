@@ -211,7 +211,7 @@ def handle_key_press(keycode: int, params: Tuple[Mlx, c_void_p, Game, MazeGenera
 
 
 def handle_key_release(keycode: int, params: Tuple[Game]) -> None:
-    game = params[0]
+    game = params
 
     if keycode == 0xff51:
         game.left_rotate = False

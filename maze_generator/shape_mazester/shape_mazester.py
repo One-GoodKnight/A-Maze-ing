@@ -224,7 +224,7 @@ class ShapeMazester():
     def maze_generator(width: int, height: int, entry: tuple[int, int],
                        exit: tuple[int, int], logo: list[Cell],
                        perfect: bool, shape: Shape
-                       ) -> Generator[list[list[Cell]], None, None]:
+                       ) -> Generator[list[list[Cell]] | bool, None, None]:
         max_x = width - 1
         max_y = height - 1
 

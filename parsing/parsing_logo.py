@@ -8,7 +8,7 @@ def parse_logo(filename: str, maze_width: int, maze_height: int) -> Optional[Tup
         for line in f.readlines():
             lines.append(line.removesuffix('\n'))
     if (len(lines) == 0):
-        return lines
+        return None
     width = len(lines[0])
     for line in lines:
         if (len(line) != width):

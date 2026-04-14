@@ -15,7 +15,7 @@ class Key(StrEnum):
 
 
 def parse_config_file(filename: str) -> Dict[str, Any]:
-    conf = {}
+    conf: Dict[str, Any] = {}
     with open(filename, 'r') as f:
         for line in f.readlines():
             line = line.removesuffix('\n')

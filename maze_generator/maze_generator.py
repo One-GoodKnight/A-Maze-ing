@@ -17,7 +17,7 @@ class MazeGenerator(BaseModel):
     output_file: str
     perfect: bool = Field(default=False)
     shape: Shape = Field(default=Shape.CIRCLE)
-    gen: Generator[list[list[Cell | None]]] | None = Field(default=None)
+    gen: Generator[list[list[Cell | None]] | bool, None, None] | None = Field(default=None)
 
     @model_validator(mode='after')
     def check_entry(self) -> Self:
@@ -64,7 +64,7 @@ class MazeGenerator(BaseModel):
 
     def get_maze_generator(self, logo: list[Cell]
                            ) -> Generator[list[list[Cell]], None, None]:
-        maze_generator: list[list[Cell]] = ShapeMazester.maze_generator(
+        maze_generator: Generator[list[list[Cell]], None, None] = ShapeMazester.maze_generator(
             self.width, self.height, self.entry,
             self.exit, logo, self.perfect, self.shape
         )
