@@ -1,7 +1,7 @@
 __version__ = "1.0.0"
 __author__ = "Nifogi"
 
-from .constants import MAZE_SCALE, MAX_MAZE_SIZE, ANIMATION_SPEED
+from .constants import MAZE_SCALE, ANIMATION_SPEED
 from .constants import MAZE_BORDER_WIDTH_PERCENT, DEFAULT_CELL_SIZE
 from .constants import WINDOW_MARGIN, ROTATION_SPEED, GRAVITY, PLAYER_BOUNCE
 from .constants import AIR_DRAG, FRICTION, PLAYER_SIZE, PLAYER_BORDER
@@ -15,7 +15,6 @@ __all__ = [
     "__author__",
     'MAZE_SCALE',
     'ANIMATION_SPEED',
-    'MAX_MAZE_SIZE',
     'MAZE_BORDER_WIDTH_PERCENT',
     'DEFAULT_CELL_SIZE',
     'WINDOW_MARGIN',

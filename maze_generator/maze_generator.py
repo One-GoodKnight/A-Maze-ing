@@ -1,12 +1,13 @@
 from pydantic import BaseModel, Field, model_validator
-from typing import Tuple, Self, Generator
+from typing import Tuple, Self, Generator, ClassVar
 from .cell import Cell
 from .shape_mazester.shape_mazester import ShapeMazester
 from .shape_mazester.shapes import Shape
-from constants import MAX_MAZE_SIZE
 
 
 class MazeGenerator(BaseModel):
+    MAX_MAZE_SIZE: ClassVar = 50
+
     width: int = Field(ge=1, le=MAX_MAZE_SIZE)
     height: int = Field(ge=1, le=MAX_MAZE_SIZE)
     entry: Tuple[int, int]
