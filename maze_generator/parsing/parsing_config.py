@@ -64,8 +64,8 @@ def parse_config_file(filename: str) -> Dict[str, Any]:
                         raise ValueError("Output file name must end with '.txt'")
                     if value.startswith('/'):
                         raise ValueError("Output file name must not start with '/'")
-                    if '../' in value:
-                        raise ValueError("Output file name must not contain '..'")
+                    if './' in value:
+                        raise ValueError("Output file name must not contain './'")
                     conf[key] = value
                 case 'perfect':
                     if (value != "True" and value != "False"):
