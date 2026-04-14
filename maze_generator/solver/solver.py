@@ -1,4 +1,4 @@
-from typing import Self, Optional, Tuple
+from typing import Self, Tuple
 from collections.abc import Callable
 from ..cell import Cell
 
@@ -27,8 +27,11 @@ class Node:
 
 
 class AStar:
-    def __init__(self, maze: list[list[Cell]], entry: Tuple[int, int], exit: Tuple[int, int]) -> None:
+    def __init__(self, maze: list[list[Cell]], entry: Tuple[int, int],
+                 exit: Tuple[int, int]) -> None:
         self.maze = maze
+        self.width = len(maze[0])
+        self.height = len(maze)
         self.start: Cell = maze[entry[1]][entry[0]]
         self.goal: Cell = maze[exit[1]][exit[0]]
         self.h: Callable[[Cell, Cell], int] = Cell.manhattan_distance
@@ -37,26 +40,23 @@ class AStar:
         ]
         self.closed_list: list[Node] = []
 
-    @staticmethod
-    def get_neighbors(maze: list[list[Cell]], cell: Cell) -> list[Cell]:
-        width = len(maze[0])
-        height = len(maze)
-
+    def get_neighbors(self, cell: Cell) -> list[Cell]:
         neighbors: list[Cell] = []
         x, y = (cell.x, cell.y)
         if not cell.north and y - 1 >= 0:
-            neighbors.append(maze[y - 1][x])
-        if not cell.east and x + 1 < width:
-            neighbors.append(maze[y][x + 1])
-        if not cell.south and y + 1 < height:
-            neighbors.append(maze[y + 1][x])
+            neighbors.append(self.maze[y - 1][x])
+        if not cell.east and x + 1 < self.width:
+            neighbors.append(self.maze[y][x + 1])
+        if not cell.south and y + 1 < self.height:
+            neighbors.append(self.maze[y + 1][x])
         if not cell.west and x - 1 >= 0:
-            neighbors.append(maze[y][x - 1])
+            neighbors.append(self.maze[y][x - 1])
         return neighbors
 
-    def get_neighbors_node(self, maze: list[list[Cell]], current: Node) -> list[Node]:
+    def get_neighbors_node(self, maze: list[list[Cell]],
+                           current: Node) -> list[Node]:
         neighbors: list[Node] = []
-        neighboring_cells: list[Cell] = AStar.get_neighbors(maze, current.cell)
+        neighboring_cells: list[Cell] = self.get_neighbors(current.cell)
         for neighbor in neighboring_cells:
             neighbors.append(
                 Node(neighbor, current.g + 1, self.h(current.cell, self.goal))
@@ -66,17 +66,19 @@ class AStar:
     def reconstruct_path(self, current: Node) -> str:
         path = ''
         while current.parent is not None:
-            if current.x == current.parent.x and current.y < current.parent.y:
+            c = current
+            p = c.parent
+            if c.x == p.x and c.y < p.y:
                 path += 'N'
-            elif current.x == current.parent.x and current.y > current.parent.y:
+            elif c.x == p.x and c.y > p.y:
                 path += 'S'
-            elif current.y == current.parent.y and current.x < current.parent.x:
+            elif c.y == p.y and c.x < p.x:
                 path += 'W'
-            elif current.y == current.parent.y and current.x > current.parent.x:
+            elif c.y == p.y and c.x > p.x:
                 path += 'E'
             else:
                 raise ValueError("Invalid maze solution")
-            current = current.parent
+            current = p
         return path[::-1]
 
     def run(self) -> str:
@@ -95,7 +97,8 @@ class AStar:
         return ''
 
 
-def solve(maze: list[list[Cell]], entry: Tuple[int, int], exit: Tuple[int, int]) -> str:
+def solve(maze: list[list[Cell]], entry: Tuple[int, int],
+          exit: Tuple[int, int]) -> str:
     algo = AStar(maze, entry, exit)
     solution = algo.run()
     return solution

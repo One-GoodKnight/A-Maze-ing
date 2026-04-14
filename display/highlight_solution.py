@@ -1,6 +1,6 @@
 from maze_generator import Cell
 from .image import Image
-from constants import MAZE_SOLUTION_COLOR, MAZE_BACKGROUND_COLOR
+from constants import MAZE_BACKGROUND_COLOR
 from typing import Tuple, Optional
 
 
@@ -42,4 +42,3 @@ def highlight_solution(image: Image, maze: list[list[Cell]],
 def clear_solution(image: Image, maze: list[list[Cell]],
                    start: Tuple[int, int], solution: str):
     highlight_solution(image, maze, start, solution, None, False)
-

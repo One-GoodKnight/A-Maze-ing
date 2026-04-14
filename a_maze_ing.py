@@ -9,7 +9,8 @@ from display import Image, Font, MazeDisplay, set_logo_color, display_player, \
     highlight_solution, clear_solution
 from helpers import CalculateSize
 from game import Game, State, Player, check_end
-from constants import WHITE, BLACK, PLAYER_SIZE, ANIMATION_SPEED, MAZE_SOLUTION_COLOR, MAZE_PLAYER_SOLUTION_COLOR 
+from constants import WHITE, BLACK, PLAYER_SIZE, ANIMATION_SPEED, \
+    MAZE_SOLUTION_COLOR, MAZE_PLAYER_SOLUTION_COLOR
 import random
 import time
 import math
@@ -114,8 +115,13 @@ def game_loop(params):
         player.velocity.x, player.velocity.y = (0, 0)
         game.angle = 0
         game.deltatime = 0
-        game.state = State.PLAY 
-        maze.player_solution = solve(maze.maze, (int(player.center_x // maze.cell_size), int(player.center_y // maze.cell_size)), maze.exit)
+        game.state = State.PLAY
+        maze.player_solution = solve(
+            maze.maze,
+            (int(player.center_x // maze.cell_size),
+             int(player.center_y // maze.cell_size)),
+            maze.exit
+        )
         maze.show_solutions = False
 
     elif game.state == State.PLAY:
@@ -130,9 +136,20 @@ def game_loop(params):
         if maze.show_solutions and (prev_x != new_x or prev_y != new_y):
             clear_solution(image, maze.maze,
                            (int(prev_x), int(prev_y)), maze.player_solution)
-            maze.player_solution = solve(maze.maze, (int(player.center_x // maze.cell_size), int(player.center_y // maze.cell_size)), maze.exit)
+            # highlight solution from maze entry back after clear
+            # for when the player was on
+            highlight_solution(image, maze.maze, maze.entry,
+                               maze.solution, MAZE_SOLUTION_COLOR)
+            maze.player_solution = solve(
+                maze.maze,
+                (int(player.center_x // maze.cell_size),
+                 int(player.center_y // maze.cell_size)),
+                maze.exit
+            )
             highlight_solution(image, maze.maze,
-                               (int(new_x), int(new_y)), maze.player_solution, MAZE_PLAYER_SOLUTION_COLOR)
+                               (int(new_x), int(new_y)),
+                               maze.player_solution,
+                               MAZE_PLAYER_SOLUTION_COLOR)
 
         display_play((mlx, mlx_ptr, win_ptr, image,
                       maze, mlx_maze_display, game, player))
@@ -168,12 +185,18 @@ def handle_key_press(keycode, params):
             clear_solution(image, maze.maze, maze.entry, maze.solution)
             maze.show_solutions = False
         else:
-            highlight_solution(image, maze.maze, maze.entry, maze.solution, MAZE_SOLUTION_COLOR)
-            maze.player_solution = solve(maze.maze, (int(player.center_x // maze.cell_size), int(player.center_y // maze.cell_size)), maze.exit)
+            highlight_solution(image, maze.maze, maze.entry,
+                               maze.solution, MAZE_SOLUTION_COLOR)
+            maze.player_solution = solve(
+                maze.maze,
+                (int(player.center_x // maze.cell_size),
+                 int(player.center_y // maze.cell_size)),
+                maze.exit)
             highlight_solution(image, maze.maze,
                                (int(player.center_x // maze.cell_size),
                                 int(player.center_y // maze.cell_size)),
-                               maze.player_solution, MAZE_PLAYER_SOLUTION_COLOR)
+                               maze.player_solution,
+                               MAZE_PLAYER_SOLUTION_COLOR)
             maze.show_solutions = True
 
 
@@ -317,4 +340,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

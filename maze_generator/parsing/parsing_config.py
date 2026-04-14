@@ -61,11 +61,14 @@ def parse_config_file(filename: str) -> Dict[str, Any]:
                     if len(value) == 0:
                         raise ValueError("Output file name must not be empty")
                     if not value.endswith('.txt'):
-                        raise ValueError("Output file name must end with '.txt'")
+                        raise ValueError("Output file name must "
+                                         "end with '.txt'")
                     if value.startswith('/'):
-                        raise ValueError("Output file name must not start with '/'")
+                        raise ValueError("Output file name must "
+                                         "not start with '/'")
                     if './' in value:
-                        raise ValueError("Output file name must not contain './'")
+                        raise ValueError("Output file name must "
+                                         "not contain './'")
                     conf[key] = value
                 case 'perfect':
                     if (value != "True" and value != "False"):
