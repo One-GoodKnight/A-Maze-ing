@@ -71,19 +71,6 @@ class Maze(BaseModel):
     def get_exit(self) -> Cell:
         return self.maze[self.exit[0]][self.exit[1]]
 
-    def get_neighbors(self, cell: Cell) -> list[Cell]:
-        neighbors: list[Cell] = []
-        x, y = (cell.x, cell.y)
-        if not cell.north and y - 1 >= 0:
-            neighbors.append(self.maze[y - 1][x])
-        if not cell.east and x + 1 < self.width:
-            neighbors.append(self.maze[y][x + 1])
-        if not cell.south and y + 1 < self.height:
-            neighbors.append(self.maze[y + 1][x])
-        if not cell.west and x - 1 >= 0:
-            neighbors.append(self.maze[y][x - 1])
-        return neighbors
-
     def __getitem__(self, index: int) -> Cell:
         return self.maze[index]
 

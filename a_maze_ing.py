@@ -4,12 +4,11 @@ except ImportError as e:
     raise SystemExit(f"Unable to import mlx: {e}")
 from maze import Maze
 from maze_generator import MazeGenerator, Cell, \
-    WallBuilder, parse_config_file, parse_logo
+    WallBuilder, parse_config_file, parse_logo, solve
 from display import Image, Font, MazeDisplay, set_logo_color, display_player, \
     highlight_solution, clear_solution
 from helpers import CalculateSize
 from game import Game, State, Player, check_end
-from solver import solve
 from constants import WHITE, BLACK, PLAYER_SIZE, ANIMATION_SPEED
 import random
 import time
@@ -94,7 +93,8 @@ def game_loop(params):
                 print("An error occurred during the "
                       f"generation of the maze: {e}")
         if try_generate and not new_maze:
-            solve(maze)
+            # TODO: calculate maze solution
+            maze.solution = solve(maze.maze, maze.entry, maze.exit)
             try:
                 maze_generator.build_output(maze.maze)
             except PermissionError:
@@ -114,8 +114,8 @@ def game_loop(params):
         player.velocity.x, player.velocity.y = (0, 0)
         game.angle = 0
         game.deltatime = 0
-        game.state = State.PLAY
-        solve(maze, player)
+        game.state = State.PLAY 
+        maze.player_solution = solve(maze.maze, (int(player.center_x // maze.cell_size), int(player.center_y // maze.cell_size)), maze.exit)
         maze.show_solutions = False
 
     elif game.state == State.PLAY:
@@ -128,9 +128,11 @@ def game_loop(params):
                         player.center_y // maze.cell_size)
 
         if maze.show_solutions and (prev_x != new_x or prev_y != new_y):
-            clear_solution(maze, player)
-            solve(maze, player)
-            highlight_solution(maze, player)
+            clear_solution(image, maze.maze,
+                           (int(prev_x), int(prev_y)), maze.player_solution)
+            maze.player_solution = solve(maze.maze, (int(player.center_x // maze.cell_size), int(player.center_y // maze.cell_size)), maze.exit)
+            highlight_solution(image, maze.maze,
+                               (int(new_x), int(new_y)), maze.player_solution)
 
         display_play((mlx, mlx_ptr, win_ptr, image,
                       maze, mlx_maze_display, game, player))
@@ -159,13 +161,19 @@ def handle_key_press(keycode, params):
 
     if game.state == State.PLAY and keycode == ord('h'):
         if maze.show_solutions:
-            clear_solution(maze)
-            clear_solution(maze, player)
+            clear_solution(image, maze.maze,
+                           (int(player.center_x // maze.cell_size),
+                            int(player.center_y // maze.cell_size)),
+                           maze.player_solution)
+            clear_solution(image, maze.maze, maze.entry, maze.solution)
             maze.show_solutions = False
         else:
-            #highlight_solution(maze)
-            solve(maze, player)
-            highlight_solution(maze, player)
+            highlight_solution(image, maze.maze, maze.entry, maze.solution)
+            maze.player_solution = solve(maze.maze, (int(player.center_x // maze.cell_size), int(player.center_y // maze.cell_size)), maze.exit)
+            highlight_solution(image, maze.maze,
+                               (int(player.center_x // maze.cell_size),
+                                int(player.center_y // maze.cell_size)),
+                               maze.player_solution)
             maze.show_solutions = True
 
 
@@ -223,22 +231,25 @@ def main() -> None:
         print(f"An error occured during file parsing: {e}")
         return 1
 
-    too_big = ((logo_width + 2 > config['width']) or
-               (logo_height + 2 > config['height']))
-    if (too_big):
-        sys.stderr.write("Error, maze too small for the logo, "
-                         "starting the maze without it.\n")
-        logo = []
+    if logo:
+        too_big = ((logo_width + 2 > config['width']) or
+                   (logo_height + 2 > config['height']))
+        if (too_big):
+            sys.stderr.write("Error, maze too small for the logo, "
+                             "starting the maze without it.\n")
+            logo = []
 
-    temp_entry = Cell(x=config['entry'][0], y=config['entry'][1])
-    temp_exit = Cell(x=config['exit'][0], y=config['exit'][1])
-    if (temp_entry in logo):
-        sys.stderr.write("Error: entry on logo, "
-                         "starting the maze without logo.\n")
-        logo = []
-    elif (temp_exit in logo):
-        sys.stderr.write("Error: exit on logo, "
-                         "starting the maze without logo.\n")
+        temp_entry = Cell(x=config['entry'][0], y=config['entry'][1])
+        temp_exit = Cell(x=config['exit'][0], y=config['exit'][1])
+        if (temp_entry in logo):
+            sys.stderr.write("Error: entry on logo, "
+                             "starting the maze without logo.\n")
+            logo = []
+        elif (temp_exit in logo):
+            sys.stderr.write("Error: exit on logo, "
+                             "starting the maze without logo.\n")
+            logo = []
+    else:
         logo = []
 
     maze_generator = MazeGenerator(**config)
@@ -306,3 +317,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

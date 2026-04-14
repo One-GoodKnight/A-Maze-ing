@@ -7,6 +7,7 @@ from .cell import Cell
 from .parsing.parsing_config import parse_config_file
 from .parsing.parsing_logo import parse_logo
 from .shape_mazester.wall_builder import WallBuilder
+from .solver.solver import solve
 
 __all__ = [
     "__version__",
@@ -17,4 +18,5 @@ __all__ = [
     "Cell",
     "WallBuilder",
     "Direction",
+    "solve",
 ]
