@@ -16,6 +16,6 @@ __all__ = [
     'display_player',
     'Font',
     'highlight_solution',
-    'set_logo_color',
     'clear_solution',
+    'set_logo_color',
 ]

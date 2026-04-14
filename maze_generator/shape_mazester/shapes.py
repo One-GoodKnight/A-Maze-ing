@@ -1,8 +1,8 @@
-from ..directions import Direction
+from .directions import Direction
 from collections.abc import Generator
-import math
+from math import sqrt, acos, pi
 from enum import Enum
-from typing import Tuple, Self
+from typing import Self
 
 
 class Shape(Enum):
@@ -31,7 +31,7 @@ class Vertex():
         dx = abs(v2.x - v1.x)
         dy = abs(v2.y - v1.y)
 
-        d = math.sqrt(dx ** 2 + dy ** 2)
+        d = sqrt(dx ** 2 + dy ** 2)
         return d
 
 
@@ -48,11 +48,11 @@ class Segment():
 class Shapes():
     @staticmethod
     def normalize_vector(vector: list[float, float]) -> list[float, float]:
-        magnitude = math.sqrt(vector[0] ** 2 + vector[1] ** 2)
+        magnitude = sqrt(vector[0] ** 2 + vector[1] ** 2)
         return [vector[0] / magnitude, vector[1] / magnitude]
 
     @staticmethod
-    def construct_shape_gen(verticies_tuple: Tuple[Tuple[float, float]]
+    def construct_shape_gen(verticies_tuple: tuple[tuple[float, float]]
                             ) -> Generator[float, None, None]:
         coeff = 6
         coeff /= 1000
@@ -106,8 +106,8 @@ class Shapes():
             vector = [res_posx, res_posy]
             normed = Shapes.normalize_vector(vector)
 
-            yield (math.acos(normed[0]) if normed[1] < 0
-                   else -math.acos(normed[0]))
+            yield (acos(normed[0]) if normed[1] < 0
+                   else -acos(normed[0]))
 
     @staticmethod
     def triangle() -> Generator[float, None, None]:
@@ -125,7 +125,7 @@ class Shapes():
         step = 0
 
         while True:
-            distance = step // (2 * math.pi)
+            distance = step // (2 * pi)
             if distance < 1:
                 distance = 1
             match direction:
@@ -153,8 +153,8 @@ class Shapes():
 
             normed = Shapes.normalize_vector(vector)
             step += step_amount / (distance if distance > 1 else 1)
-            yield (math.acos(normed[0]) if normed[1] >= 0
-                   else -math.acos(normed[0]))
+            yield (acos(normed[0]) if normed[1] >= 0
+                   else -acos(normed[0]))
 
     @staticmethod
     def circle() -> Generator[float, None, None]:
@@ -169,9 +169,9 @@ class Shapes():
 
         coeff = 11
         coeff /= 1000
-        step_amount = (2 * math.pi) * coeff
+        step_amount = (2 * pi) * coeff
         step = 0
         while (True):
-            yield (step % (2 * math.pi))
-            distance = step // (2 * math.pi)
+            yield (step % (2 * pi))
+            distance = step // (2 * pi)
             step += step_amount / (distance if distance > 1 else 1)

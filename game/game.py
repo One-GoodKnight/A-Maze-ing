@@ -4,7 +4,6 @@ from .player import Player
 from maze_generator import Cell
 from .Vector2 import Vector2
 from .state import State
-from typing import Tuple
 import math
 
 
@@ -44,7 +43,7 @@ class Game():
 
     def wall_collisions(self, maze: list[list[Cell]],
                         cell_size: int, player: Player
-                        ) -> Tuple[bool, bool, bool, bool]:
+                        ) -> tuple[bool, bool, bool, bool]:
         max_x = len(maze[0]) - 1
         max_y = len(maze) - 1
 
@@ -64,7 +63,7 @@ class Game():
         direct_west_wall = top_left_cell.west or bottom_left_cell.west
 
         # neighbor cell
-        def n_cell(cell: Cell, offset: Tuple[int, int]) -> Cell:
+        def n_cell(cell: Cell, offset: tuple[int, int]):
             return maze[cell.y + offset[1]][cell.x + offset[0]]
 
         x = player.x // cell_size

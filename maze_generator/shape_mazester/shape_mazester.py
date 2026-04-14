@@ -3,7 +3,7 @@ from random import randint, choice
 from typing import Optional, Tuple, Callable
 from collections.abc import Generator
 from ..cell import Cell
-from ..directions import Direction
+from .directions import Direction
 from .wall_builder import WallBuilder
 from .raycast import RayCast
 from .shapes import Shape

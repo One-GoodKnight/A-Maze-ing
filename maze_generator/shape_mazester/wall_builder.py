@@ -1,6 +1,6 @@
 from ..cell import Cell
-from ..directions import Direction
-from typing import Optional, Tuple
+from .directions import Direction
+from typing import Optional
 from random import randint, choice
 
 
@@ -120,8 +120,8 @@ class WallBuilder():
 
     @staticmethod
     def add_solutions(maze: list[list[Optional[Cell]]], logo: list[Cell],
-                      max_x: int, max_y: int, entry: Tuple[int, int],
-                      exit: Tuple[int, int]) -> None:
+                      max_x: int, max_y: int, entry: tuple[int, int],
+                      exit: tuple[int, int]) -> None:
         width, height = (max_x + 1, max_y + 1)
 
         entry_cell = maze[entry[1]][entry[0]]

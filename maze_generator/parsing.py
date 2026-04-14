@@ -1,4 +1,4 @@
-from maze_generator import Shape
+from .shape_mazester.shapes import Shape
 from typing import Dict, Any
 from enum import StrEnum
 
@@ -58,17 +58,15 @@ def parse_config_file(filename: str) -> Dict[str, Any]:
                                          f"'{pos}' should be an int")
                     conf[key] = (v1, v2)
                 case 'output_file':
+                    err = 'Output file must'
                     if len(value) == 0:
-                        raise ValueError("Output file name must not be empty")
+                        raise ValueError(f"{err} not be empty")
                     if not value.endswith('.txt'):
-                        raise ValueError("Output file name must "
-                                         "end with '.txt'")
+                        raise ValueError(f"{err} end with '.txt'")
                     if value.startswith('/'):
-                        raise ValueError("Output file name must "
-                                         "not start with '/'")
+                        raise ValueError(f"{err} not start with '/'")
                     if './' in value:
-                        raise ValueError("Output file name must "
-                                         "not contain './'")
+                        raise ValueError(f"{err} not contain './'")
                     conf[key] = value
                 case 'perfect':
                     if (value != "True" and value != "False"):

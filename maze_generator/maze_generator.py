@@ -1,19 +1,21 @@
 from pydantic import BaseModel, Field, model_validator
-from typing import Tuple, Self, Generator, ClassVar, Optional, cast
+from typing import Self, Generator, ClassVar, Any, cast
 from .cell import Cell
 from .shape_mazester.shape_mazester import ShapeMazester
 from .shape_mazester.shapes import Shape
-from .solver.solver import solve
+from .solver import solve
+from .parsing import parse_config_file
 import random
 
 
 class MazeGenerator(BaseModel):
-    MAX_MAZE_SIZE: ClassVar = 50
+    MAX_MAZE_SIZE: ClassVar[int] = 50
+    DEFAULT_SEED: ClassVar[int] = 42
 
     width: int = Field(ge=1, le=MAX_MAZE_SIZE)
     height: int = Field(ge=1, le=MAX_MAZE_SIZE)
-    entry: Tuple[int, int]
-    exit: Tuple[int, int]
+    entry: tuple[int, int]
+    exit: tuple[int, int]
     output_file: str
     perfect: bool = Field(default=False)
     shape: Shape = Field(default=Shape.CIRCLE)
@@ -38,6 +40,22 @@ class MazeGenerator(BaseModel):
         if (self.entry[0] == self.exit[0] and self.entry[1] == self.exit[1]):
             raise ValueError("Exit and entry should not be at the same cell")
         return self
+
+    @classmethod
+    def from_file(cls, filename: str) -> Self:
+        config = parse_config_file(filename)
+        random.seed(config['seed'] if 'seed' in config else cls.DEFAULT_SEED)
+        return MazeGenerator(**config)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            'width': self.width,
+            'height': self.height,
+            'entry': self.entry,
+            'exit': self.exit,
+            'output_file': self.output_file,
+            'perfect': self.perfect,
+        }
 
     def generate_full_maze(self) -> list[list[Cell]]:
         gen: Generator[list[list[Cell | None]] | bool, None, None] = self.get_maze_generator([])

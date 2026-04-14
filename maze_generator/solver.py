@@ -1,6 +1,6 @@
-from typing import Self, Tuple
+from typing import Self
 from collections.abc import Callable
-from ..cell import Cell
+from .cell import Cell
 
 
 class Node:
@@ -27,8 +27,8 @@ class Node:
 
 
 class AStar:
-    def __init__(self, maze: list[list[Cell]], entry: Tuple[int, int],
-                 exit: Tuple[int, int]) -> None:
+    def __init__(self, maze: list[list[Cell]], entry: tuple[int, int],
+                 exit: tuple[int, int]) -> None:
         self.maze = maze
         self.width = len(maze[0])
         self.height = len(maze)
@@ -97,8 +97,8 @@ class AStar:
         return ''
 
 
-def solve(maze: list[list[Cell]], entry: Tuple[int, int],
-          exit: Tuple[int, int]) -> str:
+def solve(maze: list[list[Cell]], entry: tuple[int, int],
+          exit: tuple[int, int]) -> str:
     algo = AStar(maze, entry, exit)
     solution = algo.run()
     return solution

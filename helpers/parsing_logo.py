@@ -1,5 +1,5 @@
 from maze_generator import Cell
-from typing import Tuple, Optional
+from typing import Optional
 
 
 def parse_logo(filename: str, maze_width: int, maze_height: int) -> Optional[Tuple[list[Cell], int, int]]:
@@ -25,7 +25,7 @@ def parse_logo(filename: str, maze_width: int, maze_height: int) -> Optional[Tup
 
 def logo_to_cells(lines: list[str], width: int, height: int,
                   maze_width: int, maze_height: int
-                  ) -> Optional[Tuple[list[Cell], int, int]]:
+                  ) -> Optional[tuple[list[Cell], int, int]]:
     cells: list[Cell] = []
     offset_x, offset_y = (maze_width // 2 - width // 2,
                           maze_height // 2 - height // 2)

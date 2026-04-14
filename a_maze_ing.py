@@ -5,18 +5,16 @@ except ImportError as e:
 from maze import Maze
 from maze_generator import MazeGenerator, Cell, \
     WallBuilder, solve
-from parsing import parse_config_file, parse_logo
 from display import Image, Font, MazeDisplay, set_logo_color, display_player, \
     highlight_solution, clear_solution
-from helpers import CalculateSize
+from helpers import CalculateSize, parse_logo
 from game import Game, State, Player, check_end
 from constants import WHITE, BLACK, PLAYER_SIZE, ANIMATION_SPEED, \
     MAZE_SOLUTION_COLOR, MAZE_PLAYER_SOLUTION_COLOR
-import random
-import time
-import math
 from typing import cast, Any, Tuple, Generator
 from ctypes import c_void_p
+from math import floor
+from time import time
 
 
 def display_generation(params: tuple[Mlx, c_void_p, c_void_p, Image, Maze, MazeDisplay]) -> None:
@@ -39,8 +37,9 @@ def display_play(params: tuple[Mlx, c_void_p, c_void_p, Image, Maze, MazeDisplay
     image.print(10, 10, rot, color=WHITE, bg_color=None, size=3)
 
     timer = f"Timer: {game.timer:.2f}s"
-    image.print(10, image.height - 45, timer,
-                color=WHITE, bg_color=None, size=3)
+    image.print(
+        10, image.height - 45, timer, color=WHITE, bg_color=None, size=3
+    )
 
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
@@ -49,12 +48,12 @@ def display_end(params: tuple[Mlx, c_void_p, c_void_p, Image, Game]) -> None:
     mlx, mlx_ptr, win_ptr, image, game = params
     image.set_to(BLACK)
     text = f"GG - {game.timer:.2f}s - Press R to generate a new maze"
-    image.print(-1, -1, text, color=WHITE, size=4)
+    image.print(-1, -1, text, color=WHITE, size=3)
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
 
 def game_loop(params: Tuple[Mlx, c_void_p, c_void_p, Image, MazeGenerator, Maze, MazeDisplay, Game, Player, list[Cell]]) -> None:
-    game_start_loop_time = time.time()
+    game_start_loop_time = time()
 
     (mlx, mlx_ptr, win_ptr, image, maze_generator, maze,
      mlx_maze_display, game, player, logo) = params
@@ -71,11 +70,11 @@ def game_loop(params: Tuple[Mlx, c_void_p, c_void_p, Image, MazeGenerator, Maze,
         maze.player_solution = ''
         maze.cell_counter = 0
         maze.maze = [[None] * maze.width for _ in range(maze.height)]
-        maze.init_time = time.time()
+        maze.init_time = time()
         game.state = State.GENERATION
 
     elif game.state == State.GENERATION:
-        time_since_gen_start = time.time() - maze.init_time
+        time_since_gen_start = time() - maze.init_time
         cells_that_should_be_generated = time_since_gen_start \
             / ANIMATION_SPEED * maze.width * maze.height
         cells_that_should_be_generated_after_this_frame = \
@@ -88,7 +87,7 @@ def game_loop(params: Tuple[Mlx, c_void_p, c_void_p, Image, MazeGenerator, Maze,
 
         new_maze = None
         try_generate = False
-        for i in range(math.floor(cells_to_generate)):
+        for i in range(floor(cells_to_generate)):
             try:
                 try_generate = True
                 new_maze = next(cast(Generator[list[list[Cell]]], maze_generator.gen))
@@ -144,22 +143,21 @@ def game_loop(params: Tuple[Mlx, c_void_p, c_void_p, Image, MazeGenerator, Maze,
                         player.center_y // maze.cell_size)
 
         if maze.show_solutions and (prev_x != new_x or prev_y != new_y):
-            clear_solution(image, cast(list[list[Cell]], maze.maze),
-                           (int(prev_x), int(prev_y)), maze.player_solution)
-            # highlight solution from maze entry back after clear
-            # for when the player was on
-            highlight_solution(image, cast(list[list[Cell]], maze.maze), maze.entry,
-                               maze.solution, MAZE_SOLUTION_COLOR)
+            clear_solution(maze.maze, (
+                int(prev_x), int(prev_y)
+            ), maze.player_solution)
+            highlight_solution(
+                maze.maze, maze.entry, maze.solution, MAZE_SOLUTION_COLOR
+            )
             maze.player_solution = solve(
                 cast(list[list[Cell]], maze.maze),
                 (int(player.center_x // maze.cell_size),
                  int(player.center_y // maze.cell_size)),
                 maze.exit
             )
-            highlight_solution(image, cast(list[list[Cell]], maze.maze),
-                               (int(new_x), int(new_y)),
-                               maze.player_solution,
-                               MAZE_PLAYER_SOLUTION_COLOR)
+            highlight_solution(maze.maze, (
+                int(new_x), int(new_y)
+            ), maze.player_solution, MAZE_PLAYER_SOLUTION_COLOR)
 
         display_play((mlx, mlx_ptr, win_ptr, image,
                       maze, mlx_maze_display, game, player))
@@ -169,8 +167,8 @@ def game_loop(params: Tuple[Mlx, c_void_p, c_void_p, Image, MazeGenerator, Maze,
     elif game.state == State.END:
         display_end((mlx, mlx_ptr, win_ptr, image, game))
 
-    game.deltatime = time.time() - game.start_loop_time
-    game.end_loop_time = time.time()
+    game.deltatime = time() - game.start_loop_time
+    game.end_loop_time = time()
 
 
 def handle_key_press(keycode: int, params: Tuple[Mlx, c_void_p, Game, MazeGenerator, Image, Maze, Player]) -> None:
@@ -233,11 +231,9 @@ def main() -> int:
               "python3 a_maze_ing.py config_file_name")
         return 1
 
-    config = {}
     filename = sys.argv[1]
     try:
-        config = parse_config_file(filename)
-        random.seed(config['seed'] if 'seed' in config else 42)
+        maze_generator = MazeGenerator.from_file(filename)
         filename = "logo.42"
         parse_logo_data = parse_logo(filename, config['width'],
                                      config['height'])
@@ -272,15 +268,15 @@ def main() -> int:
         return 1
 
     if logo:
-        too_big = ((isinstance(logo_width, int) and logo_width + 2 > config['width']) or
-                   (isinstance(logo_height, int) and logo_height + 2 > config['height']))
+        too_big = ((logo_width + 2 > maze_generator.width) or
+                   (logo_height + 2 > maze_generator.height))
         if (too_big):
             sys.stderr.write("Error, maze too small for the logo, "
                              "starting the maze without it.\n")
             logo = []
 
-        temp_entry = Cell(x=config['entry'][0], y=config['entry'][1])
-        temp_exit = Cell(x=config['exit'][0], y=config['exit'][1])
+        temp_entry = Cell(x=maze_generator.entry[0], y=maze_generator.entry[1])
+        temp_exit = Cell(x=maze_generator.exit[0], y=maze_generator.exit[1])
         if (isinstance(logo, list) and temp_entry in logo):
             sys.stderr.write("Error: entry on logo, "
                              "starting the maze without logo.\n")
@@ -292,20 +288,7 @@ def main() -> int:
     else:
         logo = []
 
-    maze_generator = MazeGenerator(**config)
-
-    maze = Maze(
-        maze=None,
-        solution="",
-        width=maze_generator.width,
-        height=maze_generator.height,
-        entry=maze_generator.entry,
-        exit=maze_generator.exit,
-        output_file=maze_generator.output_file,
-        perfect=maze_generator.perfect,
-        player_solution="",
-        show_solutions=False
-    )
+    maze = Maze(**maze_generator.to_dict())
 
     mlx = Mlx()
     mlx_ptr = mlx.mlx_init()

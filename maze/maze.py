@@ -1,12 +1,12 @@
 from pydantic import BaseModel, Field, model_validator
 from typing import Self
-from maze_generator.cell import Cell
+from maze_generator import Cell
 from constants import DEFAULT_CELL_SIZE
 
 
 class Maze(BaseModel):
-    maze: list[list[Cell | None]] | None
-    solution: str
+    maze: list[list[Cell | None]] | None = Field(default=None)
+    solution: str = Field(default='')
     width: int = Field(ge=1)
     height: int = Field(ge=1)
     entry: tuple[int, int]
