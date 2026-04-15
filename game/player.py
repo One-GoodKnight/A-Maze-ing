@@ -7,8 +7,8 @@ class Player():
         self.max_x = maze_max_x - size
         self.max_y = maze_max_y - size
 
-        self.__x = 0
-        self.__y = 0
+        self.__x: float = 0.
+        self.__y: float = 0.
         self.x = x * cell_size + cell_size / 2 - size / 2
         self.y = y * cell_size + cell_size / 2 - size / 2
 
@@ -17,20 +17,20 @@ class Player():
         self.velocity = Vector2(0, 0)
 
     @property
-    def x(self) -> int:
+    def x(self) -> float:
         return self.__x
 
     @x.setter
-    def x(self, value: float | int) -> None:
-        self.__x = int(min(max(0, value), self.max_x))
+    def x(self, value: float) -> None:
+        self.__x = min(max(0, value), self.max_x)
 
     @property
-    def y(self) -> int:
+    def y(self) -> float:
         return self.__y
 
     @y.setter
-    def y(self, value: float | int) -> None:
-        self.__y = int(min(max(0, value), self.max_y))
+    def y(self, value: float) -> None:
+        self.__y = min(max(0, value), self.max_y)
 
     @property
     def center_x(self) -> float:
