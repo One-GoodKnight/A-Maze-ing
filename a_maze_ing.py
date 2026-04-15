@@ -6,7 +6,7 @@ from maze import Maze
 from maze_generator import MazeGenerator, Cell, \
     WallBuilder, solve
 from display import Image, Font, MazeDisplay, set_logo_color, display_player, \
-    highlight_solution, clear_solution
+    highlight_solution, clear_solution, random_maze_logo_color
 from helpers import CalculateSize, parse_logo
 from game import Game, State, Player, check_end
 from constants import WHITE, BLACK, PLAYER_SIZE, ANIMATION_SPEED, \
@@ -210,9 +210,9 @@ def game_loop(
 
 def handle_key_press(
     keycode: int,
-    params: tuple[Mlx, c_void_p, Game, MazeGenerator, Image, Maze, Player]
+    params: tuple[Mlx, c_void_p, Game, MazeGenerator, Image, Maze, Player, list[Cell]]
 ) -> None:
-    mlx, mlx_ptr, game, maze_generator, image, maze, player = params
+    mlx, mlx_ptr, game, maze_generator, image, maze, player, logo = params
     if keycode == 0xFF1B or keycode == ord('q'):
         mlx.mlx_loop_exit(mlx_ptr)
 
@@ -220,6 +220,9 @@ def handle_key_press(
         game.left_rotate = True
     if keycode == 0xff53:
         game.right_rotate = True
+
+    if game.state == State.PLAY and keycode == ord('c'):
+        random_maze_logo_color(maze, logo)
 
     if game.state == State.END and keycode == ord('r'):
         game.state = State.INIT_GENERATION
@@ -343,7 +346,7 @@ def main() -> int:
 
     image = Image(mlx, mlx_ptr, window_width, window_height, font)
     mlx_maze_display = MazeDisplay(mlx, image)
-    set_logo_color(image, logo)
+    set_logo_color(logo)
 
     game = Game(maze.width, maze.height)
     player_size = int(maze.cell_size * PLAYER_SIZE)
@@ -360,7 +363,7 @@ def main() -> int:
     key_press_event, key_press_mask = (2, 1)
     key_release_event, key_release_mask = (3, 2)
     mlx.mlx_hook(win_ptr, key_press_event, key_press_mask, handle_key_press,
-                 (mlx, mlx_ptr, game, maze_generator, image, maze, player))
+                 (mlx, mlx_ptr, game, maze_generator, image, maze, player, logo))
     mlx.mlx_hook(win_ptr, key_release_event,
                  key_release_mask, handle_key_release,
                  (game))
