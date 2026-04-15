@@ -2,11 +2,7 @@
 MAZE_SCALE = 0.95
 
 # GENERATION
-<<<<<<< HEAD
-ANIMATION_SPEED = 3
-=======
 ANIMATION_SPEED = 1
->>>>>>> 580cd24 (feat: random logo color pressing c)
 
 # MAZE
 MAZE_BORDER_WIDTH_PERCENT = 10

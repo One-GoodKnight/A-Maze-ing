@@ -1,12 +1,7 @@
-<<<<<<< HEAD
-WIDTH=25
-HEIGHT=25
-=======
 WIDTH=15
 HEIGHT=15
->>>>>>> 580cd24 (feat: random logo color pressing c)
 ENTRY=0,0
-EXIT=0,15
+EXIT=0,14
 OUTPUT_FILE=maze.txt
 PERFECT=True
 SEED=-12
