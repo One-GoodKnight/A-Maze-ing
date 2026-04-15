@@ -1,5 +1,5 @@
 try:
-    from mlx import Mlx  # type: ignore[import-untyped]
+    from mlx import Mlx
 except ImportError as e:
     raise SystemExit(f"Unable to import mlx: {e}")
 try:

@@ -1,5 +1,5 @@
 try:
-    from mlx import Mlx  # type: ignore[import-untyped]
+    from mlx import Mlx
 except ImportError as e:
     raise SystemExit(f"Unable to import mlx: {e}")
 from constants import MAZE_BORDER_WIDTH_PERCENT, MAZE_BORDER_COLOR
