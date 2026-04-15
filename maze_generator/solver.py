@@ -1,4 +1,4 @@
-from typing import Self, Any
+from typing import Self
 from collections.abc import Callable
 from .cell import Cell
 
@@ -20,10 +20,10 @@ class Node:
     def y(self) -> int:
         return self.cell.y
 
-    def __eq__(self, other: Any) -> bool:
-        if not isinstance(other, Cell):
-            return False
-        return (self.cell == other)
+    def __eq__(self, other: object) -> bool:
+        if other == self.cell:
+            return True
+        return False
 
 
 class AStar:
