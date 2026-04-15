@@ -5,8 +5,17 @@ from random import randint, choice
 
 
 class WallBuilder():
+    """
+    Utilities to build or destroy the walls of a maze.
+    """
     @staticmethod
     def build_wall(maze: list[list[Optional[Cell]]]) -> None:
+        """
+        Builds the walls of a maze using the directions of it's cells.
+
+        Attributes:
+            maze (list[list[Cell]]): Maze to build the walls for.
+        """
         for row in maze:
             for cell in row:
                 if not cell:
@@ -19,6 +28,18 @@ class WallBuilder():
     @staticmethod
     def open_all_walls(maze: list[list[Optional[Cell]]], logo: list[Cell],
                        max_x: int, max_y: int, cell: Cell) -> None:
+        """
+        Breaks all the walls of a cell if possible
+        (used on entry and exit on non perfect mazes).
+
+        Attributes:
+            maze (list[list[Cell]]): Maze on which check if the neighbors
+                are valid.
+            logo (list[Cell]): Pattern of the maze.
+            max_x (int): Max x of the maze.
+            max_y (int): Max y of the maze.
+            cell (Cell): Cell to open the walls for.
+        """
         logo_set = {(c.x, c.y) for c in logo}
 
         if (cell.x, cell.y) in logo_set:
@@ -52,6 +73,20 @@ class WallBuilder():
     def destructible_walls(maze: list[list[Optional[Cell]]], logo: list[Cell],
                            max_x: int, max_y: int, cell: Cell
                            ) -> list[Direction]:
+        """
+        Returns all valid destructible walls fot the cell passed.
+
+        Attributes:
+            maze (list[list[Cell]]): Maze on which check if the neighbors
+                are valid.
+            logo (list[Cell]): Pattern of the maze.
+            max_x (int): Max x of the maze.
+            max_y (int): Max y of the maze.
+            cell (Cell): Cell for which check the walls that are destructible.
+
+        Returns:
+            list[Direction]: Directions for which the walls are destructible.
+        """
         destructible_walls = []
 
         if cell.north and cell.y != 0:
@@ -68,6 +103,20 @@ class WallBuilder():
     @staticmethod
     def open_single_wall(maze: list[list[Optional[Cell]]], logo: list[Cell],
                          max_x: int, max_y: int, cell: Cell) -> None:
+        """
+        Opens a single wall for the cell passed in args if
+        there is at least one valid.
+        The cell AND it's neighbor must have at least two walls to
+        avoid big hallways in the maze.
+
+        Attributes:
+            maze (list[list[Cell]]): Maze on which check if the
+                neighbors are valid.
+            logo (list[Cell]): Pattern of the maze.
+            max_x (int): Max x of the maze.
+            max_y (int): Max y of the maze.
+            cell (Cell): Cell for which check the walls that are destructible.
+        """
         logo_set = {(c.x, c.y) for c in logo}
 
         if (cell.x, cell.y) in logo_set:
@@ -130,6 +179,17 @@ class WallBuilder():
     def add_solutions(maze: list[list[Optional[Cell]]], logo: list[Cell],
                       max_x: int, max_y: int, entry: tuple[int, int],
                       exit: tuple[int, int]) -> None:
+        """
+        Adds solutions to a maze to make it not perfect.
+
+        Attributes:
+            maze (list[list[Cell]]): Maze on which we add solutions.
+            logo (list[Cell]): Pattern of the maze.
+            max_x (int): Max x of the maze.
+            max_y (int): Max y of the maze.
+            entry (tuple[int, int]): Entry of the maze.
+            exit (tuple[int, int]): Exit of the maze.
+        """
         width, height = (max_x + 1, max_y + 1)
 
         entry_cell = maze[entry[1]][entry[0]]

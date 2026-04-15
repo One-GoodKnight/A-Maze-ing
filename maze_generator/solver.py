@@ -101,6 +101,17 @@ class AStar:
 
 def solve(maze: list[list[Cell]], entry: tuple[int, int],
           exit: tuple[int, int]) -> str:
+    """
+    Returns a solution for the maze, entry and exit passed as parameters.
+
+    Attributes:
+        maze (list[list[Cell]]): Maze for which calculate the solution.
+        entry (tuple[int, int]): Entry of the maze.
+        exit (tuple[int, int]): Exit of the maze.
+
+    Returns:
+        str: Shortest solution for the maze.
+    """
     algo = AStar(maze, entry, exit)
     solution = algo.run()
     return solution

@@ -6,11 +6,14 @@ from typing import Callable
 
 
 class Shape(Enum):
+    """Enum that exposes the available shapes for the maze generation."""
     TRIANGLE = 'triangle'
     SQUARE = 'square'
     CIRCLE = 'circle'
 
     def get_func(self) -> Callable[[], Generator[float, None, None]]:
+        """Returns the appropriate function to get a generator of angles for
+        the shape instanciated."""
         return {
             Shape.TRIANGLE: Shapes.triangle,
             Shape.SQUARE: Shapes.square,

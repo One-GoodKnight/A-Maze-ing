@@ -1,3 +1,12 @@
+"""
+Maze generation.
+
+This pakage provides a class MazeGenerator with methods
+to parse a config file, create a maze and find
+a solution to this maze.
+"""
+
+
 __version__ = "1.0.0"
 __author__ = "Nifogi"
 
