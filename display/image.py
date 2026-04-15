@@ -22,9 +22,7 @@ class Image():
         self.height = height
         self.ptr = mlx.mlx_new_image(mlx_ptr, width, height)
         data, bpp, self.line_size, self.fmt = mlx.mlx_get_data_addr(self.ptr)
-        self.data = np.ctypeslib.as_array(
-            data, np.uint8
-        )  # type: ignore[call-overload]
+        self.data = np.ctypeslib.as_array(data)
         self.data = self.data.reshape(height, self.line_size)
         self.bits_pp = bpp
         self.bytes_pp = bpp // 8
