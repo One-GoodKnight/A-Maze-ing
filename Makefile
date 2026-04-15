@@ -15,8 +15,8 @@ debug:
 	python3 -m pdb $(NAME)
 
 clean:
-	rm -rf __pycache__
-	rm -rf .mypy_cache
+	rm -rf __pycache__ */__pycache__ */*/__pycache__
+	rm -rf .mypy_cache */.mypy_cache */*/.mypy_cache
 
 lint:
 	python3 -m flake8 .

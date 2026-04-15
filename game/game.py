@@ -20,6 +20,13 @@ class Game():
         self.state: State = State.INIT_GENERATION
         self.timer: float = 0
 
+        self.iteration: int = 0
+        self.last_fps: list[int] = []
+        self.max_fps: int = 0
+        self.min_fps: int = 1000000
+        self.avg_fps: int = 0
+        self.display_fps: bool = False
+
     @property
     def angle(self) -> float:
         return self.__angle
