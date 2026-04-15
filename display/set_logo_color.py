@@ -1,6 +1,5 @@
-from .image import Image
 from maze_generator import Cell
-from constants import LOGO_COLOR, PLAYER_COLOR
+from constants import LOGO_COLOR
 from random import randint
 
 

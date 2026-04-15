@@ -210,7 +210,8 @@ def game_loop(
 
 def handle_key_press(
     keycode: int,
-    params: tuple[Mlx, c_void_p, Game, MazeGenerator, Image, Maze, Player, list[Cell]]
+    params: tuple[Mlx, c_void_p, Game, MazeGenerator,
+                  Image, Maze, Player, list[Cell]]
 ) -> None:
     mlx, mlx_ptr, game, maze_generator, image, maze, player, logo = params
     if keycode == 0xFF1B or keycode == ord('q'):
@@ -222,7 +223,7 @@ def handle_key_press(
         game.right_rotate = True
 
     if game.state == State.PLAY and keycode == ord('c'):
-        random_maze_logo_color(maze, logo)
+        random_maze_logo_color(cast(list[list[Cell]], maze.maze), logo)
 
     if game.state == State.END and keycode == ord('r'):
         game.state = State.INIT_GENERATION
@@ -363,7 +364,8 @@ def main() -> int:
     key_press_event, key_press_mask = (2, 1)
     key_release_event, key_release_mask = (3, 2)
     mlx.mlx_hook(win_ptr, key_press_event, key_press_mask, handle_key_press,
-                 (mlx, mlx_ptr, game, maze_generator, image, maze, player, logo))
+                 (mlx, mlx_ptr, game, maze_generator, image, maze,
+                  player, logo))
     mlx.mlx_hook(win_ptr, key_release_event,
                  key_release_mask, handle_key_release,
                  (game))
