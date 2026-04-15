@@ -107,13 +107,24 @@ class Image():
         font = self.font
         bg_color = kwargs.get('bg_color', None)
         size = max(kwargs.get('size', 1), 1)
+        center = kwargs.get('center', False)
         char_width, char_height = (font.width * size, font.height * size)
-        bg_width = len(string) * char_width
-        x = x if x >= 0 else (self.width // 2) - (bg_width // 2)
-        y = y if y >= 0 else (self.height // 2) - (char_height // 2)
-        if bg_color is not None:
-            self.draw_rect((x, y), (x + bg_width, y + char_height), bg_color)
-        offset = 0
-        for char in string:
-            self.print_char(x + offset, y, char, **kwargs)
-            offset += char_width
+        lines = string.splitlines()
+        y = y if not center else (
+            (self.height // 2 + y) - ((char_height * len(lines)) // 2)
+        )
+        x = x if not center else (self.width // 2 + x)
+        for i, line in enumerate(lines):
+            bg_width = len(line) * char_width
+            curr_x = x if not center else (x - bg_width // 2)
+            curr_y = y + char_height * i
+            if bg_color is not None:
+                self.draw_rect(
+                    (curr_x, curr_y),
+                    (curr_x + bg_width, curr_y + char_height),
+                    bg_color
+                )
+            offset = 0
+            for char in line:
+                self.print_char(curr_x + offset, curr_y, char, **kwargs)
+                offset += char_width
