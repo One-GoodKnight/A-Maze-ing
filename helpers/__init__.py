@@ -1,3 +1,9 @@
+"""
+This package provides utilities to parse a logo file and
+calculate the size of the window.
+"""
+
+
 __version__ = "1.0.0"
 __author__ = "Nifogi"
 

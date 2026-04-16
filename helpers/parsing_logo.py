@@ -5,6 +5,23 @@ from typing import Optional
 def parse_logo(
     filename: str, maze_width: int, maze_height: int
 ) -> Optional[tuple[list[Cell], int, int]]:
+    """
+    Parses the file in args to get the logo.
+    
+    Attributes:
+        filename (str): Name of the file ro parse.
+        maze_width (int): Width of the maze from MazeGenerator.
+        maze_height (int): Height of the maze from MazeGenerator.
+
+    Returns:
+        Optional[tuple[list[Cell], int, int]]: None if the file is empty
+            or if the logo is too big for the maze, else returns tupple with
+            a list of cell for the logo, the width and the height.
+
+    Raises:
+        OSError: If the file cannot be read.
+        ValueError: If the content of the file is invalid for a logo.
+    """
     lines: list[str] = []
     with open(filename, 'r') as f:
         for line in f.readlines():
