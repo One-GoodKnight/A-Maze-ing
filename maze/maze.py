@@ -5,6 +5,26 @@ from constants import DEFAULT_CELL_SIZE
 
 
 class Maze(BaseModel):
+    """
+    Represents a Maze with metadata for the generation and the game
+
+    Attributes:
+        maze (list[list[Cell | None]]): Cells of the maze.
+        solution (str): Shortest solution from entry to exit.
+        width] (int): Width of the maze.
+        height (int): Height of the maze.
+        entry (tuple[int, int]): Entry of the maze.
+        exit (tuple[int, int]): Exit of the maze.
+        output_file (str): Name of the file to write the maze to.
+        perfect (bool): Maze perfect or not (unique solution if perfect).
+        cell_size (int): Size of a cell in pixels.
+        cell_counter (int): Number of cells on the maze.
+        init_time (float): Metadata for the maze generation,
+            time at which the first cell has been generated.
+        player_solution (str): Shortest solution from the player to the exit.
+        show_solutions (bool): Metadata for the game, tells it to show
+            solution or not.
+    """
     maze: list[list[Cell | None]] | None = Field(default=None)
     solution: str = Field(default='')
     width: int = Field(ge=1)
@@ -22,6 +42,7 @@ class Maze(BaseModel):
 
     @model_validator(mode='after')
     def check_entry(self) -> Self:
+        """Checks if the entry is inside the map."""
         if not ((0 <= self.entry[0] <= self.width - 1) and
                 (0 <= self.entry[1] <= self.height - 1)):
             raise ValueError("Entry should be inside the map")
@@ -29,32 +50,38 @@ class Maze(BaseModel):
 
     @model_validator(mode='after')
     def check_exit(self) -> Self:
+        """Checks if the exit is inside the map."""
         if not ((0 <= self.exit[0] <= self.width - 1) and
                 (0 <= self.exit[1] <= self.height - 1)):
             raise ValueError("Exit should be inside the map")
         return self
 
     def pixel_to_cell(self, x: int, y: int) -> Cell:
+        """Returns a new cell with x and y passed as pixel."""
         cell_x: int = x // self.cell_size
         cell_y: int = y // self.cell_size
         return Cell(x=cell_x, y=cell_y)
 
     def get_entry(self) -> Cell | None:
+        """Returns the entry cell of the maze."""
         if self.maze is not None:
             return self.maze[self.entry[0]][self.entry[1]]
         return None
 
     def get_exit(self) -> Cell | None:
+        """Returns the exit cell of the maze."""
         if self.maze is not None:
             return self.maze[self.exit[0]][self.exit[1]]
         return None
 
     def __getitem__(self, index: int) -> list[Cell | None] | None:
+        """Returns a row of the maze"""
         if self.maze is not None:
             return self.maze[index]
         return None
 
     def __str__(self) -> str:
+        """Returns the maze in ASCII art."""
         chars: list[str] = ["🬕🬂🬂🬨", "▌  ▐", "🬲🬭🬭🬷"]
         ret: str = ''
         for row in self.maze if self.maze is not None else []:
@@ -97,6 +124,8 @@ class Maze(BaseModel):
         return ret
 
     def __repr__(self) -> str:
+        """Returns the maze in hexadecimal string format with a line for
+        each row."""
         ret: str = ''
         maze = cast(list[list[Cell]], self.maze)
         for row in maze:
