@@ -169,6 +169,7 @@ def game_loop(
         game.last_fps = [0 for _ in range(10)]
 
     elif game.state == State.PLAY:
+        print(maze)
         game.timer += game.deltatime
 
         game.rotate(game.state)

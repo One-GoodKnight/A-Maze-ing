@@ -24,7 +24,7 @@ python3 a_maze_ing.py config.txt
 ```
 or:
 ```bash
-make run CONF='config.txt'
+make run
 ```  
 
 # Resources and tools used
@@ -68,19 +68,19 @@ The config file names allowed are *.txt
 # Maze generation algorithm
 The generation algorithm used is the famous Shape-mazester, it's an algo capable of generating mazes following simple geometric 2d shapes like circles, squares or triangles.
 
-The algo starts at a random position and uses a shape generator to get an angle at which cast a raycast from the starting cell.  
+The algo starts at a random position and uses a shape generator to get an angle at which cast a ray-cast from the starting cell.  
 If it finds an empty cell, it generates a neighbor from the cell just before, so a cell already inside the maze.  
-It picks a direction depending on the current angle of the raycast, it only generates the neighbor if  
+It picks a direction depending on the current angle of the ray-cast, it only generates the neighbor if  
 it is an empty cell, if it's not, it checks the next direction.
 
-This repeats until the maze is full, at each raycast, the angle is incremented so that the consecutive
-raycasts follow a clock-wise rotation.
+This repeats until the maze is full, at each ray-cast, the angle is incremented so that the consecutive
+ray-casts follow a clock-wise rotation.
 
 Shapes implemented are: circle, square and triangle.
 
-I chose this algo because everyine does DFS and it's boring, also I wanted to see if it could work and it did so that's cool.
+I chose this algo because everyone did DFS and it's boring, also I wanted to see if it could work and it did so that's cool.
 It's not really efficient tho but since we have a game on top of it we still had to limit the maze size to  
-have a decent framerate.
+have a decent frame-rate.
 
 # Feature list
 For the mandatory:
@@ -93,38 +93,38 @@ For the mandatory:
 For the bonuses:
 - Our own font class to change the font and the size of the font
 - A playable character
-- Gravity, colisions for the player
+- Gravity, collisions for the player
 - bounce, air drag, friction
 - A maze generation animation
 - A generation algo that can use multiple shapes for the generation
 - The keys SHAPE and SEED in the config file
-- Display of the raycast during the generation
+- Display of the ray-cast during the generation
 - Rotation of the maze that affects the gravity and collisions of the player
 - A timer
 - States to manage the state of the app
 - a hotkey to highlight the solutions, one form the start and one from the player
 - a check for the ending
-- An endscreen with recapitulative informations
+- An end screen with a summary of informations
 - A replay key to regenerate the maze and replay until the end of time
 - A customizable pattern with logo.42
-- Autosize of the window relative to the maze size
-- A constans file to customize:
+- Auto size of the window relative to the maze size
+- A constant file to customize:
 - MAZE_SCALE, ANIM_SPEED, BORDER_WIDTH, ROTATION_SPEED, COLORS, GRAVITY, BOUNCE, AIR_DRAG, FRICTION
 
 # Technical choices
 MAX_SIZE 50x50:
 The main limit of our project is the maze size which we limited to 50x50.  
 Two reasons for that, the first is the shape-mazester algorithm which is not suited for big mazes.
-The other is the framerate at which the game runs, even with numpy, the game runs at about 40fps on  
+The other is the frame-rate at which the game runs, even with numpy, the game runs at about 40fps on  
 a 50x50 maze on our mac.  
-The maze has to be redrawn entirely every frame because of the rotation, this redrawn is the most impactul  
-ressource demanding functionnality in the main loop.
+The maze has to be redrawn entirely every frame because of the rotation, this redrawn is the most impactful  
+resource demanding functionality in the main loop.
 
 Pydantic:
 We used pydantic to validate the data of the config file to ensure the data valid.
 
 Pip install:
-pip for the dependancies, it's simple and effective
+pip for the dependencies, it's simple and effective
 
 # Reusable code
 The reusable code is the module maze_generator in which there is a MazeGenerator class that let's you use:
@@ -143,7 +143,7 @@ We didn't plan much, we divided the tasks as the project advanced and since Elio
 
 ## What worked well and what could be improved
 ### What worked well:
-The repartition on independant functionnalities really facilited the work since we didn't had much conflicts between each other.
+The repartition on independent functionalities really facilitated the work since we didn't had much conflicts between each other.
 
 ### What could be improved
 The project was not really clear on what should be inside the module so we had to refactor multiple times to put what was needed inside and make it independant.  
@@ -162,7 +162,7 @@ parsing: Alexandre
 display: Elio, Alexandre
 font: Elio
 shape-mazester: Alexandre
-solveur: Elio
+solver: Elio
 game: Alexandre
 main: Alexandre, Elio
 readme: Elio, Alexandre
@@ -172,25 +172,18 @@ readme: Elio, Alexandre
 from maze_generator import MazeGenerator
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     maze_generator = MazeGenerator(
         width=10,
         height=10,
         entry=(0,0),
         exit=(5,5),
-        output_file="maze.txt",
+        output_file='maze.txt',
         perfect=True,
     )
-
     maze_generator.change_seed(42)
-
     maze_generator.chose_shape('triangle')
-
     maze = maze_generator.generate_full_maze()
-
-    print(maze[0][0])
-
-    solution = maze_generator.get_solution(maze)
-
-    print(solution)
+    maze_generator.build_output(maze)
+    print(f'Maze saved in {maze_generator.output_file}')
 ```
