@@ -38,6 +38,10 @@ def display_play(
 
     image.rotate(game.angle)
 
+    if image.font is None:
+        mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
+        return
+
     game.iteration += 1
     fps = int(1 // game.deltatime)
     if fps < game.min_fps:
@@ -47,13 +51,14 @@ def display_play(
     if len(game.last_fps) >= 10:
         game.last_fps[game.iteration % 10] = fps
     game.avg_fps += fps
-    if game.display_fps:
-        fps_text = (
-            f"{sum(game.last_fps) / len(game.last_fps):.0f} FPS\n"
-            f"{game.max_fps:.0f} max FPS\n"
-            f"{game.min_fps:.0f} min FPS\n"
-            f"{game.avg_fps // game.iteration:.0f} average FPS\n"
-        )
+    if game.display_fps > 0:
+        fps_text = f"{sum(game.last_fps) / len(game.last_fps):.0f} FPS"
+        if game.display_fps > 1:
+            fps_text += (
+                f"\n{game.max_fps:.0f} max FPS\n"
+                f"{game.min_fps:.0f} min FPS\n"
+                f"{game.avg_fps // game.iteration:.0f} average FPS"
+            )
         image.print(10, 10, fps_text, color=WHITE, size=1)
 
     timer_text = f"Timer: {game.timer:.2f}s"
@@ -62,6 +67,19 @@ def display_play(
             0, -(image.height // 2) + (image.font.height * 3),
             timer_text, color=WHITE, size=3, center=True
         )
+
+    controls = (
+        "Controls:\n"
+        "  <h> to show the solution\n"
+        "  <f> to show fps stats\n"
+        "  <c> to randomize colors\n"
+        "  <q> or <esc> to quit"
+    )
+    image.print(
+        image.font.width,
+        image.height - image.font.height * 2 * len(controls.splitlines()),
+        controls, color=WHITE, size=2
+    )
 
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
@@ -167,9 +185,9 @@ def game_loop(
         )
         maze.show_solutions = False
         game.last_fps = [0 for _ in range(10)]
+        # print(maze)
 
     elif game.state == State.PLAY:
-        print(maze)
         game.timer += game.deltatime
 
         game.rotate(game.state)
@@ -252,7 +270,7 @@ def handle_key_press(
             maze.show_solutions = True
 
     if game.state == State.PLAY and keycode == ord('f'):
-        game.display_fps = bool(game.display_fps ^ 1)
+        game.display_fps = (game.display_fps + 1) % 3
 
 
 def handle_key_release(keycode: int, params: Game) -> None:

@@ -36,7 +36,7 @@ class Game():
         self.max_fps: float = 0
         self.min_fps: float = math.inf
         self.avg_fps: float = 0
-        self.display_fps: bool = False
+        self.display_fps: int = 0
 
     @property
     def angle(self) -> float:
