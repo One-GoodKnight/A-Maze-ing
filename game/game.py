@@ -8,7 +8,16 @@ import math
 
 
 class Game():
-    def __init__(self, maze_width: int, maze_height: int):
+    """
+    Manages game variables with various utilities to handle
+    rotations, player physics and collisions.
+    """
+    def __init__(self, maze_width: int, maze_height: int) -> None:
+        """
+        Initializes the game and sets various variables to default value.
+
+        Att
+        """
         self.start_loop_time: float = 0
         self.end_loop_time: float = 0
         self.deltatime: float = 0
@@ -23,7 +32,7 @@ class Game():
         self.iteration: int = 0
         self.last_fps: list[int] = []
         self.max_fps: int = 0
-        self.min_fps: int = 1000000
+        self.min_fps: int = math.inf
         self.avg_fps: int = 0
         self.display_fps: bool = False
 
