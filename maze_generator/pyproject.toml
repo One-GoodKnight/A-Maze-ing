@@ -1,0 +1,15 @@
+[project]
+name = "mazegen"
+version = "1.0.0"
+authors = [
+	{name = "efiorent"},
+	{name = "aginiaux"},
+]
+description = """
+Maze generation package.
+
+This pakage provides a class MazeGenerator with methods
+to parse a config file, create a maze and find
+a solution to this maze.
+"""
+requires-python = ">=3.11"

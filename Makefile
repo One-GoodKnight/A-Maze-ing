@@ -8,9 +8,13 @@ MYPY_FLAGS	:= 				\
 	--check-untyped-defs
 
 install:
-	pip install deps/opencv_python-4.13.0.92-cp37-abi3-manylinux_2_28_x86_64.whl
-	pip install deps/mlx-2.2-py3-none-any.whl
-	pip install pydantic
+	python3 -m pip install deps/opencv_python-4.13.0.92-cp37-abi3-manylinux_2_28_x86_64.whl
+	python3 -m pip install deps/mlx-2.2-py3-none-any.whl
+	python3 -m pip install pydantic
+	python3 -m pip install build
+
+build:
+	python3 -m build maze_generator
 
 run:
 	python3 $(NAME) $(CONFIG)
@@ -21,6 +25,7 @@ debug:
 clean:
 	rm -rf __pycache__ */__pycache__ */*/__pycache__
 	rm -rf .mypy_cache */.mypy_cache */*/.mypy_cache
+	rm -rf maze_generator/dist maze_generator/mazegen.egg-info
 
 lint:
 	python3 -m flake8 .
