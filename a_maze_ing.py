@@ -22,7 +22,7 @@ def display_generation(
 ) -> None:
     mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display = params
     image.set_to(BLACK)
-    mlx_maze_display.display_maze(maze, 0, 0)
+    mlx_maze_display.display_maze(maze)
     image.rotate(0)
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
@@ -33,7 +33,7 @@ def display_play(
 ) -> None:
     mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player = params
 
-    mlx_maze_display.display_maze(maze, 0, 0)
+    mlx_maze_display.display_maze(maze)
     display_player(image, player)
 
     image.rotate(game.angle)
@@ -249,6 +249,7 @@ def handle_key_press(
                 int(player.center_y // maze.cell_size)
             ), maze.player_solution, MAZE_PLAYER_SOLUTION_COLOR)
             maze.show_solutions = True
+
     if game.state == State.PLAY and keycode == ord('f'):
         game.display_fps = bool(game.display_fps ^ 1)
 

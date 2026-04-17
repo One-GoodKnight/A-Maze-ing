@@ -11,7 +11,7 @@ class CalculateSize():
         """
         Calculates the right window size and cell size for the monitor and
         the maze that will generate.
-        
+
         Attributes:
             screen_width (int): Width of the monitor in pixels.
             screen_height (int): Height of the monitor in pixels.

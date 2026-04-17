@@ -7,6 +7,17 @@ def highlight_solution(
     maze: list[list[Cell | None]] | None, start: Tuple[int, int],
     solution: str, sol_color: Optional[int], on: bool = True
 ) -> None:
+    """
+    Changes the color of every cell in the path of the given solution.
+
+    Args:
+        maze (list[list[Cell]]): Grid of cells representing the maze.
+        start (tuple(x: int, y: int)): Coordinate of the Cell on which
+            the solution starts.
+        solution (str): Solution to the given maze. Example: 'WSWWSSSEEN'
+        sol_color (int): Color to give to cells in the solution.
+        on (bool): Whether the cells should be colored or not. Default to True.
+    """
     if not solution or maze is None or maze[0] is None:
         return
 
@@ -43,4 +54,8 @@ def highlight_solution(
 def clear_solution(
     maze: list[list[Cell | None]] | None, start: Tuple[int, int], solution: str
 ) -> None:
+    """
+    Set the color of each cells on the solution path to the default color,
+    effectively hiding the solution.
+    """
     highlight_solution(maze, start, solution, None, False)

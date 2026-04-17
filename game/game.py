@@ -30,10 +30,10 @@ class Game():
         self.timer: float = 0
 
         self.iteration: int = 0
-        self.last_fps: list[int] = []
-        self.max_fps: int = 0
-        self.min_fps: int = math.inf
-        self.avg_fps: int = 0
+        self.last_fps: list[float] = []
+        self.max_fps: float = 0
+        self.min_fps: float = math.inf
+        self.avg_fps: float = 0
         self.display_fps: bool = False
 
     @property

@@ -11,7 +11,12 @@ from .image import Image
 
 
 class MazeDisplay():
+    """
+    Stores all the variables and the functions
+    used to display a Maze on an Image.
+    """
     def __init__(self, mlx: Mlx, image: Image) -> None:
+        """Initialize the variables used to display a Maze"""
         self.mlx = mlx
         self.width = image.width
         self.height = image.height
@@ -22,6 +27,7 @@ class MazeDisplay():
 
     def write_cell(self, cell: Cell,
                    cell_width: int, cell_height: int, x: int, y: int) -> None:
+        """Draw a single maze cell at the given coordinates and size"""
         vline_width = int(cell_width / 100 * MAZE_BORDER_WIDTH_PERCENT / 2)
         hline_width = int(cell_height / 100 * MAZE_BORDER_WIDTH_PERCENT / 2)
         xpos: int = cell_width * x
@@ -66,6 +72,7 @@ class MazeDisplay():
             )
 
     def maze_to_image(self, maze: Maze) -> None:
+        """Draw the given maze on an image."""
         self.image.set_to(MAZE_BACKGROUND_COLOR)
         cell_width = int(self.width / maze.width)
         cell_height = int(self.height / maze.height)
@@ -81,7 +88,8 @@ class MazeDisplay():
         self.write_cell(start, cell_width, cell_height, start.x, start.y)
         self.write_cell(end, cell_width, cell_height, end.x, end.y)
 
-    def display_maze(self, maze: Maze, x: int, y: int) -> None:
+    def display_maze(self, maze: Maze) -> None:
+        """If the given maze exists, display it."""
         # cProfile.runctx('self.maze_to_image(maze)', globals(), locals())
         if not maze:
             return

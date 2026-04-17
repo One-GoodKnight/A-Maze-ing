@@ -8,6 +8,7 @@ import numpy as np
 def display_border(image: Image, player: Player, hline_width: int,
                    vline_width: int, player_width: int,
                    player_height: int) -> None:
+    """Draw the player's border on the given Image."""
     x0 = int(player.x + vline_width)
     y0 = int(player.y + hline_width)
     x1 = int(player.x + player_width + vline_width)
@@ -19,6 +20,7 @@ def display_border(image: Image, player: Player, hline_width: int,
 
 
 def display_player(image: Image, player: Player) -> None:
+    """Draw the player on the given Image."""
     hline_width: int = int(player.size / 100 * MAZE_BORDER_WIDTH_PERCENT / 2)
     vline_width: int = int(player.size / 100 * MAZE_BORDER_WIDTH_PERCENT / 2)
     player_width = player.size - (2 * vline_width)

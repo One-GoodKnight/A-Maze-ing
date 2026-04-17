@@ -7,7 +7,7 @@ def parse_logo(
 ) -> Optional[tuple[list[Cell], int, int]]:
     """
     Parses the file in args to get the logo.
-    
+
     Attributes:
         filename (str): Name of the file ro parse.
         maze_width (int): Width of the maze from MazeGenerator.

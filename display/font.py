@@ -1,5 +1,20 @@
 class Font:
+    """
+    Contains a dictionary of the bitmap representation of characters,
+    parsed from a text file.
+    """
     def __init__(self, fontname: str) -> None:
+        """
+        Parse the bitmap representation of characters from
+        a text file and stores them in a dictionary.
+
+        Attributes:
+            width (int): Width of the characters.
+            height (int): Height of the characters.
+            characters_supported (int): Number of characters available.
+            chars (dict[str, list[str]): Dictionary containing the bitmap
+                representation of characters.
+        """
         self.width = 8
         self.height = 14
         self.characters_supported = ord('~') - ord('!') + 1
@@ -30,9 +45,11 @@ class Font:
             self.chars.update({chr(char): char_image})
 
     def __getitem__(self, index: str) -> list[str]:
+        """Allow to use a font instance as if it was self.chars"""
         return self.chars[index]
 
     def __str__(self) -> str:
+        """Print the bitmap of each characters in the terminal"""
         s: str = ''
         for char in self.chars:
             for line in char:
@@ -40,6 +57,10 @@ class Font:
         return s
 
     def __repr__(self) -> str:
+        """
+        Print the bitmap of each characters in the terminal
+        with each line surrounded by single quotes
+        """
         s: str = '{\n'
         for char in self.chars:
             for line in char:
