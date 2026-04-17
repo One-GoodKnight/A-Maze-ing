@@ -1,12 +1,12 @@
 from maze_generator import Cell
-from constants import LOGO_COLOR
+from constants import Const
 from random import randint
 
 
 def set_logo_color(logo: list[Cell]) -> None:
     """Set the color of each cell composing the 42 logo."""
     for cell in logo:
-        cell.color = LOGO_COLOR
+        cell.color = Const.LOGO_COLOR
 
 
 def random_color() -> int:

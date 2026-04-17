@@ -6,11 +6,10 @@ from maze import Maze
 from maze_generator import MazeGenerator, Cell, \
     WallBuilder, solve
 from display import Image, Font, MazeDisplay, set_logo_color, display_player, \
-    highlight_solution, clear_solution, random_maze_logo_color
+    highlight_solution, clear_solution, random_maze_logo_color, random_color
 from helpers import CalculateSize, parse_logo
 from game import Game, State, Player, check_end
-from constants import WHITE, BLACK, PLAYER_SIZE, ANIMATION_SPEED, \
-    MAZE_SOLUTION_COLOR, MAZE_PLAYER_SOLUTION_COLOR
+from constants import Const
 from typing import cast, Generator
 from ctypes import c_void_p
 from math import floor
@@ -21,7 +20,7 @@ def display_generation(
     params: tuple[Mlx, c_void_p, c_void_p, Image, Maze, MazeDisplay]
 ) -> None:
     mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display = params
-    image.set_to(BLACK)
+    image.set_to(Const.BLACK)
     mlx_maze_display.display_maze(maze)
     image.rotate(0)
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
@@ -59,13 +58,13 @@ def display_play(
                 f"{game.min_fps:.0f} min FPS\n"
                 f"{game.avg_fps // game.iteration:.0f} average FPS"
             )
-        image.print(10, 10, fps_text, color=WHITE, size=1)
+        image.print(10, 10, fps_text, color=Const.WHITE, size=1)
 
     timer_text = f"Timer: {game.timer:.2f}s"
     if image.font is not None:
         image.print(
             0, -(image.height // 2) + (image.font.height * 3),
-            timer_text, color=WHITE, size=3, center=True
+            timer_text, color=Const.WHITE, size=3, center=True
         )
 
     controls = (
@@ -78,7 +77,7 @@ def display_play(
     image.print(
         image.font.width,
         image.height - image.font.height * 2 * len(controls.splitlines()),
-        controls, color=WHITE, size=2
+        controls, color=Const.WHITE, size=2
     )
 
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
@@ -86,13 +85,13 @@ def display_play(
 
 def display_end(params: tuple[Mlx, c_void_p, c_void_p, Image, Game]) -> None:
     mlx, mlx_ptr, win_ptr, image, game = params
-    image.set_to(BLACK)
+    image.set_to(Const.BLACK)
     text = (
         "You won GG !!!\n\n"
         f"Finised in {game.timer:.2f}s\n\n"
         "Press R to generate a new maze"
     )
-    image.print(0, 0, text, color=WHITE, size=3, center=True)
+    image.print(0, 0, text, color=Const.WHITE, size=3, center=True)
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
 
 
@@ -125,10 +124,10 @@ def game_loop(
     elif game.state == State.GENERATION:
         time_since_gen_start = time() - maze.init_time
         cells_that_should_be_generated = time_since_gen_start \
-            / ANIMATION_SPEED * maze.width * maze.height
+            / Const.ANIMATION_SPEED * maze.width * maze.height
         cells_that_should_be_generated_after_this_frame = \
             cells_that_should_be_generated + game.deltatime \
-            / ANIMATION_SPEED * maze.width * maze.height
+            / Const.ANIMATION_SPEED * maze.width * maze.height
         cells_to_generate = max(
             0,
             cells_that_should_be_generated_after_this_frame - maze.cell_counter
@@ -203,7 +202,7 @@ def game_loop(
                 int(prev_x), int(prev_y)
             ), maze.player_solution)
             highlight_solution(
-                maze.maze, maze.entry, maze.solution, MAZE_SOLUTION_COLOR
+                maze.maze, maze.entry, maze.solution, Const.MAZE_SOLUTION_COLOR
             )
             maze.player_solution = solve(
                 cast(list[list[Cell]], maze.maze),
@@ -213,7 +212,7 @@ def game_loop(
             )
             highlight_solution(maze.maze, (
                 int(new_x), int(new_y)
-            ), maze.player_solution, MAZE_PLAYER_SOLUTION_COLOR)
+            ), maze.player_solution, Const.MAZE_PLAYER_SOLUTION_COLOR)
 
         display_play((mlx, mlx_ptr, win_ptr, image,
                       maze, mlx_maze_display, game, player))
@@ -243,6 +242,7 @@ def handle_key_press(
 
     if game.state == State.PLAY and keycode == ord('c'):
         random_maze_logo_color(cast(list[list[Cell]], maze.maze), logo)
+        Const.MAZE_BORDER_COLOR = random_color()
 
     if game.state == State.END and keycode == ord('r'):
         game.state = State.INIT_GENERATION
@@ -257,7 +257,7 @@ def handle_key_press(
             maze.show_solutions = False
         else:
             highlight_solution(
-                maze.maze, maze.entry, maze.solution, MAZE_SOLUTION_COLOR
+                maze.maze, maze.entry, maze.solution, Const.MAZE_SOLUTION_COLOR
             )
             maze.player_solution = solve(cast(list[list[Cell]], maze.maze), (
                 int(player.center_x // maze.cell_size),
@@ -266,7 +266,7 @@ def handle_key_press(
             highlight_solution(maze.maze, (
                 int(player.center_x // maze.cell_size),
                 int(player.center_y // maze.cell_size)
-            ), maze.player_solution, MAZE_PLAYER_SOLUTION_COLOR)
+            ), maze.player_solution, Const.MAZE_PLAYER_SOLUTION_COLOR)
             maze.show_solutions = True
 
     if game.state == State.PLAY and keycode == ord('f'):
@@ -370,7 +370,7 @@ def main() -> int:
     set_logo_color(logo)
 
     game = Game(maze.width, maze.height)
-    player_size = int(maze.cell_size * PLAYER_SIZE)
+    player_size = int(maze.cell_size * Const.PLAYER_SIZE)
     player = Player(maze.entry[0], maze.entry[1],
                     player_size, image.width,
                     image.height, maze.cell_size)

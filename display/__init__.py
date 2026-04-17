@@ -10,7 +10,8 @@ from .maze_display import MazeDisplay
 from .player_display import display_player
 from .font import Font
 from .highlight_solution import highlight_solution, clear_solution
-from .set_logo_color import set_logo_color, random_maze_logo_color
+from .set_logo_color import set_logo_color, random_maze_logo_color, \
+        random_color
 
 __all__ = [
     "__version__",
@@ -23,4 +24,5 @@ __all__ = [
     'clear_solution',
     'set_logo_color',
     'random_maze_logo_color',
+    'random_color',
 ]

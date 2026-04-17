@@ -1,4 +1,4 @@
-from constants import DEFAULT_CELL_SIZE, WINDOW_MARGIN
+from constants import Const
 
 
 class CalculateSize():
@@ -22,13 +22,13 @@ class CalculateSize():
             tuple[int, int, int]: Tuple with window width, window height and
                 and cell_size that will be used for the rest of the program.
         """
-        cell_size = DEFAULT_CELL_SIZE
+        cell_size = Const.DEFAULT_CELL_SIZE
 
         window_width = cells_x * cell_size
         window_height = cells_y * cell_size
 
-        screen_width -= WINDOW_MARGIN
-        screen_height -= WINDOW_MARGIN
+        screen_width -= Const.WINDOW_MARGIN
+        screen_height -= Const.WINDOW_MARGIN
 
         while (cell_size > 1 and window_width > screen_width):
             cell_size -= 1

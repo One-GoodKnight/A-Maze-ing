@@ -8,7 +8,7 @@ except ImportError as e:
     raise SystemExit(f"Unable to import cv2: {e}")
 import numpy as np
 from numpy.typing import NDArray
-from constants import MAZE_SCALE, BLACK
+from constants import Const
 from .font import Font
 from functools import lru_cache
 from typing import Any, Optional
@@ -114,7 +114,7 @@ class Image():
         img = self.data.reshape(self.height, self.width, self.bytes_pp)
         center = (self.width // 2, self.height // 2)
         matrix = cv2.getRotationMatrix2D(
-            center, -angle, scale=(1 / 1.414) * MAZE_SCALE
+            center, -angle, scale=(1 / 1.414) * Const.MAZE_SCALE
         )
         color = (0, 0, 0, 255) if self.fmt == 0 else (255, 0, 0, 0)
         rotated = cv2.warpAffine(
@@ -152,7 +152,7 @@ class Image():
         if self.font is None:
             return
         font = self.font
-        color = kwargs.get('color', BLACK)
+        color = kwargs.get('color', Const.BLACK)
         size = max(kwargs.get('size', 1), 1)
         char_dict = font.chars.get(char)
         if char_dict is None:

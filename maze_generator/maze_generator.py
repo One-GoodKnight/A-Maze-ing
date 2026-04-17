@@ -1,4 +1,3 @@
-
 from pydantic import BaseModel, Field, model_validator
 from typing import Self, Generator, ClassVar, Any, cast
 from .cell import Cell

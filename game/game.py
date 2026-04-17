@@ -1,5 +1,4 @@
-from constants import ROTATION_SPEED, AIR_DRAG, GRAVITY
-from constants import PLAYER_BOUNCE, FRICTION
+from constants import Const
 from .player import Player
 from maze_generator import Cell
 from .Vector2 import Vector2
@@ -59,7 +58,7 @@ class Game():
             direction -= 1
         if (self.right_rotate):
             direction += 1
-        self.angle += direction * ROTATION_SPEED * self.deltatime
+        self.angle += direction * Const.ROTATION_SPEED * self.deltatime
 
     def wall_collisions(self, maze: list[list[Cell]],
                         cell_size: int, player: Player
@@ -129,21 +128,22 @@ class Game():
         """Calculate the velocity of the player to simulate gravity."""
         rad = math.radians(self.angle)
 
-        air_drag = Vector2(player.velocity.x * AIR_DRAG * self.deltatime,
-                           player.velocity.y * AIR_DRAG * self.deltatime)
+        air_drag = Vector2(player.velocity.x * Const.AIR_DRAG * self.deltatime,
+                           player.velocity.y * Const.AIR_DRAG * self.deltatime)
         player.velocity -= air_drag
 
         direction = Vector2(math.sin(rad), math.cos(rad))
         magnitude = math.sqrt(direction.x ** 2 + direction.y ** 2)
         normalized_dir = Vector2(direction.x / magnitude,
                                  direction.y / magnitude)
-
-        move_vector = Vector2(normalized_dir.x * GRAVITY * self.deltatime,
-                              normalized_dir.y * GRAVITY * self.deltatime)
+        gravity = Const.GRAVITY
+        move_vector = Vector2(normalized_dir.x * gravity * self.deltatime,
+                              normalized_dir.y * gravity * self.deltatime)
 
         north_wall, east_wall, south_wall, west_wall = \
             self.wall_collisions(maze, cell_size, player)
 
+        bounce = Const.PLAYER_BOUNCE
         if (south_wall and (player.velocity.y + move_vector.y) > 0):
             cur_cell_y = math.floor(player.bottom_left_corner.y / cell_size)
             new_vel = player.velocity.y + move_vector.y
@@ -153,8 +153,8 @@ class Game():
             if (cur_cell_y != tar_cell_y):
                 player.y = (tar_cell_y * cell_size) - player.size + 0.999
                 move_vector.y = 0
-                player.velocity.y = min(0, -player.velocity.y * PLAYER_BOUNCE)
-                friction = player.velocity.x * FRICTION * self.deltatime
+                player.velocity.y = min(0, -player.velocity.y * bounce)
+                friction = player.velocity.x * Const.FRICTION * self.deltatime
                 player.velocity.x -= friction
 
         if (north_wall and (player.velocity.y + move_vector.y) < 0):
@@ -166,8 +166,8 @@ class Game():
             if (cur_cell_y != tar_cell_y):
                 player.y = cur_cell_y * cell_size
                 move_vector.y = 0
-                player.velocity.y = max(0, -player.velocity.y * PLAYER_BOUNCE)
-                friction = player.velocity.x * FRICTION * self.deltatime
+                player.velocity.y = max(0, -player.velocity.y * bounce)
+                friction = player.velocity.x * Const.FRICTION * self.deltatime
                 player.velocity.x -= friction
 
         player.velocity.y += move_vector.y
@@ -185,8 +185,8 @@ class Game():
             if (cur_cell_x != tar_cell_x):
                 player.x = (tar_cell_x * cell_size) - player.size + 0.999
                 move_vector.x = 0
-                player.velocity.x = min(0, -player.velocity.x * PLAYER_BOUNCE)
-                friction = player.velocity.y * FRICTION * self.deltatime
+                player.velocity.x = min(0, -player.velocity.x * bounce)
+                friction = player.velocity.y * Const.FRICTION * self.deltatime
                 player.velocity.y -= friction
 
         if (west_wall and (player.velocity.x + move_vector.x) < 0):
@@ -198,8 +198,8 @@ class Game():
             if (cur_cell_x != tar_cell_x):
                 player.x = cur_cell_x * cell_size
                 move_vector.x = 0
-                player.velocity.x = max(0, -player.velocity.x * PLAYER_BOUNCE)
-                friction = player.velocity.y * FRICTION * self.deltatime
+                player.velocity.x = max(0, -player.velocity.x * bounce)
+                friction = player.velocity.y * Const.FRICTION * self.deltatime
                 player.velocity.y -= friction
 
         player.velocity.x += move_vector.x

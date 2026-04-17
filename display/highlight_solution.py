@@ -1,5 +1,5 @@
 from maze_generator import Cell
-from constants import MAZE_BACKGROUND_COLOR
+from constants import Const
 from typing import Tuple, Optional, cast
 
 
@@ -27,7 +27,7 @@ def highlight_solution(
     color = sol_color
 
     if not on or not sol_color:
-        color = MAZE_BACKGROUND_COLOR
+        color = Const.MAZE_BACKGROUND_COLOR
 
     cur_cell: list[int] = [start[0], start[1]]
 

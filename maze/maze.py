@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field, model_validator
 from typing import Self, cast
 from maze_generator import Cell
-from constants import DEFAULT_CELL_SIZE
+from constants import Const
 
 
 class Maze(BaseModel):
@@ -33,7 +33,7 @@ class Maze(BaseModel):
     exit: tuple[int, int]
     output_file: str
     perfect: bool = Field(default=False)
-    cell_size: int = Field(default=DEFAULT_CELL_SIZE)
+    cell_size: int = Field(default=Const.DEFAULT_CELL_SIZE)
     cell_counter: int = Field(default=0)
     init_time: float = 0
 
