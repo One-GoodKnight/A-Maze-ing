@@ -1,3 +1,8 @@
+"""
+This module manages game variables with various utilities to handle game state,
+rotations, player physics and collisions.
+"""
+
 __version__ = "1.0.0"
 __author__ = "Nifogi"
 

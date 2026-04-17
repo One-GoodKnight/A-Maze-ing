@@ -1,3 +1,7 @@
+"""
+This module is used to display and operate on images drawn on the Mlx window.
+"""
+
 __version__ = "1.0.0"
 __author__ = "Nifogi"
 

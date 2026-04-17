@@ -1,4 +1,11 @@
-NAME	:= a_maze_ing.py
+NAME		:= a_maze_ing.py
+CONFIG		:= config.txt
+MYPY_FLAGS	:= 				\
+	--warn-return-any		\
+	--warn-unused-ignores	\
+	--ignore-missing-imports\
+	--disallow-untyped-defs	\
+	--check-untyped-defs
 
 install:
 	pip install deps/opencv_python-4.13.0.92-cp37-abi3-manylinux_2_28_x86_64.whl
@@ -6,10 +13,7 @@ install:
 	pip install pydantic
 
 run:
-	@if [ -z "$(CONF)" ]; then \
-		echo "(Makefile) You can set the config file with make run CONF='name'"; \
-	fi
-	python3 $(NAME) $(CONF)
+	python3 $(NAME) $(CONFIG)
 
 debug:
 	python3 -m pdb $(NAME)
@@ -20,12 +24,8 @@ clean:
 
 lint:
 	python3 -m flake8 .
-	python3 -m mypy .  --warn-return-any		\
---warn-unused-ignores --ignore-missing-imports 	\
---disallow-untyped-defs --check-untyped-defs
+	python3 -m mypy . $(MYPY_FLAGS)
 
 lint-strict:
 	python3 -m flake8 .
-	python3 -m mypy .  --warn-return-any		\
---warn-unused-ignores --ignore-missing-imports 	\
---disallow-untyped-defs --check-untyped-defs --strict
+	python3 -m mypy . $(MYPY_FLAGS) --strict

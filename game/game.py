@@ -16,7 +16,9 @@ class Game():
         """
         Initializes the game and sets various variables to default value.
 
-        Att
+        Args:
+            maze_width (int): Width of the maze the game is played in.
+            maze_height (int): Height of the maze the game is played in.
         """
         self.start_loop_time: float = 0
         self.end_loop_time: float = 0
@@ -38,6 +40,7 @@ class Game():
 
     @property
     def angle(self) -> float:
+        """float: Angle the maze should be displayed at."""
         return self.__angle
 
     @angle.setter
@@ -48,6 +51,7 @@ class Game():
         self.__angle = value % 360
 
     def rotate(self, game_state: State) -> None:
+        """Rotate the maze."""
         if game_state != State.PLAY:
             return
         direction = 0
@@ -60,6 +64,7 @@ class Game():
     def wall_collisions(self, maze: list[list[Cell]],
                         cell_size: int, player: Player
                         ) -> tuple[bool, bool, bool, bool]:
+        """Calculate the collisions between the player and the maze walls."""
         max_x = len(maze[0]) - 1
         max_y = len(maze) - 1
 
@@ -121,6 +126,7 @@ class Game():
 
     def gravity(self, maze: list[list[Cell]],
                 cell_size: int, player: Player) -> None:
+        """Calculate the velocity of the player to simulate gravity."""
         rad = math.radians(self.angle)
 
         air_drag = Vector2(player.velocity.x * AIR_DRAG * self.deltatime,
