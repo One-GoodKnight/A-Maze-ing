@@ -140,7 +140,7 @@ Pip install:
 pip for the dependencies, it's simple and effective
 
 # Reusable code
-The reusable code is the module maze_generator in which there is a MazeGenerator class that let's you use:
+The reusable code is the module mazegen in which there is a MazeGenerator class that let's you use:
 - Parsing for the config file
 - The shape-mazester algo
 - The solver
