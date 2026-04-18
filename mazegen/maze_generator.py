@@ -56,7 +56,7 @@ class MazeGenerator(BaseModel):
     def check_entry_eq_exit(self) -> Self:
         """Validates entry on exit."""
         if (self.entry[0] == self.exit[0] and self.entry[1] == self.exit[1]):
-            raise ValueError("Exit and entry should not be at the same cell")
+            raise ValueError("Exit and entry should not be on the same cell")
         return self
 
     @classmethod
