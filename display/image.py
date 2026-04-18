@@ -114,7 +114,7 @@ class Image():
         img = self.data.reshape(self.height, self.width, self.bytes_pp)
         center = (self.width // 2, self.height // 2)
         matrix = cv2.getRotationMatrix2D(
-            center, -angle, scale=(1 / 1.414) * Const.MAZE_SCALE
+            center, -angle, scale=(1 / Const.MAZE_HYPO) * Const.MAZE_SCALE
         )
         color = (0, 0, 0, 255) if self.fmt == 0 else (255, 0, 0, 0)
         rotated = cv2.warpAffine(

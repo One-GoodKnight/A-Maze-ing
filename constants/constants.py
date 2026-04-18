@@ -1,4 +1,5 @@
 class Const:
+    """Stores constants for the game."""
     # OVERALL
     MAZE_SCALE = 0.95
 
@@ -9,6 +10,7 @@ class Const:
     MAZE_BORDER_WIDTH_PERCENT = 10
     DEFAULT_CELL_SIZE = 100
     WINDOW_MARGIN = 150
+    MAZE_HYPO = 1.414
 
     # GAME
     ROTATION_SPEED = 115

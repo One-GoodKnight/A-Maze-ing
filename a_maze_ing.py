@@ -364,6 +364,8 @@ def main() -> int:
     window_width, window_height = (window_width + 1, window_height + 1)
     win_ptr = mlx.mlx_new_window(mlx_ptr, window_width,
                                  window_height, "A-maze-ing")
+    Const.MAZE_HYPO = CalculateSize.calculate_hypothenus(
+            maze.width, maze.height)
 
     image = Image(mlx, mlx_ptr, window_width, window_height, font)
     mlx_maze_display = MazeDisplay(mlx, image)

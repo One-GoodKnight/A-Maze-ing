@@ -44,13 +44,14 @@ class Game():
 
     @angle.setter
     def angle(self, value: float) -> None:
+        """Sets the angle and clamp it between 0 and 360."""
         while (value < 0):
             value += 360
 
         self.__angle = value % 360
 
     def rotate(self, game_state: State) -> None:
-        """Rotate the maze."""
+        """Rotates the maze."""
         if game_state != State.PLAY:
             return
         direction = 0
@@ -63,7 +64,8 @@ class Game():
     def wall_collisions(self, maze: list[list[Cell]],
                         cell_size: int, player: Player
                         ) -> tuple[bool, bool, bool, bool]:
-        """Calculate the collisions between the player and the maze walls."""
+        """Checks if there should be wall collisions on the current
+        player's cell borders."""
         max_x = len(maze[0]) - 1
         max_y = len(maze) - 1
 
@@ -125,7 +127,8 @@ class Game():
 
     def gravity(self, maze: list[list[Cell]],
                 cell_size: int, player: Player) -> None:
-        """Calculate the velocity of the player to simulate gravity."""
+        """Calculate the velocity of the player to simulate gravity,
+        accounting for wall collisions."""
         rad = math.radians(self.angle)
 
         air_drag = Vector2(player.velocity.x * Const.AIR_DRAG * self.deltatime,

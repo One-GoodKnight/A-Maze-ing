@@ -1,4 +1,5 @@
 from constants import Const
+import math
 
 
 class CalculateSize():
@@ -41,3 +42,9 @@ class CalculateSize():
             window_height = cells_y * cell_size
 
         return (window_width, window_height, cell_size)
+
+    @staticmethod
+    def calculate_hypothenus(maze_width: int, maze_height: int) -> float:
+        return math.sqrt(
+            maze_width ** 2 + maze_height ** 2
+        ) / min(maze_width, maze_height)
