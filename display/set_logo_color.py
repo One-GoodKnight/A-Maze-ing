@@ -1,4 +1,4 @@
-from maze_generator import Cell
+from mazegen import Cell
 from constants import Const
 from random import randint
 

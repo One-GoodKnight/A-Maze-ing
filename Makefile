@@ -12,9 +12,11 @@ install:
 	python3 -m pip install deps/mlx-2.2-py3-none-any.whl
 	python3 -m pip install pydantic
 	python3 -m pip install build
+	python3 -m pip install flake8
+	python3 -m pip install mypy
 
 build:
-	python3 -m build maze_generator
+	python3 -m build
 
 run:
 	python3 $(NAME) $(CONFIG)
@@ -25,7 +27,7 @@ debug:
 clean:
 	rm -rf __pycache__ */__pycache__ */*/__pycache__
 	rm -rf .mypy_cache */.mypy_cache */*/.mypy_cache
-	rm -rf maze_generator/dist maze_generator/mazegen.egg-info
+	rm -rf dist
 
 lint:
 	python3 -m flake8 .

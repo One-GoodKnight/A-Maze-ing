@@ -3,7 +3,7 @@ try:
 except ImportError as e:
     raise SystemExit(f"Unable to import mlx: {e}")
 from maze import Maze
-from maze_generator import MazeGenerator, Cell, \
+from mazegen import MazeGenerator, Cell, \
     WallBuilder, solve
 from display import Image, Font, MazeDisplay, set_logo_color, display_player, \
     highlight_solution, clear_solution, random_maze_logo_color, random_color

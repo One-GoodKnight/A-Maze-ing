@@ -1,6 +1,6 @@
 from constants import Const
 from .player import Player
-from maze_generator import Cell
+from mazegen import Cell
 from .Vector2 import Vector2
 from .state import State
 import math

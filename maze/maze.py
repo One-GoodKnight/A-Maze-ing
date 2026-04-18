@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, model_validator
 from typing import Self, cast
-from maze_generator import Cell
+from mazegen import Cell
 from constants import Const
 
 

@@ -4,7 +4,7 @@ except ImportError as e:
     raise SystemExit(f"Unable to import mlx: {e}")
 from constants import Const
 from maze import Maze
-from maze_generator import Cell
+from mazegen import Cell
 from .image import Image
 
 
