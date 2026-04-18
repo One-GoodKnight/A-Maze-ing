@@ -11,8 +11,8 @@ The generation logic must be reusable by using a single class 'MazeGenerator' pr
 In order to launch our program, please activate a virtual environment, install the program dependencies, then launch the program.  
 To activate a virtual environment:  
 ```bash
-python3 -m venv a-maze-ing_venv
-source a-maze-ing_venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
 ```  
 To install the dependencies:  
 ```bash
@@ -37,8 +37,8 @@ AI was used for:
 We used [Wikipedia](wikipedia.org) for generation and solver algorithms.  
 `flake8` and `mypy` for code consistency.  
 ## Algorithms
-- [A*](https://en.wikipedia.org/wiki/A*_search_algorithm) path finding algorithm  
 - `Shape-mazester` generation algorithm ([aginiaux](https://github.com/ExplorersPath)'s creation)  
+- [A*](https://en.wikipedia.org/wiki/A*_search_algorithm) path finding algorithm  
 - [DDA](https://en.wikipedia.org/wiki/Digital_differential_analyzer_(graphics_algorithm)) raycasting algorithm
 
 ## Librairies
@@ -81,6 +81,19 @@ Shapes implemented are: circle, square and triangle.
 I chose this algo because everyone did DFS and it's boring, also I wanted to see if it could work and it did so that's cool.
 It's not really efficient tho but since we have a game on top of it we still had to limit the maze size to  
 have a decent frame-rate.
+
+# A* algoithm
+The A* algorithm works by remembring the distance from a cell towards the start, and also the cost towards the exit (diff x + diff y for both).  
+Additionning those two values and we get the manhattan, which makes it possible to continue the searching the exit cell with the best  
+plausible cell we got next to. (not accounting walls)  
+
+We use 2 lists, one for the cells visited, closed_list. And one for the cells not visited, open_list. (those cells are directly accessible from the cells in closed_list).  
+
+Everytime we need to check the next cell, we pick the cell from open_list that has the lowest manhattan value, check if it's the exit and if it's not,  
+add the cells that are accessible by checking walls to the open_list, we also calculate the manhattan values of those cells we had at this moment.  
+Then, we add the current cell to the closed_list and repeat till we find the exit.
+
+This algo is a go-to for pathfinding, it works well and is pretty efficient.
 
 # Feature list
 For the mandatory:
@@ -151,39 +164,76 @@ Having a pydantic class specifically for the input validation would probably hav
 contains variables that don't need to be validated but still are.
 We should had taken more time on the project architecture at the beginning.
 
-The main is a big fat, we could have divide it in multiple files.
+The main is a bit big, we could have divided it in multiple files.
 Some methods / classes are a bit messy and could have been cleaned up.
-We should have focused on flakes and mypy since the start it was tedious to resolve all the errors at the end.
+We should have focused on flakes and mypy since the start, it was tedious to resolve all the errors at the end.
 
 
 # Task repartition
 
-parsing: Alexandre
-display: Elio, Alexandre
-font: Elio
-shape-mazester: Alexandre
-solver: Elio
-game: Alexandre
-main: Alexandre, Elio
-readme: Elio, Alexandre
+- parsing: Alexandre
+- display: Elio, Alexandre
+- font: Elio
+- shape-mazester: Alexandre
+- solver: Elio
+- game: Alexandre
+- main: Alexandre, Elio
+- readme: Elio, Alexandre
 
-# Example of main
+# Reusable module
+
+The reusable module provides a class MazeGenerator with methods to parse a config file, create a maze and find  
+a solutions to mazes created.
+
+## Creating the reusable module
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+make install
+make build
 ```
-from maze_generator import MazeGenerator
+
+The .whl along with the .tar are created inside dist/
+
+## Using the module
+
+### Installing the .whl
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install dist/mazegen-1.0.0-py3-none-any.whl
+mkdir reusable_module
+cd reusable_module
+touch test.py
+```
+
+### Example of main that uses the module
+```
+from mazegen import MazeGenerator
 
 
 if __name__ == '__main__':
     maze_generator = MazeGenerator(
-        width=10,
-        height=10,
-        entry=(0,0),
-        exit=(5,5),
+        width=3,
+        height=3,
+        entry=(0, 0),
+        exit=(1, 1),
         output_file='maze.txt',
         perfect=True,
     )
+
     maze_generator.change_seed(42)
+
     maze_generator.chose_shape('triangle')
     maze = maze_generator.generate_full_maze()
-    maze_generator.build_output(maze)
-    print(f'Maze saved in {maze_generator.output_file}')
+
+    solution = maze_generator.get_solution(maze)
+
+    print("Maze:")
+    print(maze)
+
+    print("\nSolution:")
+    print(solution)
 ```
