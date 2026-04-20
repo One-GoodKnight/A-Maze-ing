@@ -31,16 +31,6 @@ class Cell(BaseModel):
     dir_west: bool = Field(default=False)
     color: int = Field(default=0)
 
-    @staticmethod
-    def from_hex(hex: str, x: int, y: int):
-        nb = int(hex, 16)
-        north = nb & 1
-        east = nb >> 1 & 1
-        south = nb >> 2 & 1
-        west = nb >> 3 & 1
-        return Cell(x=x, y=y, north=north, east=east, south=south, west=west)
-
-
     def to_int(self) -> int:
         """Returns an int using the walls of the cell as follow NESW."""
         north = int(self.north)

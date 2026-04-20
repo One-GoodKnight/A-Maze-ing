@@ -4,7 +4,7 @@ class Const:
     MAZE_SCALE = 0.95
 
     # GENERATION
-    ANIMATION_SPEED = 3
+    ANIMATION_SPEED = 1
 
     # MAZE
     MAZE_BORDER_WIDTH_PERCENT = 10

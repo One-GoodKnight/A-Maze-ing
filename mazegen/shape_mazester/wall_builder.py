@@ -47,25 +47,25 @@ class WallBuilder():
 
         if cell.x != 0:
             n = maze[cell.y][cell.x - 1]
-            if n is not None and n not in logo_set:
+            if n is not None and (n.x, n.y) not in logo_set:
                 cell.west = False
                 n.east = False
 
         if cell.x != max_x:
             n = maze[cell.y][cell.x + 1]
-            if n is not None and n not in logo_set:
+            if n is not None and (n.x, n.y) not in logo_set:
                 cell.east = False
                 n.west = False
 
         if cell.y != 0:
             n = maze[cell.y - 1][cell.x]
-            if n is not None and n not in logo_set:
+            if n is not None and (n.x, n.y) not in logo_set:
                 cell.north = False
                 n.south = False
 
         if cell.y != max_y:
             n = maze[cell.y + 1][cell.x]
-            if n is not None and n not in logo_set:
+            if n is not None and (n.x, n.y) not in logo_set:
                 cell.south = False
                 n.north = False
 

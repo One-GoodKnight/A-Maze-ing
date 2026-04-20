@@ -16,8 +16,8 @@ class Player():
             maze_max_y (int): Max maze y of the maze in pixels.
             cell_size (int): Size of a cell in pixels.
         """
-        self.max_x = maze_max_x - size
-        self.max_y = maze_max_y - size
+        self.max_x = maze_max_x - size - 0.001
+        self.max_y = maze_max_y - size - 0.001
 
         self.__x: float = 0.
         self.__y: float = 0.

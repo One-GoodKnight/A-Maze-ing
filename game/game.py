@@ -76,7 +76,6 @@ class Game():
 
         top_left_cell = cell_at(player.top_left_corner)
         top_right_cell = cell_at(player.top_right_corner)
-        print((player.bottom_left_corner.x, player.bottom_left_corner.y, math.floor(player.bottom_left_corner.y / cell_size)))
         bottom_left_cell = cell_at(player.bottom_left_corner)
         bottom_right_cell = cell_at(player.bottom_right_corner)
 
@@ -89,32 +88,30 @@ class Game():
         def n_cell(cell: Cell, offset: tuple[int, int]) -> Cell:
             return maze[cell.y + offset[1]][cell.x + offset[0]]
 
-        x = player.x // cell_size
-        y = player.y // cell_size
         ortho_top_wall = False
-        if top_left_cell != top_right_cell and y > 0:
+        if top_left_cell != top_right_cell and top_left_cell.y > 0:
             top_top_left_cell = n_cell(top_left_cell, (0, -1))
             top_top_right_cell = n_cell(top_right_cell, (0, -1))
             ortho_top_wall = \
                 top_top_left_cell.east or top_top_right_cell.west
 
         ortho_east_wall = False
-        if top_right_cell != bottom_right_cell and x < max_x:
+        if top_right_cell != bottom_right_cell and top_right_cell.x < max_x:
             top_right_right_cell = n_cell(top_right_cell, (1, 0))
             bottom_right_right_cell = n_cell(bottom_right_cell, (1, 0))
             ortho_east_wall = \
                 top_right_right_cell.south or bottom_right_right_cell.north
 
         ortho_south_wall = False
-        if bottom_left_cell != bottom_right_cell and y < max_y:
-            print((bottom_left_cell.x, bottom_left_cell.y))
+        if (bottom_left_cell != bottom_right_cell and
+                bottom_left_cell.y < max_y):
             bottom_bottom_left_cell = n_cell(bottom_left_cell, (0, 1))
             bottom_bottom_right_cell = n_cell(bottom_right_cell, (0, 1))
             ortho_south_wall = \
                 bottom_bottom_left_cell.east or bottom_bottom_right_cell.west
 
         ortho_west_wall = False
-        if top_left_cell != bottom_left_cell and x > 0:
+        if top_left_cell != bottom_left_cell and top_left_cell.x > 0:
             top_left_left_cell = n_cell(top_left_cell, (-1, 0))
             bottom_left_left_cell = n_cell(bottom_left_cell, (-1, 0))
             ortho_west_wall = \
