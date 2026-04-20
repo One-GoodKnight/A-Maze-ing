@@ -80,6 +80,31 @@ class Maze(BaseModel):
             return self.maze[index]
         return None
 
+    @staticmethod
+    def from_file(filename: str) -> Self:
+        maze_str: list[str] = []
+        with open(filename, 'r') as f:
+            row = f.readline().strip()
+            width = len(row)
+            while row != '':
+                if len(row) != width:
+                    raise ValueError("Invalid file content: "
+                                     "inconsistent maze row length")
+                maze_str.append(row)
+                row = f.readline().strip()
+            entry: tuple[int, int] = tuple(f.readline().strip().split(','))
+            exit: tuple[int, int] = tuple(f.readline().strip().split(','))
+            solution = f.readline().strip()
+            maze = [
+                [Cell.from_hex(c, x, y) for x, c in enumerate(row)]
+                for y, row in enumerate(maze_str)
+            ]
+            maze[int(entry[1])][int(entry[0])].color = 0xFF_00_FF_00
+            maze[int(exit[1])][int(exit[0])].color = 0xFF_FF_00_00
+            return Maze(maze=maze, solution=solution, width=width,
+                        height=len(maze), entry=entry, exit=exit,
+                        output_file=filename)
+
     def __str__(self) -> str:
         """Returns the maze in ASCII art."""
         chars: list[str] = ["🬕🬂🬂🬨", "▌  ▐", "🬲🬭🬭🬷"]

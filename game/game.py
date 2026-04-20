@@ -76,6 +76,7 @@ class Game():
 
         top_left_cell = cell_at(player.top_left_corner)
         top_right_cell = cell_at(player.top_right_corner)
+        print((player.bottom_left_corner.x, player.bottom_left_corner.y, math.floor(player.bottom_left_corner.y / cell_size)))
         bottom_left_cell = cell_at(player.bottom_left_corner)
         bottom_right_cell = cell_at(player.bottom_right_corner)
 
@@ -106,6 +107,7 @@ class Game():
 
         ortho_south_wall = False
         if bottom_left_cell != bottom_right_cell and y < max_y:
+            print((bottom_left_cell.x, bottom_left_cell.y))
             bottom_bottom_left_cell = n_cell(bottom_left_cell, (0, 1))
             bottom_bottom_right_cell = n_cell(bottom_right_cell, (0, 1))
             ortho_south_wall = \

@@ -185,6 +185,14 @@ def game_loop(
         maze.show_solutions = False
         game.last_fps = [0 for _ in range(10)]
         # print(maze)
+        maze_tmp = Maze.from_file('empty_maze.txt')
+        maze.maze = maze_tmp.maze
+        maze.width = maze_tmp.width
+        maze.height = maze_tmp.height
+        maze.cell_size = maze_tmp.cell_size
+        maze.entry = maze_tmp.entry
+        maze.exit = maze_tmp.exit
+
 
     elif game.state == State.PLAY:
         game.timer += game.deltatime
