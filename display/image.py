@@ -43,6 +43,7 @@ class Image():
         self.bits_pp = bpp
         self.bytes_pp = bpp // 8
         self.font = font
+        self.timer_x = 0
 
     @lru_cache
     def endian_color(self, argb: int | None) -> Optional[NDArray[np.uint8]]:

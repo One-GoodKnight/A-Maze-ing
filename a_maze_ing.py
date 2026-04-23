@@ -28,9 +28,10 @@ def display_generation(
 
 def display_play(
     params: tuple[Mlx, c_void_p, c_void_p, Image,
-                  Maze, MazeDisplay, Game, Player]
+                  Maze, MazeDisplay, Game, Player, Image]
 ) -> None:
-    mlx, mlx_ptr, win_ptr, image, maze, mlx_maze_display, game, player = params
+    (mlx, mlx_ptr, win_ptr, image, maze,
+        mlx_maze_display, game, player, text_image) = params
 
     mlx_maze_display.display_maze(maze)
     display_player(image, player)
@@ -50,37 +51,24 @@ def display_play(
     if len(game.last_fps) >= 10:
         game.last_fps[game.iteration % 10] = fps
     game.avg_fps += fps
-    if game.display_fps > 0:
-        fps_text = f"{sum(game.last_fps) / len(game.last_fps):.0f} FPS"
-        if game.display_fps > 1:
+    if game.display_fps >= 1:
+        fps_text = f"{sum(game.last_fps) / len(game.last_fps):.0f}"
+        if game.display_fps >= 2:
             fps_text += (
-                f"\n{game.max_fps:.0f} max FPS\n"
-                f"{game.min_fps:.0f} min FPS\n"
-                f"{game.avg_fps // game.iteration:.0f} average FPS"
+                f"\n{game.max_fps:.0f}\n{game.min_fps:.0f}\n"
+                f"{game.avg_fps // game.iteration:.0f}"
             )
-        image.print(10, 10, fps_text, color=Const.WHITE, size=1)
-
-    timer_text = f"Timer: {game.timer:.2f}s"
-    if image.font is not None:
         image.print(
-            0, -(image.height // 2) + (image.font.height * 3),
-            timer_text, color=Const.WHITE, size=3, center=True
+            10 + image.font.width * 5, 10, fps_text, color=Const.WHITE, size=1
         )
 
-    controls = (
-        "Controls:\n"
-        "  <h> to show the solution\n"
-        "  <f> to show fps stats\n"
-        "  <c> to randomize colors\n"
-        "  <q> or <esc> to quit"
-    )
-    image.print(
-        image.font.width,
-        image.height - image.font.height * 2 * len(controls.splitlines()),
-        controls, color=Const.WHITE, size=2
-    )
+    timer_text = f"{game.timer:.2f}s"
+    if image.timer_x == 0:
+        image.timer_x = image.width // 2 + image.font.width * 2
+    image.print(image.timer_x, 10, timer_text, color=Const.WHITE, size=3)
 
     mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, image.ptr, 0, 0)
+    mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, text_image.ptr, 0, 0)
 
 
 def display_end(params: tuple[Mlx, c_void_p, c_void_p, Image, Game]) -> None:
@@ -97,12 +85,12 @@ def display_end(params: tuple[Mlx, c_void_p, c_void_p, Image, Game]) -> None:
 
 def game_loop(
     params: tuple[Mlx, c_void_p, c_void_p, Image, MazeGenerator,
-                  Maze, MazeDisplay, Game, Player, list[Cell]]
+                  Maze, MazeDisplay, Game, Player, list[Cell], Image]
 ) -> None:
     game_start_loop_time = time()
 
     (mlx, mlx_ptr, win_ptr, image, maze_generator, maze,
-     mlx_maze_display, game, player, logo) = params
+     mlx_maze_display, game, player, logo, text_image) = params
 
     time_between_loops = game_start_loop_time - \
         (game.end_loop_time if game.end_loop_time != 0
@@ -135,7 +123,7 @@ def game_loop(
 
         new_maze = None
         try_generate = False
-        for i in range(floor(cells_to_generate)):
+        for _ in range(floor(cells_to_generate)):
             try:
                 try_generate = True
                 new_maze = next(
@@ -214,7 +202,7 @@ def game_loop(
             ), maze.player_solution, Const.MAZE_PLAYER_SOLUTION_COLOR)
 
         display_play((mlx, mlx_ptr, win_ptr, image,
-                      maze, mlx_maze_display, game, player))
+                      maze, mlx_maze_display, game, player, text_image))
         if (check_end(player, maze.cell_size, maze.exit)):
             game.state = State.END
 
@@ -228,9 +216,10 @@ def game_loop(
 def handle_key_press(
     keycode: int,
     params: tuple[Mlx, c_void_p, Game, MazeGenerator,
-                  Image, Maze, Player, list[Cell]]
+                  Image, Maze, Player, list[Cell], Image]
 ) -> None:
-    mlx, mlx_ptr, game, maze_generator, image, maze, player, logo = params
+    (mlx, mlx_ptr, game, maze_generator, image,
+        maze, player, logo, text_image) = params
     if keycode == 0xFF1B or keycode == ord('q'):
         mlx.mlx_loop_exit(mlx_ptr)
 
@@ -270,6 +259,13 @@ def handle_key_press(
 
     if game.state == State.PLAY and keycode == ord('f'):
         game.display_fps = (game.display_fps + 1) % 3
+        fps_text = "FPS:\nmax:\nmin:\navg:"
+        if game.display_fps == 0:
+            text_image.print(10, 10, fps_text, color=0, size=1)
+        if game.display_fps == 1:
+            text_image.print(10, 10, fps_text[:4], color=Const.WHITE, size=1)
+        if game.display_fps == 2:
+            text_image.print(10, 10, fps_text, color=Const.WHITE, size=1)
 
 
 def handle_key_release(keycode: int, params: Game) -> None:
@@ -302,9 +298,6 @@ def main() -> int:
         parse_logo_data = parse_logo(filename, maze_generator.width,
                                      maze_generator.height)
 
-        logo: list[Cell]
-        logo_width: int
-        logo_height: int
         if parse_logo_data:
             logo, logo_width, logo_height = parse_logo_data
         else:
@@ -367,8 +360,32 @@ def main() -> int:
             maze.width, maze.height)
 
     image = Image(mlx, mlx_ptr, window_width, window_height, font)
+    text_image = Image(mlx, mlx_ptr, window_width, window_height, font)
+    text_image.set_to(0)
     mlx_maze_display = MazeDisplay(mlx, image)
     set_logo_color(logo)
+    controls = (
+        "Controls:\n"
+        "  <h> to show the solution\n"
+        "  <f> to show fps stats\n"
+        "  <c> to randomize colors\n"
+        "  <q> or <esc> to quit"
+    )
+    if text_image is not None and text_image.font is not None:
+        text_image.print(
+            text_image.font.width,
+            (text_image.height -
+                text_image.font.height * 2 * len(controls.splitlines())),
+            controls, color=Const.WHITE, size=2
+        )
+        timer_text = "Timer:"
+        text_image.timer_x = (
+            (text_image.width // 2) -
+            (text_image.font.width * len(timer_text) * 3)
+        )
+        text_image.print(
+            text_image.timer_x, 10, timer_text, color=Const.WHITE, size=3
+        )
 
     game = Game(maze.width, maze.height)
     player_size = int(maze.cell_size * Const.PLAYER_SIZE)
@@ -386,19 +403,20 @@ def main() -> int:
     key_release_event, key_release_mask = (3, 2)
     mlx.mlx_hook(win_ptr, key_press_event, key_press_mask, handle_key_press,
                  (mlx, mlx_ptr, game, maze_generator, image, maze,
-                  player, logo))
+                  player, logo, text_image))
     mlx.mlx_hook(win_ptr, key_release_event,
                  key_release_mask, handle_key_release,
                  (game))
 
     mlx.mlx_loop_hook(mlx_ptr, game_loop,
                       (mlx, mlx_ptr, win_ptr, image, maze_generator,
-                       maze, mlx_maze_display, game, player, logo))
+                       maze, mlx_maze_display, game, player, logo, text_image))
 
     mlx.mlx_loop(mlx_ptr)
 
     mlx.mlx_do_key_autorepeaton(mlx_ptr)
     mlx.mlx_destroy_image(mlx_ptr, image.ptr)
+    mlx.mlx_destroy_image(mlx_ptr, text_image.ptr)
     mlx.mlx_destroy_window(mlx_ptr, win_ptr)
     mlx.mlx_release(mlx_ptr)
     return 0
